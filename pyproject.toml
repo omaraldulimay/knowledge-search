@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knowledge-search"
+version = "0.1.0"
+description = "Permission-aware hybrid search over internal company documents (German demo corpus)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy>=1.26",
+    "rank-bm25>=0.2.2",
+    "pypdf>=4.2",
+    "python-docx>=1.1",
+    "psycopg[binary]>=3.1",
+    "pgvector>=0.3",
+]
+
+[project.optional-dependencies]
+# Local multilingual embeddings (downloads a model on first use). Not needed for unit tests.
+local = ["fastembed>=0.3"]
+dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4"]
+
+[tool.setuptools.packages.find]
+include = ["ks*"]
+
+[tool.setuptools.package-data]
+ks = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
