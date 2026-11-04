@@ -212,11 +212,21 @@ class PgVectorStore:
             valid_from=row[7], superseded=row[8], policy=row[9],
         )  # fmt: skip
 
+    @staticmethod
+    def _iterative_scan(conn) -> None:
+        """An HNSW index returns ~40 candidates and the department filter is applied afterwards,
+        so a strict filter could leave fewer than k rows. pgvector >= 0.8 can keep scanning."""
+        try:
+            conn.execute("SET LOCAL hnsw.iterative_scan = strict_order")
+        except Exception:  # older pgvector: the setting does not exist
+            conn.rollback()
+
     def search_vector(
         self, query: np.ndarray, k: int, allowed: Collection[str]
     ) -> list[ScoredChunk]:
         q = _unit(query.reshape(1, -1))[0]
         with self._connect() as conn:
+            self._iterative_scan(conn)
             rows = conn.execute(
                 """SELECT chunk_id, doc_id, title, department, heading, text, position,
                           valid_from, superseded, policy, 1 - (embedding <=> %s) AS score

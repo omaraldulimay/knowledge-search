@@ -84,3 +84,20 @@ def sync_index(
         chunks_embedded=len(chunks),
         seconds=time.perf_counter() - start,
     )
+
+
+def upsert_documents(
+    docs: Sequence[Document], store: VectorStore, embedder: Embedder, manifest: dict[str, str]
+) -> IndexStats:
+    """Add or replace just these documents (upload), leaving everything else untouched."""
+    start = time.perf_counter()
+    existing = [d.doc_id for d in docs if d.doc_id in manifest]
+    store.remove_documents(existing)
+    chunks = chunk_documents(list(docs))
+    store.add(chunks, embed_in_batches(embedder, [embedding_text(c) for c in chunks]))
+    for doc in docs:
+        manifest[doc.doc_id] = doc.content_hash
+    return IndexStats(
+        added=len(docs) - len(existing), changed=len(existing), removed=0, unchanged=0,
+        chunks_embedded=len(chunks), seconds=time.perf_counter() - start,
+    )  # fmt: skip

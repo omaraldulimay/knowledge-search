@@ -1,0 +1,10 @@
+.venv
+.git
+.github
+.pytest_cache
+.ruff_cache
+.ks_index*
+data/generated
+**/__pycache__
+*.egg-info
+web/node_modules

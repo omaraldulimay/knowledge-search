@@ -5,7 +5,7 @@ Permission-aware search over the internal documents of a fictional company
 document sections, and every user only sees documents of their own department.
 Later phases add an LLM answer layer (classic RAG and agentic search), an API and a web UI.
 
-**Status: phase 1** - sample data, ingestion, embeddings, vector stores, hybrid search, permissions.
+**Status: phase 3** - search, LLM answers (classic and agentic), scale benchmark, HTTP API, Docker, CI.
 
 ## Run phase 1
 
@@ -53,3 +53,58 @@ python -m ks.cli index                     # incremental: only new/changed docs 
   `python -m ks.cli --store pgvector search "..." --user mira`
   to compare latency with the numbers in `eval/scale.json`. The benchmark command itself uses
   `MemoryStore` only.
+
+## Run the API (phase 3)
+
+```bash
+pip install -e ".[dev,local]"
+uvicorn ks.api:app --reload          # http://localhost:8000/docs has the interactive OpenAPI page
+```
+
+On startup the API indexes `data/docs` (incrementally; `MemoryStore`, or pgvector if `PG_DSN` is set).
+Configuration by environment: `APP_SECRET` (token signing; a development default and a warning are
+used if unset), `KS_EMBEDDER` (`fastembed`, `hash` or `auto` = fastembed if installed), `PG_DSN`,
+`KS_DOCS_DIR`, `LLM_PROVIDER` (default `fake`; `anthropic` needs `ANTHROPIC_API_KEY`).
+CORS allows the Vite dev server (`http://localhost:5173`).
+
+```bash
+TOKEN=$(curl -s -X POST localhost:8000/login -H 'content-type: application/json' \
+  -d '{"username": "katja"}' | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
+AUTH="Authorization: Bearer $TOKEN"
+
+curl -s -X POST localhost:8000/ask -H "$AUTH" -H 'content-type: application/json' \
+  -d '{"question": "Wie viel darf ein Hotel pro Nacht kosten?", "mode": "agentic"}'
+curl -s localhost:8000/documents -H "$AUTH"                    # only documents katja may see
+curl -s localhost:8000/documents/hr/gehaltsbaender -H "$AUTH"  # 404, same as a missing document
+# admin (fiete) only: upload, delete, metrics
+curl -s -X POST localhost:8000/documents -H "$ADMIN" -F department=it -F file=@neu.md
+curl -s -X DELETE localhost:8000/documents/it/neu -H "$ADMIN"
+curl -s localhost:8000/metrics -H "$ADMIN"
+```
+
+| Endpoint | Who | What |
+|---|---|---|
+| `GET /health` | public | status, chunk count |
+| `POST /login` `{username}` | public | signed token (8 h). **Demo simplification:** no passwords; a real setup would use SSO / OIDC |
+| `POST /ask` `{question, mode: classic\|agentic}` | user | answer, citations, steps, tokens, cost, latency |
+| `GET /documents`, `GET /documents/{doc_id}` | user | only allowed documents; forbidden and missing give the identical 404 |
+| `POST /documents` (multipart `file`, `department`), `DELETE /documents/{doc_id}` | admin (`fiete`) | md/pdf/docx upload with incremental indexing; delete |
+| `GET /metrics` | admin | per mode: count, avg/p95 latency, tokens, cost, not-found rate; top unanswered questions (= missing documentation); latest `eval/results.json` and `eval/scale.json` |
+
+`/metrics` is admin-only because the list of unanswered questions reveals what other departments ask.
+The request log is in memory (SQLite); set `KS_METRICS_DB=/path/file.db` to keep it.
+
+## Docker
+
+```bash
+docker compose up --build            # api on http://localhost:8000, Postgres + pgvector behind it
+```
+
+`docker-compose.yml` starts `postgres` (`pgvector/pgvector:pg16`, with a healthcheck) and `api`
+(`PG_DSN` points to it; the API waits until Postgres is healthy). The image is built from
+`python:3.12-slim`, runs as a non-root user and downloads the embedding model at build time.
+Set `APP_SECRET` (and optionally `LLM_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`) in your shell
+or an `.env` file. Uploaded documents live inside the container, so they are gone when it is recreated.
+
+CI (`.github/workflows/ci.yml`) runs ruff and pytest against a pgvector service container (so the
+pgvector tests run too, with the fake LLM only, no secrets) and builds the Docker image without pushing it.

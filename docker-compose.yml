@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ks
+      POSTGRES_PASSWORD: ks
+      POSTGRES_DB: ks
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ks -d ks"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      PG_DSN: postgresql://ks:ks@postgres:5432/ks
+      APP_SECRET: ${APP_SECRET:-change-me-for-anything-but-a-demo}
+      # real Claude answers only if you set both (optional, needs the anthropic extra):
+      LLM_PROVIDER: ${LLM_PROVIDER:-fake}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      KS_INDEX_DIR: /app/state
+    volumes:
+      - apistate:/app/state
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  apistate:
