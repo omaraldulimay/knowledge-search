@@ -11,7 +11,7 @@ from ks.llm import LABEL_RE, LLM, NOT_FOUND, cost_usd
 from ks.search import Hit, HybridSearcher
 
 # Gate against "nothing relevant": the best vector score AND the best BM25 score of a query must
-# both clear a threshold. Calibrated on the sample corpus; a coarse filter, the prompt does the rest.
+# both clear a threshold. Calibrated on the sample corpus; a coarse filter only.
 # Cosine scores depend on the embedder, so the vector threshold is per embedder.
 MIN_VECTOR_SCORE = {"fastembed": 0.45, "hash": 0.15}
 MIN_BM25_SCORE = float(os.environ.get("KS_MIN_BM25_SCORE", "6.0"))
