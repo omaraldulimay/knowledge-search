@@ -1,0 +1,40 @@
+# 30 evaluation questions. type: single | multi | not_found | permission
+# expected_doc_ids: documents that must be cited; empty = the answer must be the "not found" sentence.
+questions:
+  # --- 14 single-document questions
+  - {id: s01, type: single, user: mira, question: "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?", expected_doc_ids: [hr/betriebliche-altersvorsorge]}
+  - {id: s02, type: single, user: mira, question: "Welche Kündigungsfrist gilt in der Probezeit?", expected_doc_ids: [hr/kuendigungsfristen]}
+  - {id: s03, type: single, user: mira, question: "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?", expected_doc_ids: [hr/weiterbildung]}
+  - {id: s04, type: single, user: ole, question: "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?", expected_doc_ids: [it/passwortrichtlinie]}
+  - {id: s05, type: single, user: ole, question: "Wie schnell reagiert der IT-Support auf eine kritische Störung?", expected_doc_ids: [it/it-support-tickets]}
+  - {id: s06, type: single, user: ole, question: "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?", expected_doc_ids: [it/datensicherung]}
+  - {id: s07, type: single, user: katja, question: "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?", expected_doc_ids: [vertrieb/provisionsmodell]}
+  - {id: s08, type: single, user: katja, question: "Welche Pflichtfelder muss ich im CRM ausfüllen?", expected_doc_ids: [vertrieb/crm-pflege]}
+  - {id: s09, type: single, user: katja, question: "Wie funktioniert das Jobrad und das Deutschlandticket?", expected_doc_ids: [alle/betriebsrestaurant]}
+  - {id: s10, type: single, user: bent, question: "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?", expected_doc_ids: [logistik/fahrzeugpruefung]}
+  - {id: s11, type: single, user: bent, question: "Welche Fristen gelten für die Meldung eines Transportschadens?", expected_doc_ids: [logistik/reklamation-transportschaden]}
+  - {id: s12, type: single, user: bent, question: "Welche Schutzausrüstung ist im Lager Pflicht?", expected_doc_ids: [logistik/lagerordnung]}
+  - {id: s13, type: single, user: ole, question: "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?", expected_doc_ids: [alle/urlaubsantrag]}
+  - {id: s14, type: single, user: fiete, question: "Wie läuft die Evakuierung von Besuchern im Brandfall ab?", expected_doc_ids: [alle/brandschutz-notfall]}
+
+  # --- 8 questions that need two documents (data/README.md, table of two-document questions)
+  - {id: m01, type: multi, user: katja, question: "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?", expected_doc_ids: [alle/reisekostenrichtlinie, vertrieb/vertrieb-reisekosten]}
+  - {id: m02, type: multi, user: ole, question: "Wie arbeite ich im Homeoffice auf interne Systeme zu?", expected_doc_ids: [alle/arbeitszeit-homeoffice, it/vpn-einrichtung]}
+  - {id: m03, type: multi, user: fiete, question: "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?", expected_doc_ids: [vertrieb/rabattstaffel-grosskunden, logistik/gefahrgut-handling]}
+  - {id: m04, type: multi, user: katja, question: "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?", expected_doc_ids: [vertrieb/kundenbewirtung, vertrieb/vertrieb-reisekosten]}
+  - {id: m05, type: multi, user: ole, question: "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?", expected_doc_ids: [it/hardware-bestellung, it/software-freigabe]}
+  - {id: m06, type: multi, user: mira, question: "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?", expected_doc_ids: [alle/urlaubsantrag, hr/elternzeit]}
+  - {id: m07, type: multi, user: ole, question: "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?", expected_doc_ids: [it/passwortrichtlinie, it/mfa]}
+  - {id: m08, type: multi, user: fiete, question: "Gilt der Großkundenrabatt auch für die Zollabfertigung?", expected_doc_ids: [logistik/zollabwicklung, vertrieb/rabattstaffel-grosskunden]}
+
+  # --- 4 questions whose answer is in no document
+  - {id: n01, type: not_found, user: fiete, question: "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?", expected_doc_ids: []}
+  - {id: n02, type: not_found, user: mira, question: "Dürfen Haustiere ins Büro mitgebracht werden?", expected_doc_ids: []}
+  - {id: n03, type: not_found, user: bent, question: "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?", expected_doc_ids: []}
+  - {id: n04, type: not_found, user: ole, question: "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?", expected_doc_ids: []}
+
+  # --- 4 permission questions: the answer lives only in documents the user may not read
+  - {id: p01, type: permission, user: katja, question: "Wie hoch ist das Jahresbrutto-Band der Entgeltgruppe E5?", expected_doc_ids: []}
+  - {id: p02, type: permission, user: ole, question: "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?", expected_doc_ids: []}
+  - {id: p03, type: permission, user: bent, question: "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?", expected_doc_ids: []}
+  - {id: p04, type: permission, user: katja, question: "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?", expected_doc_ids: []}

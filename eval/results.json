@@ -1,0 +1,3245 @@
+{
+  "llm": "fake",
+  "embedder": "fastembed",
+  "modes": {
+    "classic": {
+      "metrics": {
+        "questions": 30,
+        "hit_rate_at_5": 1.0,
+        "full_coverage": 0.8636363636363636,
+        "citation_correctness": 0.9333333333333333,
+        "permission_leaks": 0,
+        "avg_latency_ms": 11.274138933337477,
+        "p95_latency_ms": 25.106948500047107,
+        "input_tokens": 15005,
+        "output_tokens": 4233,
+        "total_cost_usd": 0.003617,
+        "by_type": {
+          "single": {
+            "n": 14,
+            "correct": 14
+          },
+          "multi": {
+            "n": 8,
+            "correct": 8
+          },
+          "not_found": {
+            "n": 4,
+            "correct": 3
+          },
+          "permission": {
+            "n": 4,
+            "correct": 3
+          }
+        }
+      },
+      "questions": [
+        {
+          "id": "s01",
+          "type": "single",
+          "user": "mira",
+          "question": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+          "expected_doc_ids": [
+            "hr/betriebliche-altersvorsorge"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Das Unternehmen zahlt einen Zuschuss von 20 Prozent auf den umgewandelten Betrag. Dieser Zuschuss ist höher als die gesetzliche Mindestförderung von 15 Prozent. [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss]\n- Die selbst eingezahlten Beiträge sind sofort unverfallbar. Der Arbeitgeberanteil ist unverfallbar nach drei Jahren Betriebszugehörigkeit und Vollendung des 21. [hr/betriebliche-altersvorsorge#Unverfallbarkeit]\n- Fragen beantwortet Frau Svenja Rohwedder aus der Personalabteilung, Durchwahl 215. [hr/betriebliche-altersvorsorge#Ansprechpartnerin]",
+            "citations": [
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Arbeitgeberzuschuss",
+                "chunk_id": "hr/betriebliche-altersvorsorge#1"
+              },
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Unverfallbarkeit",
+                "chunk_id": "hr/betriebliche-altersvorsorge#2"
+              },
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Ansprechpartnerin",
+                "chunk_id": "hr/betriebliche-altersvorsorge#5"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 645,
+            "output_tokens": 146,
+            "cost": 0.0001375,
+            "latency_ms": 25.870341999961965,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/betriebliche-altersvorsorge"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s02",
+          "type": "single",
+          "user": "mira",
+          "question": "Welche Kündigungsfrist gilt in der Probezeit?",
+          "expected_doc_ids": [
+            "hr/kuendigungsfristen"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- In den ersten sechs Monaten (Probezeit) kann das Arbeitsverhältnis von beiden Seiten mit einer Frist von zwei Wochen gekündigt werden. Die Kündigung muss schriftlich erfolgen. [hr/kuendigungsfristen#Probezeit]\n- Nach Ablauf der Probezeit gilt für Kündigungen durch die Arbeitnehmerin oder den Arbeitnehmer eine Frist von vier Wochen zum Fünfzehnten oder zum Ende eines Kalendermonats. Für Kündigungen durch das Unternehmen verlängert sich die Frist mit der Betriebszugehörigkeit: - ab 2 Jahren: ein Monat zum Monatsende - ab 5 Jahren: zwei Monate zum Monatsende  [hr/kuendigungsfristen#Fristen nach der Probezeit]\n- Die Probezeit beträgt sechs Monate. In dieser Zeit gilt eine Kündigungsfrist von zwei Wochen. [hr/probezeit-feedback#Dauer der Probezeit]",
+            "citations": [
+              {
+                "doc_id": "hr/kuendigungsfristen",
+                "title": "Kündigungsfristen",
+                "section": "Probezeit",
+                "chunk_id": "hr/kuendigungsfristen#1"
+              },
+              {
+                "doc_id": "hr/kuendigungsfristen",
+                "title": "Kündigungsfristen",
+                "section": "Fristen nach der Probezeit",
+                "chunk_id": "hr/kuendigungsfristen#2"
+              },
+              {
+                "doc_id": "hr/probezeit-feedback",
+                "title": "Leitfaden Probezeit und Feedbackgespräche",
+                "section": "Dauer der Probezeit",
+                "chunk_id": "hr/probezeit-feedback#1"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Kündigungsfrist gilt in der Probezeit?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 562,
+            "output_tokens": 194,
+            "cost": 0.00015319999999999998,
+            "latency_ms": 7.1760129999347555,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/kuendigungsfristen",
+              "hr/probezeit-feedback"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s03",
+          "type": "single",
+          "user": "mira",
+          "question": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+          "expected_doc_ids": [
+            "hr/weiterbildung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Jede Mitarbeiterin und jeder Mitarbeiter hat ein jährliches Bildungsbudget von 1.200 Euro und bis zu fünf bezahlte Weiterbildungstage. Das Budget kann nicht ins nächste Jahr übertragen werden. [hr/weiterbildung#Bildungsbudget]\n- Gefördert werden Seminare, Online-Kurse, Fachliteratur, Zertifizierungen und Konferenzen mit beruflichem Bezug. Pflichtqualifikationen wie der Gabelstaplerschein, der ADR-Schein für Gefahrgutfahrer oder die Ausbildung zur Ersthelferin zahlt das Unternehmen vollständig und zählen nicht auf das Budget. [hr/weiterbildung#Was wird gefördert]\n- Beispiel 1: Ein Disponent besucht ein Zollseminar für 890 Euro, die Kosten werden aus dem Bildungsbudget gedeckt, es bleiben 310 Euro. Beispiel 2: Ein Fahrer erneuert den ADR-Schein für 650 Euro, die Kosten trägt das Unternehmen, das Budget bleibt unberührt. [hr/weiterbildung#Beispiele]",
+            "citations": [
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Bildungsbudget",
+                "chunk_id": "hr/weiterbildung#0"
+              },
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Was wird gefördert",
+                "chunk_id": "hr/weiterbildung#1"
+              },
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Beispiele",
+                "chunk_id": "hr/weiterbildung#6"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 674,
+            "output_tokens": 220,
+            "cost": 0.0001774,
+            "latency_ms": 6.3390199998139,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/weiterbildung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s04",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+          "expected_doc_ids": [
+            "it/passwortrichtlinie"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Ein regelmäßiger Wechsel ist nicht mehr vorgeschrieben. Passwörter müssen aber sofort geändert werden, wenn der Verdacht besteht, dass sie bekannt geworden sind, oder wenn die IT dazu auffordert. [it/passwortrichtlinie#Wechsel]\n- Ein Passwort muss mindestens 14 Zeichen lang sein. Wir empfehlen Passphrasen aus mehreren Wörtern, zum Beispiel einen Satz aus vier zufälligen Wörtern. [it/passwortrichtlinie#Anforderungen an Passwörter]\n- Nach fünf falschen Eingaben wird das Konto für 15 Minuten gesperrt. Ein vergessenes Passwort setzen Sie selbst über das Portal \"Passwort zurücksetzen\" zurück. [it/passwortrichtlinie#Sperrung und Zurücksetzen]",
+            "citations": [
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Wechsel",
+                "chunk_id": "it/passwortrichtlinie#2"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Anforderungen an Passwörter",
+                "chunk_id": "it/passwortrichtlinie#1"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Sperrung und Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 693,
+            "output_tokens": 166,
+            "cost": 0.00015230000000000002,
+            "latency_ms": 21.179762999963714,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/passwortrichtlinie",
+              "it/mfa"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s05",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+          "expected_doc_ids": [
+            "it/it-support-tickets"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- - Priorität 1 (kritisch: Ausfall von Lagerverwaltungssystem oder Scannern): Reaktion innerhalb von 30 Minuten, Lösung angestrebt innerhalb von 4 Stunden. - Priorität 2 (hoch: einzelner Arbeitsplatz ohne Zugang): Reaktion in 2 Stunden, Lösung innerhalb von 1 Arbeitstag. [it/it-support-tickets#Prioritäten und Reaktionszeiten]\n- Der IT-Support ist montags bis freitags von 7:00 bis 18:00 Uhr unter Durchwahl 300 oder per E-Mail an it-support@elbkontor.example erreichbar. Für kritische Störungen in der Disposition und im Lager gibt es rund um die Uhr eine Notfallbereitschaft unter der Nummer 0170-0000300. [it/it-support-tickets#Erreichbarkeit]\n- Wird die Reaktionszeit überschritten, eskaliert das System automatisch an die IT-Leitung, Herrn Piet Lohmeyer. Sie können Ihr Ticket außerdem selbst mit dem Knopf \"Dringlichkeit erhöhen\" höher stufen, benötigen dafür aber eine Begründung. [it/it-support-tickets#Eskalation]",
+            "citations": [
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Prioritäten und Reaktionszeiten",
+                "chunk_id": "it/it-support-tickets#2"
+              },
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Erreichbarkeit",
+                "chunk_id": "it/it-support-tickets#0"
+              },
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Eskalation",
+                "chunk_id": "it/it-support-tickets#3"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 584,
+            "output_tokens": 236,
+            "cost": 0.0001764,
+            "latency_ms": 9.67507299992576,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/it-support-tickets",
+              "it/datensicherung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s06",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+          "expected_doc_ids": [
+            "it/datensicherung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Die Datenbank des Lagerverwaltungssystems wird stündlich inkrementell und nachts vollständig gesichert. Dateiserver werden täglich um 22:00 Uhr gesichert. [it/datensicherung#Sicherungsplan]\n- Gesichert werden die Teamlaufwerke, die Postfächer, die Datenbank des Lagerverwaltungssystems, das ERP-System und die Konfiguration der Netzwerkgeräte. Lokale Daten auf Laptops werden nicht gesichert. [it/datensicherung#Was wird gesichert]\n- Wir verarbeiten Daten nur, wenn es dafür eine rechtliche Grundlage gibt, etwa einen Vertrag oder eine gesetzliche Pflicht. Wir erheben nur die Daten, die wir wirklich brauchen. [alle/datenschutz-grundlagen#Grundsätze]",
+            "citations": [
+              {
+                "doc_id": "it/datensicherung",
+                "title": "Datensicherung und Wiederherstellung",
+                "section": "Sicherungsplan",
+                "chunk_id": "it/datensicherung#2"
+              },
+              {
+                "doc_id": "it/datensicherung",
+                "title": "Datensicherung und Wiederherstellung",
+                "section": "Was wird gesichert",
+                "chunk_id": "it/datensicherung#1"
+              },
+              {
+                "doc_id": "alle/datenschutz-grundlagen",
+                "title": "Datenschutz-Grundlagen",
+                "section": "Grundsätze",
+                "chunk_id": "alle/datenschutz-grundlagen#2"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 646,
+            "output_tokens": 168,
+            "cost": 0.00014860000000000003,
+            "latency_ms": 7.941601000311493,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/datensicherung",
+              "alle/datenschutz-grundlagen"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s07",
+          "type": "single",
+          "user": "katja",
+          "question": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+          "expected_doc_ids": [
+            "vertrieb/provisionsmodell"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Die Provision wird quartalsweise abgerechnet und mit dem Gehalt des Folgemonats ausgezahlt. Maßgeblich sind bezahlte Rechnungen, nicht die gestellten. [vertrieb/provisionsmodell#Abrechnung]\n- Jede Person erhält zum Jahresbeginn ein Umsatzziel und ein Deckungsbeitragsziel. Die Gewichtung beträgt 60 Prozent Umsatz und 40 Prozent Deckungsbeitrag. [vertrieb/provisionsmodell#Zielvorgaben]\n- Ein Mitarbeiter im Außendienst hat ein Zielgehalt von 60.000 Euro. Die Provision bei 100 Prozent beträgt 20 Prozent, also 12.000 Euro. [vertrieb/provisionsmodell#Rechenbeispiel]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Abrechnung",
+                "chunk_id": "vertrieb/provisionsmodell#3"
+              },
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Zielvorgaben",
+                "chunk_id": "vertrieb/provisionsmodell#1"
+              },
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Rechenbeispiel",
+                "chunk_id": "vertrieb/provisionsmodell#6"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 629,
+            "output_tokens": 147,
+            "cost": 0.0001364,
+            "latency_ms": 24.173912000151176,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/provisionsmodell",
+              "vertrieb/vertrieb-reisekosten"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s08",
+          "type": "single",
+          "user": "katja",
+          "question": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+          "expected_doc_ids": [
+            "vertrieb/crm-pflege"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Für jeden Kunden müssen folgende Felder gepflegt sein: Firmenname, Rechtsform, Rechnungsadresse, Branche, Umsatzsteuer-ID, Hauptansprechpartner und Zahlungsziel. Für Großkunden kommen Rahmenvertragsnummer, Vertragsende und Rabattstufe hinzu. [vertrieb/crm-pflege#Pflichtfelder]\n- Neue Mitarbeitende erhalten innerhalb der ersten zwei Wochen eine zweistündige CRM-Schulung. Ansprechpartnerin für Fragen ist die CRM-Administratorin Frau Lena Wittkamp. [vertrieb/crm-pflege#Schulung]\n- Das CRM-System \"Kundenkompass\" ist die zentrale Datenbasis für alle Kundenbeziehungen der Elbkontor Logistik GmbH. Es wird von Vertrieb, Kundenservice und Geschäftsführung genutzt. [vertrieb/crm-pflege#Zweck]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Pflichtfelder",
+                "chunk_id": "vertrieb/crm-pflege#1"
+              },
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Schulung",
+                "chunk_id": "vertrieb/crm-pflege#6"
+              },
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Zweck",
+                "chunk_id": "vertrieb/crm-pflege#0"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 580,
+            "output_tokens": 178,
+            "cost": 0.000147,
+            "latency_ms": 6.489144000170199,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/crm-pflege",
+              "vertrieb/angebotsprozess"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s09",
+          "type": "single",
+          "user": "katja",
+          "question": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+          "expected_doc_ids": [
+            "alle/betriebsrestaurant"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Das Unternehmen bezuschusst das Deutschlandticket mit 25 Euro pro Monat. Der Zuschuss wird automatisch mit dem Gehalt ausgezahlt, wenn ein Nachweis im Portal hochgeladen wurde. [alle/betriebsrestaurant#Deutschlandticket]\n- Es gibt vier Standardvorlagen: den Einzelfrachtauftrag, den Rahmenvertrag Transport, den Lagerlogistikvertrag und die Vereinbarung zur Zollabwicklung. Alle Vorlagen basieren auf den Allgemeinen Deutschen Spediteurbedingungen. [vertrieb/vertragsvorlagen#Vorlagen]\n- Das Angebot wird aus der Vorlage im CRM erzeugt. Es enthält Leistungsbeschreibung, Preis, Gültigkeit, Haftungsgrenzen nach den Allgemeinen Deutschen Spediteurbedingungen und Zahlungsziel. [vertrieb/angebotsprozess#4. Angebot erstellen]",
+            "citations": [
+              {
+                "doc_id": "alle/betriebsrestaurant",
+                "title": "Betriebsrestaurant und Sozialleistungen",
+                "section": "Deutschlandticket",
+                "chunk_id": "alle/betriebsrestaurant#3"
+              },
+              {
+                "doc_id": "vertrieb/vertragsvorlagen",
+                "title": "Vertragsvorlagen im Vertrieb",
+                "section": "Vorlagen",
+                "chunk_id": "vertrieb/vertragsvorlagen#1"
+              },
+              {
+                "doc_id": "vertrieb/angebotsprozess",
+                "title": "Angebotsprozess im Vertrieb",
+                "section": "4. Angebot erstellen",
+                "chunk_id": "vertrieb/angebotsprozess#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 616,
+            "output_tokens": 186,
+            "cost": 0.0001546,
+            "latency_ms": 5.9539659996517,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/betriebsrestaurant",
+              "vertrieb/vertragsvorlagen",
+              "vertrieb/angebotsprozess",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s10",
+          "type": "single",
+          "user": "bent",
+          "question": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+          "expected_doc_ids": [
+            "logistik/fahrzeugpruefung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Vor jeder Fahrt führt die Fahrerin oder der Fahrer eine Abfahrtskontrolle durch. Geprüft werden Reifen und Reifendruck, Beleuchtung, Bremsen, Ölstand, Flüssigkeiten, Spiegel, Warnweste, Warndreieck, Verbandskasten sowie die Ladungssicherungsmittel. [logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle]\n- Die Ladungssicherung wird vor Fahrtbeginn vom Fahrer kontrolliert und nach den ersten 50 Kilometern nachgezogen. Bei langen Fahrten wird sie mindestens alle 150 Kilometer sowie nach jeder Pause geprüft. [logistik/ladungssicherung#Kontrollen]\n- Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]",
+            "citations": [
+              {
+                "doc_id": "logistik/fahrzeugpruefung",
+                "title": "Fahrzeugprüfung und Fahrerpflichten",
+                "section": "Tägliche Abfahrtskontrolle",
+                "chunk_id": "logistik/fahrzeugpruefung#0"
+              },
+              {
+                "doc_id": "logistik/ladungssicherung",
+                "title": "Ladungssicherung",
+                "section": "Kontrollen",
+                "chunk_id": "logistik/ladungssicherung#3"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 733,
+            "output_tokens": 199,
+            "cost": 0.0001728,
+            "latency_ms": 20.063004000348883,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/fahrzeugpruefung",
+              "logistik/ladungssicherung",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s11",
+          "type": "single",
+          "user": "bent",
+          "question": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+          "expected_doc_ids": [
+            "logistik/reklamation-transportschaden"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Die erste Rückmeldung an den Kunden erfolgt spätestens nach fünf Arbeitstagen, die endgültige Entscheidung innerhalb von 30 Tagen. Verjährung von Ansprüchen aus Frachtverträgen tritt nach einem Jahr ein, bei Vorsatz nach drei Jahren. [logistik/reklamation-transportschaden#Fristen]\n- Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]\n- Bei Schäden über 5.000 Euro oder Diebstahl wird die Transportversicherung eingeschaltet. Die Meldung an den Versicherer geschieht durch die Schadenabteilung binnen drei Tagen. [logistik/reklamation-transportschaden#Versicherung]",
+            "citations": [
+              {
+                "doc_id": "logistik/reklamation-transportschaden",
+                "title": "Reklamation und Transportschäden",
+                "section": "Fristen",
+                "chunk_id": "logistik/reklamation-transportschaden#3"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              },
+              {
+                "doc_id": "logistik/reklamation-transportschaden",
+                "title": "Reklamation und Transportschäden",
+                "section": "Versicherung",
+                "chunk_id": "logistik/reklamation-transportschaden#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 646,
+            "output_tokens": 190,
+            "cost": 0.00015960000000000003,
+            "latency_ms": 6.474374999925203,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/reklamation-transportschaden",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s12",
+          "type": "single",
+          "user": "bent",
+          "question": "Welche Schutzausrüstung ist im Lager Pflicht?",
+          "expected_doc_ids": [
+            "logistik/lagerordnung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Der Zutritt zu den Hallen ist nur mit Mitarbeiterausweis oder nach Anmeldung am Pförtnerhaus möglich. In allen Hallenbereichen sind Sicherheitsschuhe der Klasse S3 und Warnweste Pflicht. [logistik/lagerordnung#Zutritt und Schutzausrüstung]\n- Die Fahrzeuge sind mit mindestens zehn Zurrgurten, vier Kantenschutzwinkeln, einem Satz Antirutschmatten und zwei Sperrbalken ausgestattet. Die Bestückung wird bei jeder Wartung geprüft. [logistik/ladungssicherung#Hilfsmittel]\n- In den ersten 30 Tagen sind folgende Online-Schulungen verpflichtend: Datenschutz, Informationssicherheit, Verhaltenskodex und Arbeitssicherheit. Für Mitarbeitende im Lager kommt eine praktische Einweisung in Flurförderzeuge hinzu. [alle/onboarding#Pflichtschulungen]",
+            "citations": [
+              {
+                "doc_id": "logistik/lagerordnung",
+                "title": "Lagerordnung",
+                "section": "Zutritt und Schutzausrüstung",
+                "chunk_id": "logistik/lagerordnung#1"
+              },
+              {
+                "doc_id": "logistik/ladungssicherung",
+                "title": "Ladungssicherung",
+                "section": "Hilfsmittel",
+                "chunk_id": "logistik/ladungssicherung#7"
+              },
+              {
+                "doc_id": "alle/onboarding",
+                "title": "Onboarding für neue Mitarbeitende",
+                "section": "Pflichtschulungen",
+                "chunk_id": "alle/onboarding#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Schutzausrüstung ist im Lager Pflicht?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 640,
+            "output_tokens": 190,
+            "cost": 0.000159,
+            "latency_ms": 6.5328250002494315,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/lagerordnung",
+              "logistik/ladungssicherung",
+              "alle/onboarding",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s13",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+          "expected_doc_ids": [
+            "alle/urlaubsantrag"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Scheiden Mitarbeitende im Laufe des Jahres aus, wird der Urlaubsanspruch anteilig berechnet. Zu viel genommener Urlaub wird nicht zurückgefordert, sofern er im Rahmen der Regelung gewährt wurde. [alle/urlaubsantrag#Resturlaub bei Austritt]\n- Nicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. [alle/urlaubsantrag#Übertragung und Verfall]\n- Der jährliche Urlaubsanspruch beträgt für Vollzeitkräfte 30 Arbeitstage bei einer Fünf-Tage-Woche. Teilzeitkräfte erhalten den Anspruch anteilig. [alle/urlaubsantrag#Urlaubsanspruch]",
+            "citations": [
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Resturlaub bei Austritt",
+                "chunk_id": "alle/urlaubsantrag#7"
+              },
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Übertragung und Verfall",
+                "chunk_id": "alle/urlaubsantrag#4"
+              },
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Urlaubsanspruch",
+                "chunk_id": "alle/urlaubsantrag#1"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 649,
+            "output_tokens": 143,
+            "cost": 0.0001364,
+            "latency_ms": 6.81415899998683,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/urlaubsantrag"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s14",
+          "type": "single",
+          "user": "fiete",
+          "question": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+          "expected_doc_ids": [
+            "alle/brandschutz-notfall"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Der Empfang führt eine tagesaktuelle Besucherliste, damit im Ernstfall alle Personen im Gebäude erfasst werden können. Die Empfangskraft nimmt die Liste mit zum Sammelplatz. [alle/brandschutz-notfall#Evakuierung von Besuchern]\n- Ruhe bewahren. Brand melden über die Notrufnummer 112 und die interne Notrufnummer 999. [alle/brandschutz-notfall#Im Brandfall]\n- Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]",
+            "citations": [
+              {
+                "doc_id": "alle/brandschutz-notfall",
+                "title": "Brandschutz und Notfallverhalten",
+                "section": "Evakuierung von Besuchern",
+                "chunk_id": "alle/brandschutz-notfall#8"
+              },
+              {
+                "doc_id": "alle/brandschutz-notfall",
+                "title": "Brandschutz und Notfallverhalten",
+                "section": "Im Brandfall",
+                "chunk_id": "alle/brandschutz-notfall#1"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 671,
+            "output_tokens": 151,
+            "cost": 0.00014260000000000002,
+            "latency_ms": 40.15647000005629,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/brandschutz-notfall",
+              "logistik/gefahrgut-handling",
+              "hr/kuendigungsfristen"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m01",
+          "type": "multi",
+          "user": "katja",
+          "question": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+          "expected_doc_ids": [
+            "alle/reisekostenrichtlinie",
+            "vertrieb/vertrieb-reisekosten"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Da im Vertrieb häufig Kundentermine in Großstädten stattfinden, liegt die Obergrenze für Hotelübernachtungen bei 140 Euro pro Nacht inklusive Frühstück. Die Grenze gilt bundesweit. [vertrieb/vertrieb-reisekosten#Höhere Hotelgrenze]\n- Hotel bis 140 Euro pro Nacht, bei Messen bis 180 Euro mit Freigabe. Bahn 1. [vertrieb/vertrieb-reisekosten#Kurzübersicht]\n- Hotelübernachtungen werden bis zu einer Obergrenze von 110 Euro pro Nacht inklusive Frühstück erstattet. In den Städten München, Frankfurt, Stuttgart und Köln gilt keine höhere Grenze, sofern keine abteilungsspezifische Regelung existiert. [alle/reisekostenrichtlinie#Übernachtung]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Höhere Hotelgrenze",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
+              },
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Kurzübersicht",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#7"
+              },
+              {
+                "doc_id": "alle/reisekostenrichtlinie",
+                "title": "Reisekostenrichtlinie",
+                "section": "Übernachtung",
+                "chunk_id": "alle/reisekostenrichtlinie#4"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 649,
+            "output_tokens": 165,
+            "cost": 0.0001474,
+            "latency_ms": 11.211799000193423,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/vertrieb-reisekosten",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m02",
+          "type": "multi",
+          "user": "ole",
+          "question": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+          "expected_doc_ids": [
+            "alle/arbeitszeit-homeoffice",
+            "it/vpn-einrichtung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Das Unternehmen stellt Laptop und Headset. Ein Monitor kann auf Antrag geliehen werden. [alle/arbeitszeit-homeoffice#Ausstattung und Datenschutz]\n- Mitarbeitende in der Verwaltung können bis zu drei Tage pro Woche von zu Hause arbeiten, sofern die Tätigkeit es erlaubt und die Führungskraft zustimmt. Die Vereinbarung wird schriftlich im Portal festgehalten. [alle/arbeitszeit-homeoffice#Homeoffice]\n- Arbeiten aus dem Ausland ist nur bis zu 10 Arbeitstage pro Jahr und nur innerhalb der EU nach vorheriger Genehmigung erlaubt. Steuerliche und sozialversicherungsrechtliche Fragen klärt die Personalabteilung vorab. [alle/arbeitszeit-homeoffice#Mobiles Arbeiten im Ausland]",
+            "citations": [
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Ausstattung und Datenschutz",
+                "chunk_id": "alle/arbeitszeit-homeoffice#4"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Homeoffice",
+                "chunk_id": "alle/arbeitszeit-homeoffice#3"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Mobiles Arbeiten im Ausland",
+                "chunk_id": "alle/arbeitszeit-homeoffice#5"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 617,
+            "output_tokens": 174,
+            "cost": 0.00014869999999999998,
+            "latency_ms": 8.4795339998891,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/arbeitszeit-homeoffice"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m03",
+          "type": "multi",
+          "user": "fiete",
+          "question": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+          "expected_doc_ids": [
+            "vertrieb/rabattstaffel-grosskunden",
+            "logistik/gefahrgut-handling"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Für Gefahrguttransporte gilt ein eigener Zuschlag von 18 Prozent auf die Grundfracht, der nicht rabattierbar ist. Details zu Gefahrgut finden Sie in der Anweisung der Logistik. [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut]\n- | Jahresumsatz (netto) | Rabatt auf Listenpreis | |---|---| | 150.000 bis 299.999 Euro | 4 Prozent | | 300.000 bis 599.999 Euro | 7 Prozent | | 600.000 bis 999.999 Euro | 10 Prozent | | ab 1.000.000 Euro | 12 Prozent | Der Rabatt wird auf die Grundfracht gewährt. Nebenleistungen wie Maut, Treibstoffzuschlag, Gefahrgutzuschlag und Zollabfertigung si [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]\n- Ein Kunde mit einem Jahresumsatz von 420.000 Euro erhält 7 Prozent Rabatt auf die Grundfracht. Hat er außerdem einen Dreijahresvertrag, erhöht sich der Rabatt auf 8 Prozent. [vertrieb/rabattstaffel-grosskunden#Beispielrechnung]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Sonderfall Gefahrgut",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Staffel auf Frachtumsatz",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Beispielrechnung",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#7"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 640,
+            "output_tokens": 225,
+            "cost": 0.0001765,
+            "latency_ms": 9.077357000023767,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/zollabwicklung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m04",
+          "type": "multi",
+          "user": "katja",
+          "question": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+          "expected_doc_ids": [
+            "vertrieb/kundenbewirtung",
+            "vertrieb/vertrieb-reisekosten"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Das Essen mit Kunden wird bis 60 Euro pro Person erstattet. Es ist die Bewirtungsrechnung mit Anlass, Teilnehmern und Namen der Gäste beizufügen. [vertrieb/vertrieb-reisekosten#Kundenbewirtung auf Reisen]\n- Bewirtungen sind erlaubt, wenn sie geschäftlich begründet sind. Pro Person werden bis zu 60 Euro inklusive Getränken und Trinkgeld erstattet. [vertrieb/kundenbewirtung#Bewirtung]\n- Zulässig: Mittagessen mit der Einkaufsleiterin eines Bestandskunden für 45 Euro pro Person, mit korrekt ausgefülltem Beleg. Zulässig: Eine Flasche Wein im Wert von 25 Euro zum Jahresabschluss. [vertrieb/kundenbewirtung#Beispiele]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Kundenbewirtung auf Reisen",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#4"
+              },
+              {
+                "doc_id": "vertrieb/kundenbewirtung",
+                "title": "Kundenbewirtung und Geschenke an Kunden",
+                "section": "Bewirtung",
+                "chunk_id": "vertrieb/kundenbewirtung#1"
+              },
+              {
+                "doc_id": "vertrieb/kundenbewirtung",
+                "title": "Kundenbewirtung und Geschenke an Kunden",
+                "section": "Beispiele",
+                "chunk_id": "vertrieb/kundenbewirtung#6"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 680,
+            "output_tokens": 160,
+            "cost": 0.000148,
+            "latency_ms": 13.155141999959596,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/vertrieb-reisekosten",
+              "vertrieb/kundenbewirtung",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m05",
+          "type": "multi",
+          "user": "ole",
+          "question": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+          "expected_doc_ids": [
+            "it/hardware-bestellung",
+            "it/software-freigabe"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Geräte werden vor der Ausgabe von der IT vorinstalliert, verschlüsselt und in die Geräteverwaltung aufgenommen. Die Übergabe erfolgt gegen Unterschrift. [it/hardware-bestellung#Montage und Einrichtung]\n- Standardprogramme wie Office, PDF-Reader, Browser, Videokonferenz und Passwortmanager können Sie selbst über das Selbstbedienungsportal installieren. Die Installation erfolgt ohne Administratorrechte. [it/software-freigabe#Softwarekatalog]\n- Zusätzliche oder abweichende Hardware wird über das Ticketsystem in der Kategorie \"Hardware\" bestellt. Die Führungskraft muss die Bestellung bestätigen. [it/hardware-bestellung#Bestellung]",
+            "citations": [
+              {
+                "doc_id": "it/hardware-bestellung",
+                "title": "Hardware-Bestellung",
+                "section": "Montage und Einrichtung",
+                "chunk_id": "it/hardware-bestellung#3"
+              },
+              {
+                "doc_id": "it/software-freigabe",
+                "title": "Software-Freigabe",
+                "section": "Softwarekatalog",
+                "chunk_id": "it/software-freigabe#1"
+              },
+              {
+                "doc_id": "it/hardware-bestellung",
+                "title": "Hardware-Bestellung",
+                "section": "Bestellung",
+                "chunk_id": "it/hardware-bestellung#1"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 648,
+            "output_tokens": 164,
+            "cost": 0.00014680000000000002,
+            "latency_ms": 11.195950000001176,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/hardware-bestellung",
+              "it/software-freigabe"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m06",
+          "type": "multi",
+          "user": "mira",
+          "question": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+          "expected_doc_ids": [
+            "alle/urlaubsantrag",
+            "hr/elternzeit"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Der Urlaubsanspruch kann für jeden vollen Monat der Elternzeit um ein Zwölftel gekürzt werden. Das Unternehmen macht von dieser Kürzung Gebrauch, außer bei Teilzeit-Arbeit während der Elternzeit. [hr/elternzeit#Urlaub während der Elternzeit]\n- Während der Elternzeit kann bis zu 32 Stunden pro Woche gearbeitet werden. Der Antrag auf Teilzeit wird acht Wochen vor Beginn gestellt. [hr/elternzeit#Teilzeit in Elternzeit]\n- Das Unternehmen zahlt zum Elterngeld einen freiwilligen Zuschuss. Er beträgt für die ersten drei Monate der Elternzeit 200 Euro pro Monat. [hr/elternzeit#Zuschüsse des Unternehmens]",
+            "citations": [
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Urlaub während der Elternzeit",
+                "chunk_id": "hr/elternzeit#4"
+              },
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Teilzeit in Elternzeit",
+                "chunk_id": "hr/elternzeit#2"
+              },
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Zuschüsse des Unternehmens",
+                "chunk_id": "hr/elternzeit#3"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 596,
+            "output_tokens": 156,
+            "cost": 0.00013759999999999998,
+            "latency_ms": 9.790756000256806,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/elternzeit"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m07",
+          "type": "multi",
+          "user": "ole",
+          "question": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+          "expected_doc_ids": [
+            "it/passwortrichtlinie",
+            "it/mfa"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Beim Wechsel des Smartphones übertragen Sie die Konten vor dem Zurücksetzen des alten Geräts. Ist das alte Gerät verloren, melden Sie sich beim IT-Support unter Durchwahl 300. [it/mfa#Handy verloren oder gewechselt]\n- Nach fünf falschen Eingaben wird das Konto für 15 Minuten gesperrt. Ein vergessenes Passwort setzen Sie selbst über das Portal \"Passwort zurücksetzen\" zurück. [it/passwortrichtlinie#Sperrung und Zurücksetzen]\n- Das Unternehmen stellt allen Beschäftigten den Passwortmanager \"Tresor\" zur Verfügung. Verwenden Sie für jedes Konto ein eigenes Passwort. [it/passwortrichtlinie#Passwortmanager]",
+            "citations": [
+              {
+                "doc_id": "it/mfa",
+                "title": "Mehrfaktor-Anmeldung (MFA)",
+                "section": "Handy verloren oder gewechselt",
+                "chunk_id": "it/mfa#4"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Sperrung und Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#4"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Passwortmanager",
+                "chunk_id": "it/passwortrichtlinie#3"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 693,
+            "output_tokens": 157,
+            "cost": 0.00014780000000000001,
+            "latency_ms": 8.528579999619978,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/mfa",
+              "it/passwortrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m08",
+          "type": "multi",
+          "user": "fiete",
+          "question": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+          "expected_doc_ids": [
+            "logistik/zollabwicklung",
+            "vertrieb/rabattstaffel-grosskunden"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- | Jahresumsatz (netto) | Rabatt auf Listenpreis | |---|---| | 150.000 bis 299.999 Euro | 4 Prozent | | 300.000 bis 599.999 Euro | 7 Prozent | | 600.000 bis 999.999 Euro | 10 Prozent | | ab 1.000.000 Euro | 12 Prozent | Der Rabatt wird auf die Grundfracht gewährt. Nebenleistungen wie Maut, Treibstoffzuschlag, Gefahrgutzuschlag und Zollabfertigung si [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]\n- Für die Zollabfertigung berechnet das Unternehmen eine Pauschale von 45 Euro pro Zollanmeldung, zuzüglich der verauslagten Abgaben mit einer Auslagenpauschale von 2 Prozent. Die Gebühr unterliegt nicht der Rabattstaffel für Großkunden. [logistik/zollabwicklung#Gebühren]\n- Für Gefahrguttransporte gilt ein eigener Zuschlag von 18 Prozent auf die Grundfracht, der nicht rabattierbar ist. Details zu Gefahrgut finden Sie in der Anweisung der Logistik. [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Staffel auf Frachtumsatz",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+              },
+              {
+                "doc_id": "logistik/zollabwicklung",
+                "title": "Zollabwicklung",
+                "section": "Gebühren",
+                "chunk_id": "logistik/zollabwicklung#5"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Sonderfall Gefahrgut",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 585,
+            "output_tokens": 236,
+            "cost": 0.0001765,
+            "latency_ms": 8.156455000062124,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/zollabwicklung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n01",
+          "type": "not_found",
+          "user": "fiete",
+          "question": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 8.136040999943361,
+            "found": false,
+            "retrieved_doc_ids": [
+              "alle/betriebsrestaurant",
+              "alle/onboarding",
+              "vertrieb/crm-pflege"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n02",
+          "type": "not_found",
+          "user": "mira",
+          "question": "Dürfen Haustiere ins Büro mitgebracht werden?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Dürfen Haustiere ins Büro mitgebracht werden?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 8.382763000099658,
+            "found": false,
+            "retrieved_doc_ids": [
+              "hr/gehaltsbaender",
+              "alle/arbeitszeit-homeoffice",
+              "alle/reisekostenrichtlinie",
+              "hr/kuendigungsfristen",
+              "hr/weiterbildung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n03",
+          "type": "not_found",
+          "user": "bent",
+          "question": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 8.098964000055275,
+            "found": false,
+            "retrieved_doc_ids": [
+              "alle/onboarding",
+              "logistik/gefahrgut-handling",
+              "logistik/ladungssicherung",
+              "logistik/lagerordnung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n04",
+          "type": "not_found",
+          "user": "ole",
+          "question": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Der Verhaltenskodex beschreibt, wie wir miteinander, mit Kunden und mit Geschäftspartnern umgehen. [alle/verhaltenskodex#Verhaltenskodex der Elbkontor Logistik GmbH]\n- Gültig ab 01.01.2026 für alle Mitarbeitenden der Elbkontor Logistik GmbH. [alle/reisekostenrichtlinie#Reisekostenrichtlinie]\n- Dieses Merkblatt fasst zusammen, was alle Mitarbeitenden der Elbkontor Logistik GmbH über den Umgang mit personenbezogenen Daten wissen müssen. [alle/datenschutz-grundlagen#Datenschutz-Grundlagen]",
+            "citations": [
+              {
+                "doc_id": "alle/verhaltenskodex",
+                "title": "Verhaltenskodex der Elbkontor Logistik GmbH",
+                "section": "Verhaltenskodex der Elbkontor Logistik GmbH",
+                "chunk_id": "alle/verhaltenskodex#0"
+              },
+              {
+                "doc_id": "alle/reisekostenrichtlinie",
+                "title": "Reisekostenrichtlinie",
+                "section": "Reisekostenrichtlinie",
+                "chunk_id": "alle/reisekostenrichtlinie#0"
+              },
+              {
+                "doc_id": "alle/datenschutz-grundlagen",
+                "title": "Datenschutz-Grundlagen",
+                "section": "Datenschutz-Grundlagen",
+                "chunk_id": "alle/datenschutz-grundlagen#0"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 366,
+            "output_tokens": 128,
+            "cost": 0.00010059999999999999,
+            "latency_ms": 6.862410999929125,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/verhaltenskodex",
+              "alle/reisekostenrichtlinie",
+              "alle/datenschutz-grundlagen",
+              "alle/urlaubsantrag",
+              "alle/onboarding"
+            ]
+          },
+          "correct": false,
+          "leak": false
+        },
+        {
+          "id": "p01",
+          "type": "permission",
+          "user": "katja",
+          "question": "Wie hoch ist das Jahresbrutto-Band der Entgeltgruppe E5?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist das Jahresbrutto-Band der Entgeltgruppe E5?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 7.4461259996496665,
+            "found": false,
+            "retrieved_doc_ids": [
+              "vertrieb/provisionsmodell",
+              "vertrieb/rabattstaffel-grosskunden"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "p02",
+          "type": "permission",
+          "user": "ole",
+          "question": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- Nicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. [alle/urlaubsantrag#Übertragung und Verfall]\n- Nach vier Wochen, nach drei Monaten und vor Ablauf der Probezeit führt die Führungskraft ein Feedbackgespräch. Die Probezeit dauert in der Regel sechs Monate. [alle/onboarding#Gespräche in der Probezeit]\n- Bei mehr als sechs Stunden Arbeit besteht Anspruch auf 30 Minuten Pause, bei mehr als neun Stunden auf 45 Minuten. Die Pausen werden nicht als Arbeitszeit gerechnet und automatisch abgezogen, wenn sie nicht gebucht wurden. [alle/arbeitszeit-homeoffice#Pausen]",
+            "citations": [
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Übertragung und Verfall",
+                "chunk_id": "alle/urlaubsantrag#4"
+              },
+              {
+                "doc_id": "alle/onboarding",
+                "title": "Onboarding für neue Mitarbeitende",
+                "section": "Gespräche in der Probezeit",
+                "chunk_id": "alle/onboarding#6"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Pausen",
+                "chunk_id": "alle/arbeitszeit-homeoffice#2"
+              }
+            ],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 563,
+            "output_tokens": 154,
+            "cost": 0.00013330000000000001,
+            "latency_ms": 8.59103699986008,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/urlaubsantrag",
+              "alle/onboarding",
+              "alle/arbeitszeit-homeoffice",
+              "it/datensicherung"
+            ]
+          },
+          "correct": false,
+          "leak": false
+        },
+        {
+          "id": "p03",
+          "type": "permission",
+          "user": "bent",
+          "question": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 8.150733000093169,
+            "found": false,
+            "retrieved_doc_ids": [
+              "logistik/zollabwicklung",
+              "logistik/gefahrgut-handling",
+              "alle/onboarding",
+              "logistik/reklamation-transportschaden",
+              "alle/verhaltenskodex"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "p04",
+          "type": "permission",
+          "user": "katja",
+          "question": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "classic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+                  "k": 5
+                },
+                "summary": "5 Treffer"
+              }
+            ],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 8.120853000036732,
+            "found": false,
+            "retrieved_doc_ids": [
+              "alle/betriebsrestaurant",
+              "vertrieb/rabattstaffel-grosskunden",
+              "vertrieb/vertragsvorlagen",
+              "alle/urlaubsantrag"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        }
+      ]
+    },
+    "agentic": {
+      "metrics": {
+        "questions": 30,
+        "hit_rate_at_5": 1.0,
+        "full_coverage": 0.8636363636363636,
+        "citation_correctness": 0.9333333333333333,
+        "permission_leaks": 0,
+        "avg_latency_ms": 8.760171933378539,
+        "p95_latency_ms": 10.555909300092026,
+        "input_tokens": 58626,
+        "output_tokens": 5592,
+        "total_cost_usd": 0.0086586,
+        "by_type": {
+          "single": {
+            "n": 14,
+            "correct": 14
+          },
+          "multi": {
+            "n": 8,
+            "correct": 8
+          },
+          "not_found": {
+            "n": 4,
+            "correct": 3
+          },
+          "permission": {
+            "n": 4,
+            "correct": 3
+          }
+        }
+      },
+      "questions": [
+        {
+          "id": "s01",
+          "type": "single",
+          "user": "mira",
+          "question": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+          "expected_doc_ids": [
+            "hr/betriebliche-altersvorsorge"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Betriebliche Altersvorsorge) Das Unternehmen zahlt einen Zuschuss von 20 Prozent auf den umgewandelten Betrag. Dieser Zuschuss ist höher als die gesetzliche Mindestförderung von 15 Prozent. [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss]\n- (Betriebliche Altersvorsorge) Die selbst eingezahlten Beiträge sind sofort unverfallbar. Der Arbeitgeberanteil ist unverfallbar nach drei Jahren Betriebszugehörigkeit und Vollendung des 21. [hr/betriebliche-altersvorsorge#Unverfallbarkeit]\n- (Betriebliche Altersvorsorge) Fragen beantwortet Frau Svenja Rohwedder aus der Personalabteilung, Durchwahl 215. [hr/betriebliche-altersvorsorge#Ansprechpartnerin]",
+            "citations": [
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Arbeitgeberzuschuss",
+                "chunk_id": "hr/betriebliche-altersvorsorge#1"
+              },
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Unverfallbarkeit",
+                "chunk_id": "hr/betriebliche-altersvorsorge#2"
+              },
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge",
+                "section": "Ansprechpartnerin",
+                "chunk_id": "hr/betriebliche-altersvorsorge#5"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "hr/betriebliche-altersvorsorge"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2275,
+            "output_tokens": 201,
+            "cost": 0.000328,
+            "latency_ms": 9.357979000014893,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/betriebliche-altersvorsorge"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s02",
+          "type": "single",
+          "user": "mira",
+          "question": "Welche Kündigungsfrist gilt in der Probezeit?",
+          "expected_doc_ids": [
+            "hr/kuendigungsfristen"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Kündigungsfristen) In den ersten sechs Monaten (Probezeit) kann das Arbeitsverhältnis von beiden Seiten mit einer Frist von zwei Wochen gekündigt werden. Die Kündigung muss schriftlich erfolgen. [hr/kuendigungsfristen#Probezeit]\n- (Kündigungsfristen) Nach Ablauf der Probezeit gilt für Kündigungen durch die Arbeitnehmerin oder den Arbeitnehmer eine Frist von vier Wochen zum Fünfzehnten oder zum Ende eines Kalendermonats. Für Kündigungen durch das Unternehmen verlängert sich die Frist mit [hr/kuendigungsfristen#Fristen nach der Probezeit]\n- (Leitfaden Probezeit und Feedbackgespräche) Die Probezeit beträgt sechs Monate. In dieser Zeit gilt eine Kündigungsfrist von zwei Wochen. [hr/probezeit-feedback#Dauer der Probezeit]",
+            "citations": [
+              {
+                "doc_id": "hr/kuendigungsfristen",
+                "title": "Kündigungsfristen",
+                "section": "Probezeit",
+                "chunk_id": "hr/kuendigungsfristen#1"
+              },
+              {
+                "doc_id": "hr/kuendigungsfristen",
+                "title": "Kündigungsfristen",
+                "section": "Fristen nach der Probezeit",
+                "chunk_id": "hr/kuendigungsfristen#2"
+              },
+              {
+                "doc_id": "hr/probezeit-feedback",
+                "title": "Leitfaden Probezeit und Feedbackgespräche",
+                "section": "Dauer der Probezeit",
+                "chunk_id": "hr/probezeit-feedback#1"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Kündigungsfrist gilt in der Probezeit?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "hr/kuendigungsfristen"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2249,
+            "output_tokens": 212,
+            "cost": 0.00033089999999999997,
+            "latency_ms": 8.246187000167993,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/kuendigungsfristen",
+              "hr/probezeit-feedback"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s03",
+          "type": "single",
+          "user": "mira",
+          "question": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+          "expected_doc_ids": [
+            "hr/weiterbildung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Weiterbildung und Bildungsbudget) Jede Mitarbeiterin und jeder Mitarbeiter hat ein jährliches Bildungsbudget von 1.200 Euro und bis zu fünf bezahlte Weiterbildungstage. Das Budget kann nicht ins nächste Jahr übertragen werden. [hr/weiterbildung#Bildungsbudget]\n- (Weiterbildung und Bildungsbudget) Gefördert werden Seminare, Online-Kurse, Fachliteratur, Zertifizierungen und Konferenzen mit beruflichem Bezug. Pflichtqualifikationen wie der Gabelstaplerschein, der ADR-Schein für Gefahrgutfahrer oder die Ausbildung zur Ersthelferin zahlt [hr/weiterbildung#Was wird gefördert]\n- (Weiterbildung und Bildungsbudget) Beispiel 1: Ein Disponent besucht ein Zollseminar für 890 Euro, die Kosten werden aus dem Bildungsbudget gedeckt, es bleiben 310 Euro. Beispiel 2: Ein Fahrer erneuert den ADR-Schein für 650 Euro, die Kosten trägt das Unternehmen, das Budget [hr/weiterbildung#Beispiele]",
+            "citations": [
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Bildungsbudget",
+                "chunk_id": "hr/weiterbildung#0"
+              },
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Was wird gefördert",
+                "chunk_id": "hr/weiterbildung#1"
+              },
+              {
+                "doc_id": "hr/weiterbildung",
+                "title": "Weiterbildung und Bildungsbudget",
+                "section": "Beispiele",
+                "chunk_id": "hr/weiterbildung#6"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "hr/weiterbildung"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2308,
+            "output_tokens": 257,
+            "cost": 0.0003593,
+            "latency_ms": 7.914522000191937,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/weiterbildung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s04",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+          "expected_doc_ids": [
+            "it/passwortrichtlinie"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Passwortrichtlinie) Ein regelmäßiger Wechsel ist nicht mehr vorgeschrieben. Passwörter müssen aber sofort geändert werden, wenn der Verdacht besteht, dass sie bekannt geworden sind, oder wenn die IT dazu auffordert. [it/passwortrichtlinie#Wechsel]\n- (Passwortrichtlinie) Ein Passwort muss mindestens 14 Zeichen lang sein. Wir empfehlen Passphrasen aus mehreren Wörtern, zum Beispiel einen Satz aus vier zufälligen Wörtern. [it/passwortrichtlinie#Anforderungen an Passwörter]\n- (Passwortrichtlinie) Nach fünf falschen Eingaben wird das Konto für 15 Minuten gesperrt. Ein vergessenes Passwort setzen Sie selbst über das Portal \"Passwort zurücksetzen\" zurück. [it/passwortrichtlinie#Sperrung und Zurücksetzen]",
+            "citations": [
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Wechsel",
+                "chunk_id": "it/passwortrichtlinie#2"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Anforderungen an Passwörter",
+                "chunk_id": "it/passwortrichtlinie#1"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Sperrung und Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/passwortrichtlinie"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2350,
+            "output_tokens": 214,
+            "cost": 0.000342,
+            "latency_ms": 9.424902999853657,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/passwortrichtlinie",
+              "it/mfa"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s05",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+          "expected_doc_ids": [
+            "it/it-support-tickets"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (IT-Support und Ticketsystem) - Priorität 1 (kritisch: Ausfall von Lagerverwaltungssystem oder Scannern): Reaktion innerhalb von 30 Minuten, Lösung angestrebt innerhalb von 4 Stunden. - Priorität 2 (hoch: einzelner Arbeitsplatz ohne Zugang): Reaktion in 2 Stunden, Lösun [it/it-support-tickets#Prioritäten und Reaktionszeiten]\n- (IT-Support und Ticketsystem) Der IT-Support ist montags bis freitags von 7:00 bis 18:00 Uhr unter Durchwahl 300 oder per E-Mail an it-support@elbkontor.example erreichbar. Für kritische Störungen in der Disposition und im Lager gibt es rund um die Uhr eine Notfallberei [it/it-support-tickets#Erreichbarkeit]\n- (IT-Support und Ticketsystem) Wird die Reaktionszeit überschritten, eskaliert das System automatisch an die IT-Leitung, Herrn Piet Lohmeyer. Sie können Ihr Ticket außerdem selbst mit dem Knopf \"Dringlichkeit erhöhen\" höher stufen, benötigen dafür aber eine Begründung. [it/it-support-tickets#Eskalation]",
+            "citations": [
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Prioritäten und Reaktionszeiten",
+                "chunk_id": "it/it-support-tickets#2"
+              },
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Erreichbarkeit",
+                "chunk_id": "it/it-support-tickets#0"
+              },
+              {
+                "doc_id": "it/it-support-tickets",
+                "title": "IT-Support und Ticketsystem",
+                "section": "Eskalation",
+                "chunk_id": "it/it-support-tickets#3"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/it-support-tickets"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2341,
+            "output_tokens": 271,
+            "cost": 0.00036960000000000004,
+            "latency_ms": 10.44064799998523,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/it-support-tickets",
+              "it/datensicherung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s06",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+          "expected_doc_ids": [
+            "it/datensicherung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Datensicherung und Wiederherstellung) Die Datenbank des Lagerverwaltungssystems wird stündlich inkrementell und nachts vollständig gesichert. Dateiserver werden täglich um 22:00 Uhr gesichert. [it/datensicherung#Sicherungsplan]\n- (Datensicherung und Wiederherstellung) Gesichert werden die Teamlaufwerke, die Postfächer, die Datenbank des Lagerverwaltungssystems, das ERP-System und die Konfiguration der Netzwerkgeräte. Lokale Daten auf Laptops werden nicht gesichert. [it/datensicherung#Was wird gesichert]\n- (Datenschutz-Grundlagen) Wir verarbeiten Daten nur, wenn es dafür eine rechtliche Grundlage gibt, etwa einen Vertrag oder eine gesetzliche Pflicht. Wir erheben nur die Daten, die wir wirklich brauchen. [alle/datenschutz-grundlagen#Grundsätze]",
+            "citations": [
+              {
+                "doc_id": "it/datensicherung",
+                "title": "Datensicherung und Wiederherstellung",
+                "section": "Sicherungsplan",
+                "chunk_id": "it/datensicherung#2"
+              },
+              {
+                "doc_id": "it/datensicherung",
+                "title": "Datensicherung und Wiederherstellung",
+                "section": "Was wird gesichert",
+                "chunk_id": "it/datensicherung#1"
+              },
+              {
+                "doc_id": "alle/datenschutz-grundlagen",
+                "title": "Datenschutz-Grundlagen",
+                "section": "Grundsätze",
+                "chunk_id": "alle/datenschutz-grundlagen#2"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/datensicherung"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2318,
+            "output_tokens": 223,
+            "cost": 0.0003433,
+            "latency_ms": 8.13098299977355,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/datensicherung",
+              "alle/datenschutz-grundlagen"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s07",
+          "type": "single",
+          "user": "katja",
+          "question": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+          "expected_doc_ids": [
+            "vertrieb/provisionsmodell"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Provisionsmodell Vertrieb 2026) Die Provision wird quartalsweise abgerechnet und mit dem Gehalt des Folgemonats ausgezahlt. Maßgeblich sind bezahlte Rechnungen, nicht die gestellten. [vertrieb/provisionsmodell#Abrechnung]\n- (Provisionsmodell Vertrieb 2026) Jede Person erhält zum Jahresbeginn ein Umsatzziel und ein Deckungsbeitragsziel. Die Gewichtung beträgt 60 Prozent Umsatz und 40 Prozent Deckungsbeitrag. [vertrieb/provisionsmodell#Zielvorgaben]\n- (Provisionsmodell Vertrieb 2026) Ein Mitarbeiter im Außendienst hat ein Zielgehalt von 60.000 Euro. Die Provision bei 100 Prozent beträgt 20 Prozent, also 12.000 Euro. [vertrieb/provisionsmodell#Rechenbeispiel]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Abrechnung",
+                "chunk_id": "vertrieb/provisionsmodell#3"
+              },
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Zielvorgaben",
+                "chunk_id": "vertrieb/provisionsmodell#1"
+              },
+              {
+                "doc_id": "vertrieb/provisionsmodell",
+                "title": "Provisionsmodell Vertrieb 2026",
+                "section": "Rechenbeispiel",
+                "chunk_id": "vertrieb/provisionsmodell#6"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/provisionsmodell"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2307,
+            "output_tokens": 205,
+            "cost": 0.0003332,
+            "latency_ms": 8.88366200024393,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/provisionsmodell",
+              "vertrieb/vertrieb-reisekosten"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s08",
+          "type": "single",
+          "user": "katja",
+          "question": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+          "expected_doc_ids": [
+            "vertrieb/crm-pflege"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (CRM-Pflege) Für jeden Kunden müssen folgende Felder gepflegt sein: Firmenname, Rechtsform, Rechnungsadresse, Branche, Umsatzsteuer-ID, Hauptansprechpartner und Zahlungsziel. Für Großkunden kommen Rahmenvertragsnummer, Vertragsende und Rabattstufe hinzu [vertrieb/crm-pflege#Pflichtfelder]\n- (CRM-Pflege) Neue Mitarbeitende erhalten innerhalb der ersten zwei Wochen eine zweistündige CRM-Schulung. Ansprechpartnerin für Fragen ist die CRM-Administratorin Frau Lena Wittkamp. [vertrieb/crm-pflege#Schulung]\n- (CRM-Pflege) Das CRM-System \"Kundenkompass\" ist die zentrale Datenbasis für alle Kundenbeziehungen der Elbkontor Logistik GmbH. Es wird von Vertrieb, Kundenservice und Geschäftsführung genutzt. [vertrieb/crm-pflege#Zweck]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Pflichtfelder",
+                "chunk_id": "vertrieb/crm-pflege#1"
+              },
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Schulung",
+                "chunk_id": "vertrieb/crm-pflege#6"
+              },
+              {
+                "doc_id": "vertrieb/crm-pflege",
+                "title": "CRM-Pflege",
+                "section": "Zweck",
+                "chunk_id": "vertrieb/crm-pflege#0"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/crm-pflege"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2213,
+            "output_tokens": 214,
+            "cost": 0.0003283,
+            "latency_ms": 7.2365599999102415,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/crm-pflege",
+              "vertrieb/angebotsprozess"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s09",
+          "type": "single",
+          "user": "katja",
+          "question": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+          "expected_doc_ids": [
+            "alle/betriebsrestaurant"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Betriebsrestaurant und Sozialleistungen) Das Unternehmen bezuschusst das Deutschlandticket mit 25 Euro pro Monat. Der Zuschuss wird automatisch mit dem Gehalt ausgezahlt, wenn ein Nachweis im Portal hochgeladen wurde. [alle/betriebsrestaurant#Deutschlandticket]\n- (Vertragsvorlagen im Vertrieb) Es gibt vier Standardvorlagen: den Einzelfrachtauftrag, den Rahmenvertrag Transport, den Lagerlogistikvertrag und die Vereinbarung zur Zollabwicklung. Alle Vorlagen basieren auf den Allgemeinen Deutschen Spediteurbedingungen. [vertrieb/vertragsvorlagen#Vorlagen]\n- (Angebotsprozess im Vertrieb) Das Angebot wird aus der Vorlage im CRM erzeugt. Es enthält Leistungsbeschreibung, Preis, Gültigkeit, Haftungsgrenzen nach den Allgemeinen Deutschen Spediteurbedingungen und Zahlungsziel. [vertrieb/angebotsprozess#4. Angebot erstellen]",
+            "citations": [
+              {
+                "doc_id": "alle/betriebsrestaurant",
+                "title": "Betriebsrestaurant und Sozialleistungen",
+                "section": "Deutschlandticket",
+                "chunk_id": "alle/betriebsrestaurant#3"
+              },
+              {
+                "doc_id": "vertrieb/vertragsvorlagen",
+                "title": "Vertragsvorlagen im Vertrieb",
+                "section": "Vorlagen",
+                "chunk_id": "vertrieb/vertragsvorlagen#1"
+              },
+              {
+                "doc_id": "vertrieb/angebotsprozess",
+                "title": "Angebotsprozess im Vertrieb",
+                "section": "4. Angebot erstellen",
+                "chunk_id": "vertrieb/angebotsprozess#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/betriebsrestaurant"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2339,
+            "output_tokens": 239,
+            "cost": 0.00035339999999999997,
+            "latency_ms": 7.375329000296915,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/betriebsrestaurant",
+              "vertrieb/vertragsvorlagen",
+              "vertrieb/angebotsprozess",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s10",
+          "type": "single",
+          "user": "bent",
+          "question": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+          "expected_doc_ids": [
+            "logistik/fahrzeugpruefung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Fahrzeugprüfung und Fahrerpflichten) Vor jeder Fahrt führt die Fahrerin oder der Fahrer eine Abfahrtskontrolle durch. Geprüft werden Reifen und Reifendruck, Beleuchtung, Bremsen, Ölstand, Flüssigkeiten, Spiegel, Warnweste, Warndreieck, Verbandskasten sowie die Ladungssicherung [logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle]\n- (Ladungssicherung) Die Ladungssicherung wird vor Fahrtbeginn vom Fahrer kontrolliert und nach den ersten 50 Kilometern nachgezogen. Bei langen Fahrten wird sie mindestens alle 150 Kilometer sowie nach jeder Pause geprüft. [logistik/ladungssicherung#Kontrollen]\n- (Gefahrgut-Handling) Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]",
+            "citations": [
+              {
+                "doc_id": "logistik/fahrzeugpruefung",
+                "title": "Fahrzeugprüfung und Fahrerpflichten",
+                "section": "Tägliche Abfahrtskontrolle",
+                "chunk_id": "logistik/fahrzeugpruefung#0"
+              },
+              {
+                "doc_id": "logistik/ladungssicherung",
+                "title": "Ladungssicherung",
+                "section": "Kontrollen",
+                "chunk_id": "logistik/ladungssicherung#3"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "logistik/fahrzeugpruefung"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2374,
+            "output_tokens": 251,
+            "cost": 0.0003629,
+            "latency_ms": 8.915880000131438,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/fahrzeugpruefung",
+              "logistik/ladungssicherung",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s11",
+          "type": "single",
+          "user": "bent",
+          "question": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+          "expected_doc_ids": [
+            "logistik/reklamation-transportschaden"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Reklamation und Transportschäden) Die erste Rückmeldung an den Kunden erfolgt spätestens nach fünf Arbeitstagen, die endgültige Entscheidung innerhalb von 30 Tagen. Verjährung von Ansprüchen aus Frachtverträgen tritt nach einem Jahr ein, bei Vorsatz nach drei Jahren. [logistik/reklamation-transportschaden#Fristen]\n- (Gefahrgut-Handling) Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]\n- (Reklamation und Transportschäden) Bei Schäden über 5.000 Euro oder Diebstahl wird die Transportversicherung eingeschaltet. Die Meldung an den Versicherer geschieht durch die Schadenabteilung binnen drei Tagen. [logistik/reklamation-transportschaden#Versicherung]",
+            "citations": [
+              {
+                "doc_id": "logistik/reklamation-transportschaden",
+                "title": "Reklamation und Transportschäden",
+                "section": "Fristen",
+                "chunk_id": "logistik/reklamation-transportschaden#3"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              },
+              {
+                "doc_id": "logistik/reklamation-transportschaden",
+                "title": "Reklamation und Transportschäden",
+                "section": "Versicherung",
+                "chunk_id": "logistik/reklamation-transportschaden#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "logistik/reklamation-transportschaden"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2438,
+            "output_tokens": 247,
+            "cost": 0.00036730000000000004,
+            "latency_ms": 7.193507000010868,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/reklamation-transportschaden",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s12",
+          "type": "single",
+          "user": "bent",
+          "question": "Welche Schutzausrüstung ist im Lager Pflicht?",
+          "expected_doc_ids": [
+            "logistik/lagerordnung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Lagerordnung) Der Zutritt zu den Hallen ist nur mit Mitarbeiterausweis oder nach Anmeldung am Pförtnerhaus möglich. In allen Hallenbereichen sind Sicherheitsschuhe der Klasse S3 und Warnweste Pflicht. [logistik/lagerordnung#Zutritt und Schutzausrüstung]\n- (Ladungssicherung) Die Fahrzeuge sind mit mindestens zehn Zurrgurten, vier Kantenschutzwinkeln, einem Satz Antirutschmatten und zwei Sperrbalken ausgestattet. Die Bestückung wird bei jeder Wartung geprüft. [logistik/ladungssicherung#Hilfsmittel]\n- (Onboarding für neue Mitarbeitende) In den ersten 30 Tagen sind folgende Online-Schulungen verpflichtend: Datenschutz, Informationssicherheit, Verhaltenskodex und Arbeitssicherheit. Für Mitarbeitende im Lager kommt eine praktische Einweisung in Flurförderzeuge hinzu. [alle/onboarding#Pflichtschulungen]",
+            "citations": [
+              {
+                "doc_id": "logistik/lagerordnung",
+                "title": "Lagerordnung",
+                "section": "Zutritt und Schutzausrüstung",
+                "chunk_id": "logistik/lagerordnung#1"
+              },
+              {
+                "doc_id": "logistik/ladungssicherung",
+                "title": "Ladungssicherung",
+                "section": "Hilfsmittel",
+                "chunk_id": "logistik/ladungssicherung#7"
+              },
+              {
+                "doc_id": "alle/onboarding",
+                "title": "Onboarding für neue Mitarbeitende",
+                "section": "Pflichtschulungen",
+                "chunk_id": "alle/onboarding#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Schutzausrüstung ist im Lager Pflicht?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "logistik/lagerordnung"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2326,
+            "output_tokens": 232,
+            "cost": 0.0003486,
+            "latency_ms": 8.282602000235784,
+            "found": true,
+            "retrieved_doc_ids": [
+              "logistik/lagerordnung",
+              "logistik/ladungssicherung",
+              "alle/onboarding",
+              "logistik/gefahrgut-handling"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s13",
+          "type": "single",
+          "user": "ole",
+          "question": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+          "expected_doc_ids": [
+            "alle/urlaubsantrag"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Urlaubsantrag und Urlaubsregelung) Scheiden Mitarbeitende im Laufe des Jahres aus, wird der Urlaubsanspruch anteilig berechnet. Zu viel genommener Urlaub wird nicht zurückgefordert, sofern er im Rahmen der Regelung gewährt wurde. [alle/urlaubsantrag#Resturlaub bei Austritt]\n- (Urlaubsantrag und Urlaubsregelung) Nicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. [alle/urlaubsantrag#Übertragung und Verfall]\n- (Urlaubsantrag und Urlaubsregelung) Der jährliche Urlaubsanspruch beträgt für Vollzeitkräfte 30 Arbeitstage bei einer Fünf-Tage-Woche. Teilzeitkräfte erhalten den Anspruch anteilig. [alle/urlaubsantrag#Urlaubsanspruch]",
+            "citations": [
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Resturlaub bei Austritt",
+                "chunk_id": "alle/urlaubsantrag#7"
+              },
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Übertragung und Verfall",
+                "chunk_id": "alle/urlaubsantrag#4"
+              },
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Urlaubsanspruch",
+                "chunk_id": "alle/urlaubsantrag#1"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/urlaubsantrag"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2341,
+            "output_tokens": 200,
+            "cost": 0.00033410000000000004,
+            "latency_ms": 8.020366999971884,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/urlaubsantrag"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "s14",
+          "type": "single",
+          "user": "fiete",
+          "question": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+          "expected_doc_ids": [
+            "alle/brandschutz-notfall"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Brandschutz und Notfallverhalten) Der Empfang führt eine tagesaktuelle Besucherliste, damit im Ernstfall alle Personen im Gebäude erfasst werden können. Die Empfangskraft nimmt die Liste mit zum Sammelplatz. [alle/brandschutz-notfall#Evakuierung von Besuchern]\n- (Brandschutz und Notfallverhalten) Ruhe bewahren. Brand melden über die Notrufnummer 112 und die interne Notrufnummer 999. [alle/brandschutz-notfall#Im Brandfall]\n- (Gefahrgut-Handling) Gefahrgut darf nur von Fahrern mit gültigem ADR-Schein transportiert werden. Das Fahrzeug braucht orange Warntafeln, Feuerlöscher, Unfallmerkblatt und die persönliche Schutzausrüstung. [logistik/gefahrgut-handling#Transport]",
+            "citations": [
+              {
+                "doc_id": "alle/brandschutz-notfall",
+                "title": "Brandschutz und Notfallverhalten",
+                "section": "Evakuierung von Besuchern",
+                "chunk_id": "alle/brandschutz-notfall#8"
+              },
+              {
+                "doc_id": "alle/brandschutz-notfall",
+                "title": "Brandschutz und Notfallverhalten",
+                "section": "Im Brandfall",
+                "chunk_id": "alle/brandschutz-notfall#1"
+              },
+              {
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Transport",
+                "chunk_id": "logistik/gefahrgut-handling#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/brandschutz-notfall"
+                },
+                "summary": "9 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2310,
+            "output_tokens": 203,
+            "cost": 0.0003325,
+            "latency_ms": 7.70879599986074,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/brandschutz-notfall",
+              "logistik/gefahrgut-handling",
+              "hr/kuendigungsfristen"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m01",
+          "type": "multi",
+          "user": "katja",
+          "question": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+          "expected_doc_ids": [
+            "alle/reisekostenrichtlinie",
+            "vertrieb/vertrieb-reisekosten"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie) Da im Vertrieb häufig Kundentermine in Großstädten stattfinden, liegt die Obergrenze für Hotelübernachtungen bei 140 Euro pro Nacht inklusive Frühstück. Die Grenze gilt bundesweit. [vertrieb/vertrieb-reisekosten#Höhere Hotelgrenze]\n- (Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie) Hotel bis 140 Euro pro Nacht, bei Messen bis 180 Euro mit Freigabe. Bahn 1. [vertrieb/vertrieb-reisekosten#Kurzübersicht]\n- (Reisekostenrichtlinie) Hotelübernachtungen werden bis zu einer Obergrenze von 110 Euro pro Nacht inklusive Frühstück erstattet. In den Städten München, Frankfurt, Stuttgart und Köln gilt keine höhere Grenze, sofern keine abteilungsspezifische Regelung existiert. [alle/reisekostenrichtlinie#Übernachtung]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Höhere Hotelgrenze",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
+              },
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Kurzübersicht",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#7"
+              },
+              {
+                "doc_id": "alle/reisekostenrichtlinie",
+                "title": "Reisekostenrichtlinie",
+                "section": "Übernachtung",
+                "chunk_id": "alle/reisekostenrichtlinie#4"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/vertrieb-reisekosten"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2447,
+            "output_tokens": 240,
+            "cost": 0.00036470000000000003,
+            "latency_ms": 8.838645000196266,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/vertrieb-reisekosten",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m02",
+          "type": "multi",
+          "user": "ole",
+          "question": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+          "expected_doc_ids": [
+            "alle/arbeitszeit-homeoffice",
+            "it/vpn-einrichtung"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Arbeitszeit und Homeoffice) Das Unternehmen stellt Laptop und Headset. Ein Monitor kann auf Antrag geliehen werden. [alle/arbeitszeit-homeoffice#Ausstattung und Datenschutz]\n- (Arbeitszeit und Homeoffice) Mitarbeitende in der Verwaltung können bis zu drei Tage pro Woche von zu Hause arbeiten, sofern die Tätigkeit es erlaubt und die Führungskraft zustimmt. Die Vereinbarung wird schriftlich im Portal festgehalten. [alle/arbeitszeit-homeoffice#Homeoffice]\n- (Arbeitszeit und Homeoffice) Arbeiten aus dem Ausland ist nur bis zu 10 Arbeitstage pro Jahr und nur innerhalb der EU nach vorheriger Genehmigung erlaubt. Steuerliche und sozialversicherungsrechtliche Fragen klärt die Personalabteilung vorab. [alle/arbeitszeit-homeoffice#Mobiles Arbeiten im Ausland]",
+            "citations": [
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Ausstattung und Datenschutz",
+                "chunk_id": "alle/arbeitszeit-homeoffice#4"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Homeoffice",
+                "chunk_id": "alle/arbeitszeit-homeoffice#3"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Mobiles Arbeiten im Ausland",
+                "chunk_id": "alle/arbeitszeit-homeoffice#5"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/arbeitszeit-homeoffice"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2305,
+            "output_tokens": 223,
+            "cost": 0.000342,
+            "latency_ms": 10.217193999778829,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/arbeitszeit-homeoffice"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m03",
+          "type": "multi",
+          "user": "fiete",
+          "question": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+          "expected_doc_ids": [
+            "vertrieb/rabattstaffel-grosskunden",
+            "logistik/gefahrgut-handling"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Rabattstaffel für Großkunden) Für Gefahrguttransporte gilt ein eigener Zuschlag von 18 Prozent auf die Grundfracht, der nicht rabattierbar ist. Details zu Gefahrgut finden Sie in der Anweisung der Logistik. [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut]\n- (Rabattstaffel für Großkunden) | Jahresumsatz (netto) | Rabatt auf Listenpreis | |---|---| | 150.000 bis 299.999 Euro | 4 Prozent | | 300.000 bis 599.999 Euro | 7 Prozent | | 600.000 bis 999.999 Euro | 10 Prozent | | ab 1.000.000 Euro | 12 Prozent | Der Rabatt wird auf d [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]\n- (Rabattstaffel für Großkunden) Ein Kunde mit einem Jahresumsatz von 420.000 Euro erhält 7 Prozent Rabatt auf die Grundfracht. Hat er außerdem einen Dreijahresvertrag, erhöht sich der Rabatt auf 8 Prozent. [vertrieb/rabattstaffel-grosskunden#Beispielrechnung]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Sonderfall Gefahrgut",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Staffel auf Frachtumsatz",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Beispielrechnung",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#7"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/rabattstaffel-grosskunden"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2363,
+            "output_tokens": 260,
+            "cost": 0.0003663,
+            "latency_ms": 8.921453000311885,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/zollabwicklung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m04",
+          "type": "multi",
+          "user": "katja",
+          "question": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+          "expected_doc_ids": [
+            "vertrieb/kundenbewirtung",
+            "vertrieb/vertrieb-reisekosten"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie) Das Essen mit Kunden wird bis 60 Euro pro Person erstattet. Es ist die Bewirtungsrechnung mit Anlass, Teilnehmern und Namen der Gäste beizufügen. [vertrieb/vertrieb-reisekosten#Kundenbewirtung auf Reisen]\n- (Kundenbewirtung und Geschenke an Kunden) Bewirtungen sind erlaubt, wenn sie geschäftlich begründet sind. Pro Person werden bis zu 60 Euro inklusive Getränken und Trinkgeld erstattet. [vertrieb/kundenbewirtung#Bewirtung]\n- (Kundenbewirtung und Geschenke an Kunden) Zulässig: Mittagessen mit der Einkaufsleiterin eines Bestandskunden für 45 Euro pro Person, mit korrekt ausgefülltem Beleg. Zulässig: Eine Flasche Wein im Wert von 25 Euro zum Jahresabschluss. [vertrieb/kundenbewirtung#Beispiele]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
+                "section": "Kundenbewirtung auf Reisen",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#4"
+              },
+              {
+                "doc_id": "vertrieb/kundenbewirtung",
+                "title": "Kundenbewirtung und Geschenke an Kunden",
+                "section": "Bewirtung",
+                "chunk_id": "vertrieb/kundenbewirtung#1"
+              },
+              {
+                "doc_id": "vertrieb/kundenbewirtung",
+                "title": "Kundenbewirtung und Geschenke an Kunden",
+                "section": "Beispiele",
+                "chunk_id": "vertrieb/kundenbewirtung#6"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/vertrieb-reisekosten"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2371,
+            "output_tokens": 227,
+            "cost": 0.0003506,
+            "latency_ms": 7.981199999903765,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/vertrieb-reisekosten",
+              "vertrieb/kundenbewirtung",
+              "alle/reisekostenrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m05",
+          "type": "multi",
+          "user": "ole",
+          "question": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+          "expected_doc_ids": [
+            "it/hardware-bestellung",
+            "it/software-freigabe"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Hardware-Bestellung) Geräte werden vor der Ausgabe von der IT vorinstalliert, verschlüsselt und in die Geräteverwaltung aufgenommen. Die Übergabe erfolgt gegen Unterschrift. [it/hardware-bestellung#Montage und Einrichtung]\n- (Software-Freigabe) Standardprogramme wie Office, PDF-Reader, Browser, Videokonferenz und Passwortmanager können Sie selbst über das Selbstbedienungsportal installieren. Die Installation erfolgt ohne Administratorrechte. [it/software-freigabe#Softwarekatalog]\n- (Hardware-Bestellung) Zusätzliche oder abweichende Hardware wird über das Ticketsystem in der Kategorie \"Hardware\" bestellt. Die Führungskraft muss die Bestellung bestätigen. [it/hardware-bestellung#Bestellung]",
+            "citations": [
+              {
+                "doc_id": "it/hardware-bestellung",
+                "title": "Hardware-Bestellung",
+                "section": "Montage und Einrichtung",
+                "chunk_id": "it/hardware-bestellung#3"
+              },
+              {
+                "doc_id": "it/software-freigabe",
+                "title": "Software-Freigabe",
+                "section": "Softwarekatalog",
+                "chunk_id": "it/software-freigabe#1"
+              },
+              {
+                "doc_id": "it/hardware-bestellung",
+                "title": "Hardware-Bestellung",
+                "section": "Bestellung",
+                "chunk_id": "it/hardware-bestellung#1"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/hardware-bestellung"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2310,
+            "output_tokens": 211,
+            "cost": 0.0003365,
+            "latency_ms": 9.500774000116508,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/hardware-bestellung",
+              "it/software-freigabe"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m06",
+          "type": "multi",
+          "user": "mira",
+          "question": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+          "expected_doc_ids": [
+            "alle/urlaubsantrag",
+            "hr/elternzeit"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Elternzeit und Familienleistungen) Der Urlaubsanspruch kann für jeden vollen Monat der Elternzeit um ein Zwölftel gekürzt werden. Das Unternehmen macht von dieser Kürzung Gebrauch, außer bei Teilzeit-Arbeit während der Elternzeit. [hr/elternzeit#Urlaub während der Elternzeit]\n- (Elternzeit und Familienleistungen) Während der Elternzeit kann bis zu 32 Stunden pro Woche gearbeitet werden. Der Antrag auf Teilzeit wird acht Wochen vor Beginn gestellt. [hr/elternzeit#Teilzeit in Elternzeit]\n- (Elternzeit und Familienleistungen) Das Unternehmen zahlt zum Elterngeld einen freiwilligen Zuschuss. Er beträgt für die ersten drei Monate der Elternzeit 200 Euro pro Monat. [hr/elternzeit#Zuschüsse des Unternehmens]",
+            "citations": [
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Urlaub während der Elternzeit",
+                "chunk_id": "hr/elternzeit#4"
+              },
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Teilzeit in Elternzeit",
+                "chunk_id": "hr/elternzeit#2"
+              },
+              {
+                "doc_id": "hr/elternzeit",
+                "title": "Elternzeit und Familienleistungen",
+                "section": "Zuschüsse des Unternehmens",
+                "chunk_id": "hr/elternzeit#3"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "hr/elternzeit"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2307,
+            "output_tokens": 211,
+            "cost": 0.00033620000000000004,
+            "latency_ms": 8.909977999792318,
+            "found": true,
+            "retrieved_doc_ids": [
+              "hr/elternzeit"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m07",
+          "type": "multi",
+          "user": "ole",
+          "question": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+          "expected_doc_ids": [
+            "it/passwortrichtlinie",
+            "it/mfa"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Mehrfaktor-Anmeldung (MFA)) Beim Wechsel des Smartphones übertragen Sie die Konten vor dem Zurücksetzen des alten Geräts. Ist das alte Gerät verloren, melden Sie sich beim IT-Support unter Durchwahl 300. [it/mfa#Handy verloren oder gewechselt]\n- (Passwortrichtlinie) Nach fünf falschen Eingaben wird das Konto für 15 Minuten gesperrt. Ein vergessenes Passwort setzen Sie selbst über das Portal \"Passwort zurücksetzen\" zurück. [it/passwortrichtlinie#Sperrung und Zurücksetzen]\n- (Passwortrichtlinie) Das Unternehmen stellt allen Beschäftigten den Passwortmanager \"Tresor\" zur Verfügung. Verwenden Sie für jedes Konto ein eigenes Passwort. [it/passwortrichtlinie#Passwortmanager]",
+            "citations": [
+              {
+                "doc_id": "it/mfa",
+                "title": "Mehrfaktor-Anmeldung (MFA)",
+                "section": "Handy verloren oder gewechselt",
+                "chunk_id": "it/mfa#4"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Sperrung und Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#4"
+              },
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Passwortmanager",
+                "chunk_id": "it/passwortrichtlinie#3"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/mfa"
+                },
+                "summary": "7 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2265,
+            "output_tokens": 204,
+            "cost": 0.0003285,
+            "latency_ms": 7.873095999912039,
+            "found": true,
+            "retrieved_doc_ids": [
+              "it/mfa",
+              "it/passwortrichtlinie"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "m08",
+          "type": "multi",
+          "user": "fiete",
+          "question": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+          "expected_doc_ids": [
+            "logistik/zollabwicklung",
+            "vertrieb/rabattstaffel-grosskunden"
+          ],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Rabattstaffel für Großkunden) | Jahresumsatz (netto) | Rabatt auf Listenpreis | |---|---| | 150.000 bis 299.999 Euro | 4 Prozent | | 300.000 bis 599.999 Euro | 7 Prozent | | 600.000 bis 999.999 Euro | 10 Prozent | | ab 1.000.000 Euro | 12 Prozent | Der Rabatt wird auf d [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]\n- (Zollabwicklung) Für die Zollabfertigung berechnet das Unternehmen eine Pauschale von 45 Euro pro Zollanmeldung, zuzüglich der verauslagten Abgaben mit einer Auslagenpauschale von 2 Prozent. Die Gebühr unterliegt nicht der Rabattstaffel für Großkunden. [logistik/zollabwicklung#Gebühren]\n- (Rabattstaffel für Großkunden) Für Gefahrguttransporte gilt ein eigener Zuschlag von 18 Prozent auf die Grundfracht, der nicht rabattierbar ist. Details zu Gefahrgut finden Sie in der Anweisung der Logistik. [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut]",
+            "citations": [
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Staffel auf Frachtumsatz",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+              },
+              {
+                "doc_id": "logistik/zollabwicklung",
+                "title": "Zollabwicklung",
+                "section": "Gebühren",
+                "chunk_id": "logistik/zollabwicklung#5"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel für Großkunden",
+                "section": "Sonderfall Gefahrgut",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "vertrieb/rabattstaffel-grosskunden"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2324,
+            "output_tokens": 261,
+            "cost": 0.0003629,
+            "latency_ms": 8.843282000270847,
+            "found": true,
+            "retrieved_doc_ids": [
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/zollabwicklung"
+            ]
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n01",
+          "type": "not_found",
+          "user": "fiete",
+          "question": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 512,
+            "output_tokens": 33,
+            "cost": 6.77e-05,
+            "latency_ms": 8.690404999924795,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n02",
+          "type": "not_found",
+          "user": "mira",
+          "question": "Dürfen Haustiere ins Büro mitgebracht werden?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Dürfen Haustiere ins Büro mitgebracht werden?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 500,
+            "output_tokens": 31,
+            "cost": 6.55e-05,
+            "latency_ms": 7.602683000186516,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n03",
+          "type": "not_found",
+          "user": "bent",
+          "question": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 508,
+            "output_tokens": 31,
+            "cost": 6.630000000000001e-05,
+            "latency_ms": 8.517105000009906,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "n04",
+          "type": "not_found",
+          "user": "ole",
+          "question": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Verhaltenskodex der Elbkontor Logistik GmbH) Der Verhaltenskodex beschreibt, wie wir miteinander, mit Kunden und mit Geschäftspartnern umgehen. [alle/verhaltenskodex#Verhaltenskodex der Elbkontor Logistik GmbH]\n- (Reisekostenrichtlinie) Gültig ab 01.01.2026 für alle Mitarbeitenden der Elbkontor Logistik GmbH. [alle/reisekostenrichtlinie#Reisekostenrichtlinie]\n- (Datenschutz-Grundlagen) Dieses Merkblatt fasst zusammen, was alle Mitarbeitenden der Elbkontor Logistik GmbH über den Umgang mit personenbezogenen Daten wissen müssen. [alle/datenschutz-grundlagen#Datenschutz-Grundlagen]",
+            "citations": [
+              {
+                "doc_id": "alle/verhaltenskodex",
+                "title": "Verhaltenskodex der Elbkontor Logistik GmbH",
+                "section": "Verhaltenskodex der Elbkontor Logistik GmbH",
+                "chunk_id": "alle/verhaltenskodex#0"
+              },
+              {
+                "doc_id": "alle/reisekostenrichtlinie",
+                "title": "Reisekostenrichtlinie",
+                "section": "Reisekostenrichtlinie",
+                "chunk_id": "alle/reisekostenrichtlinie#0"
+              },
+              {
+                "doc_id": "alle/datenschutz-grundlagen",
+                "title": "Datenschutz-Grundlagen",
+                "section": "Datenschutz-Grundlagen",
+                "chunk_id": "alle/datenschutz-grundlagen#0"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/verhaltenskodex"
+                },
+                "summary": "9 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2073,
+            "output_tokens": 179,
+            "cost": 0.0002968,
+            "latency_ms": 10.650214000179403,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/verhaltenskodex",
+              "alle/reisekostenrichtlinie",
+              "alle/datenschutz-grundlagen",
+              "alle/urlaubsantrag",
+              "alle/onboarding"
+            ]
+          },
+          "correct": false,
+          "leak": false
+        },
+        {
+          "id": "p01",
+          "type": "permission",
+          "user": "katja",
+          "question": "Wie hoch ist das Jahresbrutto-Band der Entgeltgruppe E5?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie hoch ist das Jahresbrutto-Band der Entgeltgruppe E5?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 508,
+            "output_tokens": 31,
+            "cost": 6.630000000000001e-05,
+            "latency_ms": 11.92854000009902,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "p02",
+          "type": "permission",
+          "user": "ole",
+          "question": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Laut den Dokumenten:\n- (Urlaubsantrag und Urlaubsregelung) Nicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. [alle/urlaubsantrag#Übertragung und Verfall]\n- (Onboarding für neue Mitarbeitende) Nach vier Wochen, nach drei Monaten und vor Ablauf der Probezeit führt die Führungskraft ein Feedbackgespräch. Die Probezeit dauert in der Regel sechs Monate. [alle/onboarding#Gespräche in der Probezeit]\n- (Arbeitszeit und Homeoffice) Bei mehr als sechs Stunden Arbeit besteht Anspruch auf 30 Minuten Pause, bei mehr als neun Stunden auf 45 Minuten. Die Pausen werden nicht als Arbeitszeit gerechnet und automatisch abgezogen, wenn sie nicht gebucht wurden. [alle/arbeitszeit-homeoffice#Pausen]",
+            "citations": [
+              {
+                "doc_id": "alle/urlaubsantrag",
+                "title": "Urlaubsantrag und Urlaubsregelung",
+                "section": "Übertragung und Verfall",
+                "chunk_id": "alle/urlaubsantrag#4"
+              },
+              {
+                "doc_id": "alle/onboarding",
+                "title": "Onboarding für neue Mitarbeitende",
+                "section": "Gespräche in der Probezeit",
+                "chunk_id": "alle/onboarding#6"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Pausen",
+                "chunk_id": "alle/arbeitszeit-homeoffice#2"
+              }
+            ],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "alle/urlaubsantrag"
+                },
+                "summary": "8 Abschnitte gelesen"
+              }
+            ],
+            "input_tokens": 2324,
+            "output_tokens": 216,
+            "cost": 0.0003404,
+            "latency_ms": 10.32547800014072,
+            "found": true,
+            "retrieved_doc_ids": [
+              "alle/urlaubsantrag",
+              "alle/onboarding",
+              "alle/arbeitszeit-homeoffice",
+              "it/datensicherung"
+            ]
+          },
+          "correct": false,
+          "leak": false
+        },
+        {
+          "id": "p03",
+          "type": "permission",
+          "user": "bent",
+          "question": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 509,
+            "output_tokens": 33,
+            "cost": 6.740000000000001e-05,
+            "latency_ms": 8.543321000161086,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        },
+        {
+          "id": "p04",
+          "type": "permission",
+          "user": "katja",
+          "question": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+          "expected_doc_ids": [],
+          "result": {
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
+            "mode": "agentic",
+            "steps": [
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              }
+            ],
+            "input_tokens": 511,
+            "output_tokens": 32,
+            "cost": 6.709999999999999e-05,
+            "latency_ms": 8.329864999723213,
+            "found": false,
+            "retrieved_doc_ids": []
+          },
+          "correct": true,
+          "leak": false
+        }
+      ]
+    }
+  }
+}

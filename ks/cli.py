@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ks.auth import USERS, allowed_departments, get_user
 from ks.embed import Embedder, get_embedder
+from ks.eval import QUESTIONS, RESULTS
 from ks.ingest import chunk_documents, embedding_text, load_documents
 from ks.search import HybridSearcher
 from ks.store import MemoryStore, PgVectorStore, VectorStore
@@ -67,6 +68,18 @@ def cmd_search(args: argparse.Namespace) -> None:
         print(f"   {snippet}...")
 
 
+def cmd_eval(args: argparse.Namespace) -> None:
+    from ks.eval import format_table, load_questions, open_searcher, run_eval
+    from ks.llm import get_llm
+
+    searcher, embedder = open_searcher(Path(args.index_dir), Path(args.docs))
+    modes = ["classic", "agentic"] if args.mode == "both" else [args.mode]
+    questions = load_questions(Path(args.questions))
+    report = run_eval(modes, questions, searcher, get_llm(), embedder, Path(args.out))
+    print(format_table(report))
+    print(f"Written: {args.out}")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="ks")
     parser.add_argument("--store", choices=["memory", "pgvector"], default="memory")
@@ -84,6 +97,13 @@ def main(argv: list[str] | None = None) -> None:
     p_search.add_argument("--user", required=True)
     p_search.add_argument("-k", type=int, default=5)
     p_search.set_defaults(func=cmd_search)
+
+    p_eval = sub.add_parser("eval", help="run eval/questions.yaml and write eval/results.json")
+    p_eval.add_argument("--mode", choices=["classic", "agentic", "both"], default="both")
+    p_eval.add_argument("--questions", default=str(QUESTIONS))
+    p_eval.add_argument("--out", default=str(RESULTS))
+    p_eval.add_argument("--docs", default=str(DEFAULT_DOCS))
+    p_eval.set_defaults(func=cmd_eval)
 
     args = parser.parse_args(argv)
     args.func(args)
