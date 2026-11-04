@@ -37,6 +37,7 @@ export default function SourcePanel({ docId, section, onClose }: Props) {
   const [doc, setDoc] = useState<DocDetail | null>(null);
   const [error, setError] = useState("");
   const closeRef = useRef<HTMLButtonElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const hitRef = useRef<HTMLElement | null>(null);
 
@@ -61,20 +62,24 @@ export default function SourcePanel({ docId, section, onClose }: Props) {
     // scroll only the panel itself, never the page behind it
     const hit = hitRef.current;
     const panel = panelRef.current;
-    if (hit && panel?.scrollTo) panel.scrollTo({ top: hit.offsetTop - panel.clientHeight / 3 });
+    if (hit && panel?.scrollTo) panel.scrollTo({ top: hit.offsetTop - (headRef.current?.offsetHeight ?? 0) - 16 });
   }, [doc, section]);
 
   return (
     <aside className="panel" aria-label="Quelle" ref={panelRef}>
-      <div className="panel-head">
+      <div className="panel-head" ref={headRef}>
         <div>
           <h2>{doc?.title ?? "Quelle"}</h2>
           {doc && <span className="chip">{deptLabel(doc.department)}</span>}
         </div>
-        <button ref={closeRef} className="iconbtn" onClick={onClose} aria-label="Quelle schließen">
-          ×
+        <button ref={closeRef} className="closebtn" onClick={onClose}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+            <path d="M2 2l10 10M12 2L2 12" />
+          </svg>
+          Schließen
         </button>
       </div>
+      <div className="panel-body">
       {error && <p className="error">{error}</p>}
       {!doc && !error && <p className="muted">Lädt …</p>}
       {doc?.chunks.map((c) => {
@@ -91,6 +96,7 @@ export default function SourcePanel({ docId, section, onClose }: Props) {
           </section>
         );
       })}
+      </div>
     </aside>
   );
 }

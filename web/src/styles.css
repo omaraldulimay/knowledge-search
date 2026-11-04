@@ -171,9 +171,15 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
 
 .panel {
   position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; background: var(--surface);
-  border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem;
+  border: 1px solid var(--line); border-radius: 16px;
 }
-.panel-head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; margin-bottom: 0.8rem; }
+.panel-body { padding: 0.4rem 1.2rem 1.5rem; }
+.panel-head {
+  position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.2rem 0.8rem; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.closebtn { display: inline-flex; align-items: center; gap: 0.4rem; flex: none; background: none; border: 1px solid var(--line); border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.9rem; }
+.closebtn:hover { border-color: var(--accent); color: var(--accent); }
 .panel-head h2 { margin: 0 0 0.4rem; font-size: 1.15rem; }
 .chunk { padding: 0.8rem 0.9rem; margin: 0 -0.9rem; border-radius: 10px; border-left: 3px solid transparent; }
 .chunk h3 { font-family: var(--sans); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.3rem; }
@@ -237,7 +243,7 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
 /* ---- small screens */
 @media (max-width: 900px) {
   .ask--panel { grid-template-columns: minmax(0, 1fr); }
-  .panel { position: fixed; inset: 0; max-height: none; border-radius: 0; z-index: 20; padding: 1rem 1.2rem 2rem; }
+  .panel { position: fixed; inset: 0; max-height: none; border-radius: 0; z-index: 20; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
