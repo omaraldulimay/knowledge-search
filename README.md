@@ -1,110 +1,146 @@
 # knowledge-search
 
-Permission-aware search over the internal documents of a fictional company
-("Elbkontor Logistik GmbH"). Employees ask questions in German, the search returns the matching
-document sections, and every user only sees documents of their own department.
-Later phases add an LLM answer layer (classic RAG and agentic search), an API and a web UI.
+Ask questions about internal documents in plain German, get answers with clickable sources, and make sure everyone only sees what their department may read.
 
-**Status: phase 3** - search, LLM answers (classic and agentic), scale benchmark, HTTP API, Docker, CI.
+![Ask screen with the citation side panel](docs/img/ask.webp)
 
-## Run phase 1
+**Demo:** https://omaraldulimay.github.io/knowledge-search/ (live after the first deploy; precomputed answers, no server)
+
+## What it does
+
+- **Answers with sources.** Every claim carries a citation (document, section, chunk) that opens the original text.
+- **Two search modes, measured against each other.** Classic RAG (search once) vs. an agent that calls search tools itself.
+- **Rights are enforced in the data layer.** A user never receives a chunk of a department they do not belong to.
+- **Quality is visible.** 30 eval questions, live request log, a scale test with 10,000 filler documents.
+
+Fictional company ("Elbkontor Logistik GmbH"), 35 invented German documents (md, pdf, docx), five demo users.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  F["Files: md / pdf / docx"] --> C["Chunks<br/>(heading-aware)"]
+  C --> E["Embeddings<br/>(local FastEmbed)"]
+  E --> S[("Store<br/>pgvector or memory")]
+
+  Q["Question + user"] --> M{Mode}
+  M -->|classic| H["Hybrid search<br/>vector + BM25"]
+  M -->|agentic| T["Tool loop, max 6 calls<br/>search / read_document / list_documents"]
+  H --> L["Claude"]
+  T <--> L
+  L --> A["Answer with citations"]
+
+  S --- P["Permission filter<br/>inside store and tools"]
+  P --- H
+  P --- T
+```
+
+## Two modes
+
+| | Classic ("Einmal suchen") | Agentic ("KI sucht selbst") |
+|---|---|---|
+| Flow | hybrid search once, top 5 chunks go into the prompt | model calls `search`, `read_document`, `list_documents` itself |
+| Strength | fast, cheap, predictable | can combine two documents, re-search with better terms |
+| Cost | 1 model call | up to 6 tool calls, about 4x the tokens in the eval |
+| UI | answer + sources | answer + sources + timeline of the steps |
+
+## Results
+
+30 questions: 14 single-document, 8 need two documents, 4 not in any document, 4 only in documents the user must not see.
+
+| | Classic | Agentic |
+|---|---|---|
+| Right document in top 5 | 100 % | 100 % |
+| Citation correct | 93 % | 93 % |
+| Permission leaks | 0 | 0 |
+| p95 latency | 25 ms | 11 ms |
+| Cost per question | $0.0001 | $0.0003 |
+
+![Scale test: 35 vs. 10,035 documents](eval/scale.png)
+
+> **Honest note:** these numbers come from the deterministic `FakeLLM` (an extractive stand-in), not from Claude.
+> Latency and cost therefore say little; the real Claude run replaces them (`LLM_PROVIDER=anthropic python -m ks.cli eval`, then `export-demo`).
+> What is already real: retrieval (hit rate, search latency), the permission checks and the scale test.
+>
+> **The scale drop:** with 10,035 documents the right document is still found (100 % hit rate), but citation correctness falls from 93 % to 77 %.
+> The generated filler contains outdated policy versions and near-duplicate FAQ pages that compete for the cited slots. Search p95 grows from 15 ms to 62 ms (in-memory store, fine for this size). Versions are handled by a "newest valid version wins" rule, but not every distractor is caught.
+
+![Quality dashboard](docs/img/quality.webp)
+
+## Permissions
+
+A `vertrieb` user cannot read `hr` documents, by any route. The filter lives in the store and in the agent tools, not in the prompt, so a prompt injection cannot lift it.
+
+- **Forbidden equals missing.** `GET /documents/hr/gehaltsbaender` as `katja` returns the same 404 as a document that does not exist. The agent tool `read_document` answers the same way. Nobody can probe which documents exist.
+- Departments: `alle` (everyone), `hr`, `it`, `vertrieb`, `logistik`; `fiete` is admin and sees all.
+- One test proves that classic search, agent tools and `/documents` return no `hr` chunk for a `vertrieb` user. The eval counts leaks too (0 in all runs).
+- Demo login has no passwords (just a user name). A real setup would put SSO / OIDC in front; the rest stays the same.
+
+## Run it
+
+**Local, no Docker** (Python 3.12, Node 20):
 
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev,local]"      # "local" installs fastembed (downloads a ~220 MB model once)
-
-python -m ks.cli index                                   # build the index in .ks_index/
+pip install -e ".[dev,local]"           # "local" = FastEmbed, downloads a ~220 MB model once
+python -m ks.cli index                  # build the index
 python -m ks.cli search "Wie viel Urlaub habe ich?" --user mira
-python -m ks.cli search "Wie hoch ist das Gehaltsband E5?" --user katja   # vertrieb: no hr hits
-
-pytest && ruff check .                                   # offline, no model download
+uvicorn ks.api:app --reload             # API on :8000, OpenAPI page at /docs
 ```
 
-Without the `local` extra index with `--embedder hash` (or `KS_EMBEDDER=hash`): a deterministic toy
-embedder for tests. Demo users: `mira` (hr), `ole` (it), `katja` (vertrieb), `bent` (logistik),
-`fiete` (admin, all departments). Everybody additionally sees the department `alle`.
+Default LLM is the fake one. Real Claude answers need both `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` (model via `LLM_MODEL`, default `claude-haiku-5-5`).
 
-Optional Postgres + pgvector store: set `PG_DSN` and put `--store pgvector` before the command
-(`python -m ks.cli --store pgvector index`).
-The sample documents and the "combine two documents" questions are described in `data/README.md`.
-
-## Scale benchmark (phase 2b)
-
-How does search behave with 35 documents vs. 35 + N generated ones? `scripts/gen_corpus.py`
-writes seeded, template-based filler (delivery notes, shift logs, project notes, minutes,
-customer letters) plus distractors: outdated policy versions ("Reisekostenrichtlinie (Stand 2019)",
-other numbers) and near-duplicate FAQ pages. No LLM involved, everything is invented.
+**Docker Compose** (API + Postgres with pgvector):
 
 ```bash
-python -m ks.cli bench-scale --n 10000     # writes eval/scale.json and eval/scale.png
-python -m ks.cli clean-generated           # deletes data/generated (docs and indexes, gitignored)
-python -m ks.cli index                     # incremental: only new/changed docs are embedded
+docker compose up --build               # http://localhost:8000
 ```
 
-- **Versions:** documents may have front matter (`policy`, `valid_from`, `superseded`). If search
-  candidates contain several versions of one policy, only the newest valid one stays
-  (`apply_version_rule` in `ks/search.py`); an outdated chunk without a newer sibling is demoted.
-- **Incremental index:** a content hash per document (`manifest.json` in the index dir) decides what
-  is re-embedded; deleted files are removed. Embeddings run in batches with progress output.
-- **Against pgvector** (HNSW index is in `ks/schema.sql`): start Postgres with the pgvector
-  extension, `export PG_DSN=postgresql://...`, then
-  `python scripts/gen_corpus.py --n 10000 --out data/generated/all && cp -r data/docs/* data/generated/all/`,
-  `python -m ks.cli --store pgvector index --docs data/generated/all`, then
-  `python -m ks.cli --store pgvector search "..." --user mira`
-  to compare latency with the numbers in `eval/scale.json`. The benchmark command itself uses
-  `MemoryStore` only.
-
-## Run the API (phase 3)
-
-```bash
-pip install -e ".[dev,local]"
-uvicorn ks.api:app --reload          # http://localhost:8000/docs has the interactive OpenAPI page
-```
-
-On startup the API indexes `data/docs` (incrementally; `MemoryStore`, or pgvector if `PG_DSN` is set).
-Configuration by environment: `APP_SECRET` (token signing; a development default and a warning are
-used if unset), `KS_EMBEDDER` (`fastembed`, `hash` or `auto` = fastembed if installed), `PG_DSN`,
-`KS_DOCS_DIR`, `LLM_PROVIDER` (default `fake`; `anthropic` needs `ANTHROPIC_API_KEY`).
-CORS allows the Vite dev server (`http://localhost:5173`).
+**API examples:**
 
 ```bash
 TOKEN=$(curl -s -X POST localhost:8000/login -H 'content-type: application/json' \
   -d '{"username": "katja"}' | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
-AUTH="Authorization: Bearer $TOKEN"
-
-curl -s -X POST localhost:8000/ask -H "$AUTH" -H 'content-type: application/json' \
+curl -s -X POST localhost:8000/ask -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
   -d '{"question": "Wie viel darf ein Hotel pro Nacht kosten?", "mode": "agentic"}'
-curl -s localhost:8000/documents -H "$AUTH"                    # only documents katja may see
-curl -s localhost:8000/documents/hr/gehaltsbaender -H "$AUTH"  # 404, same as a missing document
-# admin (fiete) only: upload, delete, metrics
-curl -s -X POST localhost:8000/documents -H "$ADMIN" -F department=it -F file=@neu.md
-curl -s -X DELETE localhost:8000/documents/it/neu -H "$ADMIN"
-curl -s localhost:8000/metrics -H "$ADMIN"
+curl -s localhost:8000/documents -H "Authorization: Bearer $TOKEN"        # only what katja may see
 ```
 
-| Endpoint | Who | What |
-|---|---|---|
-| `GET /health` | public | status, chunk count |
-| `POST /login` `{username}` | public | signed token (8 h). **Demo simplification:** no passwords; a real setup would use SSO / OIDC |
-| `POST /ask` `{question, mode: classic\|agentic}` | user | answer, citations, steps, tokens, cost, latency |
-| `GET /documents`, `GET /documents/{doc_id}` | user | only allowed documents; forbidden and missing give the identical 404 |
-| `POST /documents` (multipart `file`, `department`), `DELETE /documents/{doc_id}` | admin (`fiete`) | md/pdf/docx upload with incremental indexing; delete |
-| `GET /metrics` | admin | per mode: count, avg/p95 latency, tokens, cost, not-found rate; top unanswered questions (= missing documentation); latest `eval/results.json` and `eval/scale.json` |
+Admin only (`fiete`): `POST /documents` (upload md/pdf/docx, indexed incrementally), `DELETE /documents/{id}`, `GET /metrics`.
 
-`/metrics` is admin-only because the list of unanswered questions reveals what other departments ask.
-The request log is in memory (SQLite); set `KS_METRICS_DB=/path/file.db` to keep it.
-
-## Docker
+**Frontend** (React + TypeScript + Vite; `/api` is proxied to :8000):
 
 ```bash
-docker compose up --build            # api on http://localhost:8000, Postgres + pgvector behind it
+cd web && npm ci && npm run dev         # http://localhost:5173
+npm run build:demo                      # static demo build in web/dist-demo (no server)
 ```
 
-`docker-compose.yml` starts `postgres` (`pgvector/pgvector:pg16`, with a healthcheck) and `api`
-(`PG_DSN` points to it; the API waits until Postgres is healthy). The image is built from
-`python:3.12-slim`, runs as a non-root user and downloads the embedding model at build time.
-Set `APP_SECRET` (and optionally `LLM_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`) in your shell
-or an `.env` file. Uploaded documents live inside the container, so they are gone when it is recreated.
+**Static demo:** `python -m ks.cli export-demo` writes `web/public/demo/demo.json` with prepared questions in both modes. Run it with `LLM_PROVIDER=anthropic` to refresh the answers with real Claude output; the file records which model produced them. GitHub Pages builds from the committed file and never calls an LLM.
 
-CI (`.github/workflows/ci.yml`) runs ruff and pytest against a pgvector service container (so the
-pgvector tests run too, with the fake LLM only, no secrets) and builds the Docker image without pushing it.
+**Scale test:** `python -m ks.cli bench-scale --n 10000` (seeded, no LLM), `python -m ks.cli clean-generated` removes the generated corpus.
+
+![Mobile view](docs/img/mobile.webp)
+
+## Tests & CI
+
+```bash
+pytest && ruff check .                  # offline: hash embedder + fake LLM, no API calls
+cd web && npm test && npm run build
+```
+
+GitHub Actions (`ci.yml`) runs ruff and pytest against a pgvector service (so the pgvector tests run too), the web tests and build, and a Docker build without push. `pages.yml` deploys the demo. No workflow has a secret or calls a paid API.
+
+## Design decisions
+
+- **Hybrid search.** Vectors find paraphrases ("Resturlaub" vs. "Urlaubstage verfallen"), BM25 finds exact terms like "E5" or "VPN". Reciprocal rank fusion merges both without tuning score scales.
+- **Rights in the tools, not the prompt.** A prompt can be talked around; a `WHERE department IN (...)` cannot. The model never sees a forbidden chunk.
+- **Agentic max 6 calls.** A hard cap bounds cost and latency, and stops loops. Questions that need more are rare in this corpus.
+- **A fixed not-found sentence.** If no chunk passes the score threshold, the answer is exactly "Dazu habe ich in den Dokumenten nichts gefunden." Classic mode does not even call the model; the agent is instructed to use the same sentence. No invention. The question lands in the "missing documentation" list.
+- **Local embeddings.** FastEmbed (multilingual) runs on the CPU: free, no data leaves the machine, CI stays offline.
+
+## What I'd do next
+
+- Real SSO instead of the demo login; per-document rights instead of per department.
+- A re-ranker for the large corpus, to win back the lost citation correctness.
+- Run the eval on Claude regularly and track it over time; add answer-quality grading, not only citation checks.
+- Streaming answers and persistent request logs.
