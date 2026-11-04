@@ -1,3 +1,8 @@
+---
+policy: rabattstaffel-grosskunden
+valid_from: 2026-01-01
+superseded: false
+---
 # Rabattstaffel für Großkunden
 
 Diese Staffel gilt für Rahmenverträge mit Großkunden der Elbkontor Logistik GmbH im Geschäftsjahr 2026. Sie ist ausschließlich für den Vertrieb bestimmt und darf Kunden nicht als Liste ausgehändigt werden.

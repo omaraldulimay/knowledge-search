@@ -1,0 +1,40 @@
+{
+  "generated_documents": 10000,
+  "n_requested": 10000,
+  "seed": 42,
+  "embedder": "fastembed",
+  "store": "MemoryStore",
+  "llm": "fake",
+  "machine": "Darwin x86_64, Python 3.12.7",
+  "small": {
+    "documents": 35,
+    "chunks": 272,
+    "index_seconds": 16.05,
+    "index_size_mb": 0.58,
+    "hit_rate_at_5": 1.0,
+    "citation_correctness": 0.933,
+    "permission_leaks": 0,
+    "search_p50_ms": 9.4,
+    "search_p95_ms": 14.9,
+    "bm25_warmup_seconds": 0.5,
+    "peak_rss_mb": 1288
+  },
+  "large": {
+    "documents": 10035,
+    "chunks": 38456,
+    "index_seconds": 938.06,
+    "index_size_mb": 75.0,
+    "hit_rate_at_5": 1.0,
+    "citation_correctness": 0.767,
+    "permission_leaks": 0,
+    "search_p50_ms": 24.3,
+    "search_p95_ms": 61.5,
+    "bm25_warmup_seconds": 5.74,
+    "peak_rss_mb": 1288
+  },
+  "reindex_unchanged": {
+    "seconds": 0.01,
+    "documents_embedded": 0
+  },
+  "note": "peak_rss_mb is the process peak so far (small runs first, so large includes it)"
+}

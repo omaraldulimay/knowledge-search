@@ -1,3 +1,8 @@
+---
+policy: passwortrichtlinie
+valid_from: 2026-01-01
+superseded: false
+---
 # Passwortrichtlinie
 
 ## Ziel

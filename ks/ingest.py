@@ -1,10 +1,12 @@
 """Load documents (md, pdf, docx) and split them into heading-aware chunks."""
 
+import hashlib
 import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
+import yaml
 from docx import Document as DocxDocument
 from pypdf import PdfReader
 
@@ -19,6 +21,11 @@ class Document:
     department: str
     text: str  # markdown-like: headings start with "#"
     source: str  # file name, e.g. "gehaltsbaender.md"
+    # version metadata (optional front matter in .md files, see parse_front_matter)
+    valid_from: str = ""  # ISO date "YYYY-MM-DD" from which this version is valid
+    superseded: bool = False  # True = a newer version of this policy exists
+    policy: str = ""  # key shared by all versions of one policy, e.g. "reisekostenrichtlinie"
+    content_hash: str = ""  # sha256 of the file bytes + department, used for incremental indexing
 
 
 @dataclass(frozen=True)
@@ -30,6 +37,9 @@ class Chunk:
     heading: str
     text: str
     position: int
+    valid_from: str = ""
+    superseded: bool = False
+    policy: str = ""
 
 
 def approx_tokens(text: str) -> int:
@@ -87,6 +97,20 @@ def _load_pdf(path: Path) -> str:
     return "\n\n".join(paragraphs)
 
 
+FRONT_MATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+
+
+def parse_front_matter(text: str) -> tuple[dict, str]:
+    """Split an optional `---` YAML block from the start of a markdown file.
+
+    Known keys: policy, valid_from (date), superseded (bool). Returns (metadata, body)."""
+    m = FRONT_MATTER_RE.match(text)
+    if not m:
+        return {}, text
+    meta = yaml.safe_load(m.group(1))
+    return (meta if isinstance(meta, dict) else {}), text[m.end() :]
+
+
 LOADERS = {".md": _load_md, ".docx": _load_docx, ".pdf": _load_pdf}
 
 
@@ -101,6 +125,10 @@ def _title_of(text: str, fallback: str) -> str:
 def load_document(path: Path, department: str) -> Document:
     loader = LOADERS[path.suffix.lower()]
     text = loader(path)
+    meta: dict = {}
+    if path.suffix.lower() == ".md":
+        meta, text = parse_front_matter(text)
+    digest = hashlib.sha256(path.read_bytes() + department.encode()).hexdigest()
     # PDF: the first bold text is the title; promote it to a level-1 heading
     if path.suffix.lower() == ".pdf":
         text = re.sub(r"^## ", "# ", text, count=1)
@@ -110,6 +138,10 @@ def load_document(path: Path, department: str) -> Document:
         department=department,
         text=text,
         source=path.name,
+        valid_from=str(meta.get("valid_from", "")),
+        superseded=bool(meta.get("superseded", False)),
+        policy=str(meta.get("policy", "")),
+        content_hash=digest,
     )
 
 
@@ -189,6 +221,9 @@ def chunk_document(doc: Document, max_tokens: int = 500, overlap_tokens: int = 6
                     heading=heading or doc.title,
                     text=text,
                     position=position,
+                    valid_from=doc.valid_from,
+                    superseded=doc.superseded,
+                    policy=doc.policy,
                 )
             )
     return chunks

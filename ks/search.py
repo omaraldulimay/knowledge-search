@@ -6,6 +6,7 @@ import re
 from collections.abc import Collection
 from dataclasses import dataclass
 
+import numpy as np
 from rank_bm25 import BM25Okapi
 
 from ks.embed import Embedder
@@ -13,6 +14,7 @@ from ks.ingest import Chunk, embedding_text
 from ks.store import VectorStore
 
 UMLAUTS = str.maketrans({"ä": "a", "ö": "o", "ü": "u", "ß": "ss"})  # Gehaltsbänder ~ Gehaltsband
+SUPERSEDED_PENALTY = 0.5  # score factor for outdated chunks whose newer version was not found
 RRF_K = 60  # standard constant from the RRF paper; dampens the influence of top ranks
 STOPWORDS = {
     "der", "die", "das", "und", "oder", "ein", "eine", "einen", "ist", "sind", "wie", "was",
@@ -40,6 +42,36 @@ def tokenize(text: str) -> list[str]:
         if len(stem) >= 10:
             tokens.append(stem[:7])
     return tokens
+
+
+def apply_version_rule(fused: dict[str, float], by_id: dict[str, Chunk]) -> dict[str, float]:
+    """Newest valid version wins. Chunks that share a `policy` key are versions of the same policy:
+
+    1. Only the version with the newest `valid_from` stays; older versions are dropped.
+    2. A chunk flagged `superseded` is dropped if a non-superseded version of the same policy
+       is among the candidates.
+    3. A superseded chunk without such a newer version is kept but its score is halved,
+       so that outdated text never outranks a current document.
+    Chunks without a policy key are not touched."""
+    newest: dict[str, str] = {}
+    current: set[str] = set()  # policies for which a non-superseded version is a candidate
+    for cid in fused:
+        c = by_id[cid]
+        if c.policy:
+            newest[c.policy] = max(newest.get(c.policy, ""), c.valid_from)
+            if not c.superseded:
+                current.add(c.policy)
+    result: dict[str, float] = {}
+    for cid, score in fused.items():
+        c = by_id[cid]
+        if c.policy and c.valid_from < newest[c.policy]:
+            continue  # rule 1
+        if c.policy and c.superseded:
+            if c.policy in current:
+                continue  # rule 2
+            score *= SUPERSEDED_PENALTY  # rule 3
+        result[cid] = score
+    return result
 
 
 @dataclass(frozen=True)
@@ -83,7 +115,7 @@ class HybridSearcher:
         if bm25 is not None:
             index, chunks = bm25
             scores = index.get_scores(tokenize(query))
-            ranked = sorted(range(len(chunks)), key=lambda i: -scores[i])[:candidates]
+            ranked = np.argsort(-scores)[:candidates]
             bm25_hits = [(chunks[i], float(scores[i])) for i in ranked if scores[i] > 0]
 
         # 3) reciprocal rank fusion: score = sum over rankers of 1 / (RRF_K + rank)
@@ -101,5 +133,6 @@ class HybridSearcher:
             kw_scores[chunk.chunk_id] = score
             fused[chunk.chunk_id] = fused.get(chunk.chunk_id, 0.0) + 1.0 / (RRF_K + rank)
 
+        fused = apply_version_rule(fused, by_id)
         top = sorted(fused, key=lambda cid: -fused[cid])[:k]
         return [Hit(by_id[c], fused[c], vec_scores.get(c), kw_scores.get(c)) for c in top]

@@ -1,3 +1,8 @@
+---
+policy: urlaubsantrag
+valid_from: 2026-01-01
+superseded: false
+---
 # Urlaubsantrag und Urlaubsregelung
 
 Diese Regelung beschreibt, wie Mitarbeitende der Elbkontor Logistik GmbH Urlaub beantragen.

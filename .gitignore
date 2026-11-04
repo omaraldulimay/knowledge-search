@@ -7,3 +7,5 @@ __pycache__/
 *.egg-info/
 .env
 .DS_Store
+data/generated/
+.ks_index_*/

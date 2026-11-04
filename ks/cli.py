@@ -8,7 +8,8 @@ from pathlib import Path
 from ks.auth import USERS, allowed_departments, get_user
 from ks.embed import Embedder, get_embedder
 from ks.eval import QUESTIONS, RESULTS
-from ks.ingest import chunk_documents, embedding_text, load_documents
+from ks.indexer import load_manifest, save_manifest, sync_index
+from ks.ingest import load_documents
 from ks.search import HybridSearcher
 from ks.store import MemoryStore, PgVectorStore, VectorStore
 
@@ -25,18 +26,45 @@ def _pg_store(dim: int) -> PgVectorStore:
 
 def cmd_index(args: argparse.Namespace) -> None:
     embedder = get_embedder(args.embedder)
-    chunks = chunk_documents(load_documents(Path(args.docs)))
-    vectors = embedder.embed([embedding_text(c) for c in chunks])
+    docs = load_documents(Path(args.docs))
+    index_dir = Path(args.index_dir)
     if args.store == "pgvector":
         store = _pg_store(embedder.dim)
         store.init_schema(reset=True)
-        store.add(chunks, vectors)
-    else:
-        store = MemoryStore()
-        store.add(chunks, vectors)
-        store.save(Path(args.index_dir), embedder.name)
-    docs = len({c.doc_id for c in chunks})
-    print(f"Indexed {docs} documents / {len(chunks)} chunks with '{embedder.name}' ({args.store}).")
+        manifest: dict[str, str] = {}
+    elif (
+        not args.full
+        and (index_dir / "meta.json").exists()
+        and MemoryStore.saved_embedder_name(index_dir) == embedder.name
+    ):
+        store, manifest = MemoryStore.load(index_dir), load_manifest(index_dir)
+    else:  # first run, --full, or another embedder: start from scratch
+        store, manifest = MemoryStore(), {}
+    stats = sync_index(docs, store, embedder, manifest, progress=print)
+    if args.store == "memory":
+        store.save(index_dir, embedder.name)
+        save_manifest(index_dir, manifest)
+    print(
+        f"Index '{embedder.name}' ({args.store}): {stats.added} new, {stats.changed} changed, "
+        f"{stats.removed} removed, {stats.unchanged} unchanged documents; "
+        f"{stats.chunks_embedded} chunks embedded in {stats.seconds:.1f}s; "
+        f"{store.count()} chunks in total."
+    )
+
+
+def cmd_bench_scale(args: argparse.Namespace) -> None:
+    from ks.scale import format_scale, run_scale
+
+    result = run_scale(args.n, args.embedder, args.seed)
+    print(format_scale(result))
+    print("Written: eval/scale.json, eval/scale.png")
+
+
+def cmd_clean_generated(args: argparse.Namespace) -> None:
+    from ks.scale import clean_generated
+
+    removed = clean_generated()
+    print("Removed: " + ", ".join(map(str, removed)) if removed else "Nothing to remove.")
 
 
 def _open(args: argparse.Namespace) -> tuple[VectorStore, Embedder]:
@@ -91,6 +119,17 @@ def main(argv: list[str] | None = None) -> None:
     p_index.add_argument("--embedder", choices=["fastembed", "hash"],
                          default=os.environ.get("KS_EMBEDDER", "fastembed"))  # fmt: skip
     p_index.set_defaults(func=cmd_index)
+
+    p_index.add_argument("--full", action="store_true", help="ignore the old index, rebuild all")
+
+    p_bench = sub.add_parser("bench-scale", help="generate N filler docs, benchmark small vs large")
+    p_bench.add_argument("--n", type=int, default=10000)
+    p_bench.add_argument("--seed", type=int, default=42)
+    p_bench.add_argument("--embedder", choices=["fastembed", "hash"], default="fastembed")
+    p_bench.set_defaults(func=cmd_bench_scale)
+
+    p_clean = sub.add_parser("clean-generated", help="delete data/generated (docs and indexes)")
+    p_clean.set_defaults(func=cmd_clean_generated)
 
     p_search = sub.add_parser("search", help="hybrid search as a given user")
     p_search.add_argument("query")

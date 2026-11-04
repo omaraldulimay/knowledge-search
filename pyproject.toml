@@ -22,7 +22,7 @@ dependencies = [
 # Local multilingual embeddings (downloads a model on first use). Not needed for unit tests.
 local = ["fastembed>=0.3"]
 anthropic = ["anthropic>=1.0"]
-dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4"]
+dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4", "matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
 include = ["ks*"]
@@ -39,3 +39,6 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/gen_corpus.py" = ["E501"]  # long template sentences

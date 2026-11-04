@@ -1,3 +1,8 @@
+---
+policy: arbeitszeit-homeoffice
+valid_from: 2026-01-01
+superseded: false
+---
 # Arbeitszeit und Homeoffice
 
 ## Regelarbeitszeit

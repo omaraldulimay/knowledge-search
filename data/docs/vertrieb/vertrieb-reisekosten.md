@@ -1,3 +1,8 @@
+---
+policy: vertrieb-reisekosten
+valid_from: 2026-01-01
+superseded: false
+---
 # Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie
 
 Diese Ergänzung gilt ausschließlich für Mitarbeitende der Abteilung Vertrieb. Sie ergänzt die allgemeine Reisekostenrichtlinie der Elbkontor Logistik GmbH und geht ihr bei Abweichungen vor. Alles, was hier nicht geregelt ist, richtet sich nach der allgemeinen Richtlinie.

@@ -24,6 +24,10 @@ class VectorStore(Protocol):
 
     def clear(self) -> None: ...
 
+    def remove_documents(self, doc_ids: Collection[str]) -> None:
+        """Delete every chunk of these documents (used for changed and deleted files)."""
+        ...
+
     def count(self) -> int: ...
 
     def search_vector(
@@ -50,6 +54,7 @@ class MemoryStore:
     def __init__(self) -> None:
         self._chunks: list[Chunk] = []
         self._matrix = np.zeros((0, 0), dtype=np.float32)
+        self._masks: dict[frozenset[str], np.ndarray] = {}  # allowed departments -> bool per row
 
     def add(self, chunks: Sequence[Chunk], vectors: np.ndarray) -> None:
         if len(chunks) != len(vectors):
@@ -59,6 +64,16 @@ class MemoryStore:
         vectors = _unit(vectors)
         self._matrix = vectors if not len(self._chunks) else np.vstack([self._matrix, vectors])
         self._chunks.extend(chunks)
+        self._masks.clear()
+
+    def remove_documents(self, doc_ids: Collection[str]) -> None:
+        drop = set(doc_ids)
+        keep = [i for i, c in enumerate(self._chunks) if c.doc_id not in drop]
+        if len(keep) == len(self._chunks):
+            return
+        self._chunks = [self._chunks[i] for i in keep]
+        self._matrix = self._matrix[keep] if keep else np.zeros((0, 0), dtype=np.float32)
+        self._masks.clear()
 
     def clear(self) -> None:
         self.__init__()
@@ -66,18 +81,29 @@ class MemoryStore:
     def count(self) -> int:
         return len(self._chunks)
 
+    def _mask(self, allowed: Collection[str]) -> np.ndarray:
+        """Boolean row mask of the chunks the user may see (cached per department set)."""
+        key = frozenset(allowed)
+        if key not in self._masks:
+            self._masks[key] = np.array([c.department in key for c in self._chunks], dtype=bool)
+        return self._masks[key]
+
     def _allowed_rows(self, allowed: Collection[str]) -> list[int]:
-        return [i for i, c in enumerate(self._chunks) if c.department in allowed]
+        return np.flatnonzero(self._mask(allowed)).tolist()
 
     def search_vector(
         self, query: np.ndarray, k: int, allowed: Collection[str]
     ) -> list[ScoredChunk]:
-        rows = self._allowed_rows(allowed)  # candidate selection happens BEFORE scoring
-        if not rows:
+        if not self._chunks:
             return []
-        sims = self._matrix[rows] @ _unit(query.reshape(1, -1))[0]
-        order = np.argsort(-sims)[:k]
-        return [ScoredChunk(self._chunks[rows[i]], float(sims[i])) for i in order]
+        mask = self._mask(allowed)  # forbidden rows get -inf BEFORE ranking, so they never win
+        if not mask.any():
+            return []
+        sims = np.where(mask, self._matrix @ _unit(query.reshape(1, -1))[0], -np.inf)
+        k = min(k, int(mask.sum()))
+        top = np.argpartition(-sims, k - 1)[:k]
+        order = top[np.argsort(-sims[top])]
+        return [ScoredChunk(self._chunks[i], float(sims[i])) for i in order]
 
     def get_chunks(self, allowed: Collection[str]) -> list[Chunk]:
         return [self._chunks[i] for i in self._allowed_rows(allowed)]
@@ -100,6 +126,8 @@ class MemoryStore:
         raw = json.loads((directory / "chunks.json").read_text(encoding="utf-8"))
         store._chunks = [Chunk(**item) for item in raw]
         store._matrix = np.load(directory / "vectors.npy")
+        if not store._chunks:
+            store._matrix = np.zeros((0, 0), dtype=np.float32)
         return store
 
     @staticmethod
@@ -134,20 +162,39 @@ class PgVectorStore:
     def add(self, chunks: Sequence[Chunk], vectors: np.ndarray) -> None:
         vectors = _unit(vectors)
         rows = [
-            (c.chunk_id, c.doc_id, c.title, c.department, c.heading, c.text, c.position, v)
+            (
+                c.chunk_id,
+                c.doc_id,
+                c.title,
+                c.department,
+                c.heading,
+                c.text,
+                c.position,
+                c.valid_from,
+                c.superseded,
+                c.policy,
+                v,
+            )
             for c, v in zip(chunks, vectors, strict=True)
         ]
         with self._connect() as conn, conn.cursor() as cur:
             cur.executemany(
                 """INSERT INTO chunks
-                   (chunk_id, doc_id, title, department, heading, text, position, embedding)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                   (chunk_id, doc_id, title, department, heading, text, position,
+                    valid_from, superseded, policy, embedding)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                    ON CONFLICT (chunk_id) DO UPDATE SET
                      title = EXCLUDED.title, department = EXCLUDED.department,
                      heading = EXCLUDED.heading, text = EXCLUDED.text,
-                     position = EXCLUDED.position, embedding = EXCLUDED.embedding""",
+                     position = EXCLUDED.position, valid_from = EXCLUDED.valid_from,
+                     superseded = EXCLUDED.superseded, policy = EXCLUDED.policy,
+                     embedding = EXCLUDED.embedding""",
                 rows,
             )
+
+    def remove_documents(self, doc_ids: Collection[str]) -> None:
+        with self._connect() as conn:
+            conn.execute("DELETE FROM chunks WHERE doc_id = ANY(%s)", (list(doc_ids),))
 
     def clear(self) -> None:
         with self._connect() as conn:
@@ -162,6 +209,7 @@ class PgVectorStore:
         return Chunk(
             chunk_id=row[0], doc_id=row[1], title=row[2], department=row[3],
             heading=row[4], text=row[5], position=row[6],
+            valid_from=row[7], superseded=row[8], policy=row[9],
         )  # fmt: skip
 
     def search_vector(
@@ -171,17 +219,18 @@ class PgVectorStore:
         with self._connect() as conn:
             rows = conn.execute(
                 """SELECT chunk_id, doc_id, title, department, heading, text, position,
-                          1 - (embedding <=> %s) AS score
+                          valid_from, superseded, policy, 1 - (embedding <=> %s) AS score
                    FROM chunks WHERE department = ANY(%s)
                    ORDER BY embedding <=> %s LIMIT %s""",
                 (q, list(allowed), q, k),
             ).fetchall()
-        return [ScoredChunk(self._chunk(r), float(r[7])) for r in rows]
+        return [ScoredChunk(self._chunk(r), float(r[10])) for r in rows]
 
     def get_chunks(self, allowed: Collection[str]) -> list[Chunk]:
         with self._connect() as conn:
             rows = conn.execute(
-                """SELECT chunk_id, doc_id, title, department, heading, text, position
+                """SELECT chunk_id, doc_id, title, department, heading, text, position,
+                          valid_from, superseded, policy
                    FROM chunks WHERE department = ANY(%s) ORDER BY chunk_id""",
                 (list(allowed),),
             ).fetchall()
@@ -190,7 +239,8 @@ class PgVectorStore:
     def get_document_chunks(self, doc_id: str, allowed: Collection[str]) -> list[Chunk]:
         with self._connect() as conn:
             rows = conn.execute(
-                """SELECT chunk_id, doc_id, title, department, heading, text, position
+                """SELECT chunk_id, doc_id, title, department, heading, text, position,
+                          valid_from, superseded, policy
                    FROM chunks WHERE doc_id = %s AND department = ANY(%s) ORDER BY position""",
                 (doc_id, list(allowed)),
             ).fetchall()

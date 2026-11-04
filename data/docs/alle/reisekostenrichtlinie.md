@@ -1,3 +1,8 @@
+---
+policy: reisekostenrichtlinie
+valid_from: 2026-01-01
+superseded: false
+---
 # Reisekostenrichtlinie
 
 Gültig ab 01.01.2026 für alle Mitarbeitenden der Elbkontor Logistik GmbH.
