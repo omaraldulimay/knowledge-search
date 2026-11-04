@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { IS_DEMO, api, demoApi } from "../api";
 import { examplesFor, fmtCost, fmtInt, fmtMs, parseAnswer } from "../format";
 import type { AskResult, Mode, Session, Step } from "../types";
 import SourcePanel from "./SourcePanel";
@@ -8,6 +8,11 @@ const MODES: [Mode, string][] = [
   ["classic", "Einmal suchen"],
   ["agentic", "KI sucht selbst"],
 ];
+
+const KIND_TAG: Record<string, string> = {
+  not_found: "nicht dokumentiert",
+  permission: "Rechte-Test",
+};
 
 function stepLabel(s: Step): string {
   if (s.tool === "search") return `Suche „${String(s.args.query ?? "")}“`;
@@ -43,6 +48,11 @@ export default function Ask({ session, devParams }: { session: Session; devParam
   const [error, setError] = useState("");
   const [open, setOpen] = useState<Open | null>(null);
   const lastMarker = useRef<HTMLElement | null>(null);
+  const [prepared, setPrepared] = useState<{ question: string; kind: string }[]>([]);
+
+  useEffect(() => {
+    if (IS_DEMO) void demoApi.questions().then(setPrepared);
+  }, []);
 
   const submit = async (q = question, m = mode) => {
     if (!q.trim() || loading) return;
@@ -79,38 +89,63 @@ export default function Ask({ session, devParams }: { session: Session; devParam
     <div className={open ? "ask ask--panel" : "ask"}>
       <div className="ask-main">
         <h1>Was möchtest du wissen?</h1>
-        <form
-          className="askform"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void submit();
-          }}
-        >
-          <label className="sr-only" htmlFor="q">
-            Frage
-          </label>
-          <input
-            id="q"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="z. B. Wie viel Urlaub habe ich?"
-            maxLength={1000}
-            autoComplete="off"
-          />
-          <button className="primary" type="submit" disabled={loading || !question.trim()}>
-            {loading ? "Sucht …" : "Absenden"}
-          </button>
-        </form>
+        {IS_DEMO ? (
+          <p className="demo-hint muted">Demo: vorbereitete Fragen. Live-Version läuft lokal mit Docker.</p>
+        ) : (
+          <form
+            className="askform"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void submit();
+            }}
+          >
+            <label className="sr-only" htmlFor="q">
+              Frage
+            </label>
+            <input
+              id="q"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="z. B. Wie viel Urlaub habe ich?"
+              maxLength={1000}
+              autoComplete="off"
+            />
+            <button className="primary" type="submit" disabled={loading || !question.trim()}>
+              {loading ? "Sucht …" : "Absenden"}
+            </button>
+          </form>
+        )}
         <div className="modes" role="radiogroup" aria-label="Suchmodus">
           {MODES.map(([id, label]) => (
             <label key={id} className={mode === id ? "mode mode--on" : "mode"}>
-              <input type="radio" name="mode" checked={mode === id} onChange={() => setMode(id)} />
+              <input type="radio" name="mode" checked={mode === id} onChange={() => {
+                  setMode(id);
+                  if (IS_DEMO && asked) void submit(asked, id); // compare the two modes on the same question
+                }} />
               {label}
             </label>
           ))}
         </div>
 
-        {!result && !loading && (
+        {IS_DEMO && (
+          <div className="examples" role="group" aria-label="Vorbereitete Fragen">
+            {prepared.map((p) => (
+              <button
+                key={p.question}
+                className={asked === p.question ? "chip chip--btn chip--on" : "chip chip--btn"}
+                onClick={() => {
+                  setQuestion(p.question);
+                  void submit(p.question);
+                }}
+              >
+                {p.question}
+                {KIND_TAG[p.kind] && <small className="muted"> · {KIND_TAG[p.kind]}</small>}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!IS_DEMO && !result && !loading && (
           <div className="examples">
             {examplesFor(session.departments).map((q) => (
               <button

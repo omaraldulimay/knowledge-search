@@ -1,3 +1,4 @@
+import { createDemoApi, type DemoData } from "./demo";
 import type { AskResult, DemoUser, DocDetail, DocItem, Metrics, Mode, Session } from "./types";
 
 let token: string | null = null;
@@ -33,7 +34,9 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 const post = (body: unknown): RequestInit => ({ method: "POST", body: JSON.stringify(body) });
 
-export const api = {
+export const IS_DEMO = import.meta.env.VITE_DEMO === "1";
+
+const realApi = {
   users: () => call<DemoUser[]>("/users"),
   login: (username: string) => call<Session>("/login", post({ username })),
   ask: (question: string, mode: Mode) => call<AskResult>("/ask", post({ question, mode })),
@@ -48,3 +51,10 @@ export const api = {
   remove: (id: string) => call<{ deleted: string }>(`/documents/${id}`, { method: "DELETE" }),
   metrics: () => call<Metrics>("/metrics"),
 };
+
+export const demoApi = createDemoApi(async () => {
+  const res = await fetch(`${import.meta.env.BASE_URL}demo/demo.json`);
+  return (await res.json()) as DemoData;
+});
+
+export const api = IS_DEMO ? { ...realApi, ...demoApi } : realApi;

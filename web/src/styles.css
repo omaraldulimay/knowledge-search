@@ -95,6 +95,14 @@ main { padding: clamp(20px, 4vw, 48px) clamp(16px, 4vw, 40px) 80px; max-width: 1
 }
 .chip--btn { text-align: left; color: var(--text); background: var(--surface); }
 .chip--btn:hover { border-color: var(--accent); color: var(--accent); }
+.chip--on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.chip small { font-size: 0.78rem; }
+.demo-hint { margin-top: 1rem; font-size: 0.95rem; }
+.demobadge {
+  font-size: 0.72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.05rem 0.55rem; white-space: nowrap; cursor: help;
+}
+.drop[aria-disabled="true"], .linkbtn:disabled, .upload select:disabled { opacity: 0.45; cursor: not-allowed; }
 .linkbtn { background: none; border: 0; padding: 0.2rem 0.3rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-size: 0.9rem; }
 .linkbtn:hover { color: var(--accent); }
 .primary {
@@ -257,3 +265,5 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
   .doclist li { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+.login .demobadge { display: inline-block; margin-top: 0.6rem; }

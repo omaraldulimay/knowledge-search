@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../api";
+import { IS_DEMO, api } from "../api";
 import { deptLabel } from "../format";
 import type { DocItem, Session } from "../types";
 import SourcePanel from "./SourcePanel";
 
 const DEPARTMENTS = ["alle", "hr", "it", "vertrieb", "logistik"];
+const DEMO_OFF = "In der Demo nicht verfügbar";
 const ACCEPT = [".md", ".pdf", ".docx"];
 
 function Upload({ onDone }: { onDone: () => void }) {
@@ -13,7 +14,7 @@ function Upload({ onDone }: { onDone: () => void }) {
   const [state, setState] = useState("");
 
   const send = async (files: FileList | null) => {
-    if (!files?.length) return;
+    if (IS_DEMO || !files?.length) return;
     const file = files[0];
     if (!ACCEPT.some((s) => file.name.toLowerCase().endsWith(s))) {
       setState("Nur .md, .pdf und .docx");
@@ -30,9 +31,10 @@ function Upload({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <div className="upload">
+    <div className="upload" title={IS_DEMO ? DEMO_OFF : undefined}>
       <label
         className={over ? "drop drop--over" : "drop"}
+        aria-disabled={IS_DEMO}
         onDragOver={(e) => {
           e.preventDefault();
           setOver(true);
@@ -46,6 +48,7 @@ function Upload({ onDone }: { onDone: () => void }) {
       >
         <input
           type="file"
+          disabled={IS_DEMO}
           accept={ACCEPT.join(",")}
           className="sr-only"
           onChange={(e) => {
@@ -58,7 +61,7 @@ function Upload({ onDone }: { onDone: () => void }) {
       </label>
       <label className="field">
         <span className="muted">Abteilung</span>
-        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+        <select disabled={IS_DEMO} value={department} onChange={(e) => setDepartment(e.target.value)}>
           {DEPARTMENTS.map((d) => (
             <option key={d} value={d}>
               {deptLabel(d)}
@@ -136,6 +139,8 @@ export default function Documents({ session }: { session: Session }) {
                       <button
                         className="linkbtn"
                         aria-label={`${d.title} löschen`}
+                        disabled={IS_DEMO}
+                        title={IS_DEMO ? DEMO_OFF : undefined}
                         onClick={() => setConfirm(d.doc_id)}
                       >
                         Löschen

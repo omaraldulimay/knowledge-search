@@ -108,6 +108,17 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(f"Written: {args.out}")
 
 
+def cmd_export_demo(args: argparse.Namespace) -> None:
+    from ks.demo import export_demo
+    from ks.eval import open_searcher
+    from ks.llm import get_llm
+
+    searcher, _ = open_searcher(Path(args.index_dir), Path(args.docs))
+    demo = export_demo(searcher, get_llm(), Path(args.out))
+    n = sum(len(q) for q in demo["questions"].values())
+    print(f"Demo written to {args.out}: {n} questions x 2 modes, by {demo['generated_by']}")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="ks")
     parser.add_argument("--store", choices=["memory", "pgvector"], default="memory")
@@ -143,6 +154,13 @@ def main(argv: list[str] | None = None) -> None:
     p_eval.add_argument("--out", default=str(RESULTS))
     p_eval.add_argument("--docs", default=str(DEFAULT_DOCS))
     p_eval.set_defaults(func=cmd_eval)
+
+    from ks.demo import DEMO_JSON
+
+    p_demo = sub.add_parser("export-demo", help="write the static GitHub Pages demo data")
+    p_demo.add_argument("--out", default=str(DEMO_JSON))
+    p_demo.add_argument("--docs", default=str(DEFAULT_DOCS))
+    p_demo.set_defaults(func=cmd_export_demo)
 
     args = parser.parse_args(argv)
     args.func(args)

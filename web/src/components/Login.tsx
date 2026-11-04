@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { deptLabel } from "../format";
+import DemoBadge from "./DemoBadge";
 import type { DemoUser, Session } from "../types";
 
 // Department chips are static demo info; the real permissions are enforced by the API.
@@ -34,6 +35,7 @@ export default function Login({ onLogin }: { onLogin: (s: Session) => void }) {
       <p className="wordmark">Elbkontor</p>
       <h1>Wissenssuche</h1>
       <p className="muted">Wer bist du?</p>
+      <DemoBadge />
       <ul className="people">
         {users.map((u) => {
           const dept = DEPARTMENT_OF[u.login];

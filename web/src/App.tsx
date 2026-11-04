@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, setToken } from "./api";
+import { IS_DEMO, api, setToken } from "./api";
 import Ask from "./components/Ask";
+import DemoBadge from "./components/DemoBadge";
 import Documents from "./components/Documents";
 import Login from "./components/Login";
 import Quality from "./components/Quality";
@@ -9,7 +10,7 @@ import type { Session } from "./types";
 export type Tab = "ask" | "docs" | "quality";
 
 // Dev only: ?as=katja logs in automatically, ?tab=docs|quality picks the screen (used for screenshots).
-const devParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null;
+const devParams = import.meta.env.DEV || IS_DEMO ? new URLSearchParams(window.location.search) : null;
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -57,6 +58,7 @@ export default function App() {
           ))}
         </nav>
         <div className="who">
+          <DemoBadge />
           <span className="chip">{session.name}</span>
           <button className="linkbtn" onClick={logOut}>
             Abmelden
