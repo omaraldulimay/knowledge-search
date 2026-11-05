@@ -1,26 +1,27 @@
-# 15 held-out questions, written in everyday employee language (synonyms, abbreviations, no wording copied
-# from the documents). Never used for tuning: they only report how well the tuned system generalises.
+# 15 held-out questions in everyday employee language (synonyms, abbreviations, no wording copied
+# from the documents). Written before any tuning on the new corpus and committed first; they are
+# never used for tuning, they only report how well the tuned system generalises.
 # type: single | multi | not_found | permission
 questions:
   # --- 6 single-document questions
-  - {id: h01, type: single, user: ole, question: "Mein Handy mit der Authenticator-App ist weg, wie komm ich jetzt noch in mein Postfach?", expected_doc_ids: [it/mfa]}
-  - {id: h02, type: single, user: mira, question: "Wie früh muss ich dem Chef sagen, dass ich nach der Geburt zuhause bleiben will?", expected_doc_ids: [hr/elternzeit]}
-  - {id: h03, type: single, user: bent, question: "Wie oft soll ich auf einer langen Tour die Gurte nachspannen?", expected_doc_ids: [logistik/ladungssicherung]}
-  - {id: h04, type: single, user: katja, question: "Bis zu welchem Wert darf ich einem Kunden was schenken?", expected_doc_ids: [vertrieb/kundenbewirtung]}
-  - {id: h05, type: single, user: ole, question: "Wann kommt eigentlich die erste Überweisung, wenn man neu in der Firma ist?", expected_doc_ids: [alle/onboarding]}
-  - {id: h06, type: single, user: mira, question: "Wie viel legt die Firma bei der bAV obendrauf?", expected_doc_ids: [hr/betriebliche-altersvorsorge]}
+  - {id: h01, type: single, user: ole, question: "Was ist eigentlich eine P1 und in welcher Zeit muss sich die IT bei mir melden?", expected_doc_ids: [it/it-support-tickets]}
+  - {id: h02, type: single, user: bent, question: "Bei einer Palette steht K5, was heißt das?", expected_doc_ids: [logistik/elko-statuscodes]}
+  - {id: h03, type: single, user: katja, question: "Bis wann muss die Bestellung von Kehrwieder Getränke da sein und wann ist Leergut dran?", expected_doc_ids: [vertrieb/kunden-sla-uebersicht]}
+  - {id: h04, type: single, user: mira, question: "Wie viel Geld gibt uns die Firma für die Kita dazu?", expected_doc_ids: [hr/elternzeit]}
+  - {id: h05, type: single, user: ole, question: "Wie viele Tage Homeoffice haben wir jetzt? Früher waren es doch mehr.", expected_doc_ids: [alle/arbeitszeit-homeoffice]}
+  - {id: h06, type: single, user: bent, question: "Wer ist bei uns Gefahrgutbeauftragte und wie erreiche ich die?", expected_doc_ids: [logistik/gefahrgut-handling]}
 
   # --- 5 questions that need two documents
-  - {id: h07, type: multi, user: ole, question: "Ich will nächste Woche von zuhause aus arbeiten, was muss ich dafür auf dem Laptop starten, um an die Laufwerke zu kommen?", expected_doc_ids: [alle/arbeitszeit-homeoffice, it/vpn-einrichtung]}
-  - {id: h08, type: multi, user: katja, question: "Wenn ich auf Dienstreise einen Kunden zum Abendessen einlade: wie teuer darf das werden und wie schnell muss die Quittung ins System?", expected_doc_ids: [vertrieb/kundenbewirtung, vertrieb/vertrieb-reisekosten]}
-  - {id: h09, type: multi, user: fiete, question: "Mein ADR-Schein läuft ab. Zahlt das die Firma oder geht das von meinem Lerntopf runter?", expected_doc_ids: [hr/weiterbildung, logistik/gefahrgut-handling]}
-  - {id: h10, type: multi, user: mira, question: "Ich komme aus der Babypause zurück, wie sieht es mit meinem Resturlaub aus?", expected_doc_ids: [alle/urlaubsantrag, hr/elternzeit]}
-  - {id: h11, type: multi, user: ole, question: "Der neue Kollege kriegt seinen Rechner morgen, wie kommt er an zusätzliche Programme?", expected_doc_ids: [it/hardware-bestellung, it/software-freigabe]}
+  - {id: h07, type: multi, user: katja, question: "Nordhafen Frische bestellt um halb drei für morgen früh, geht das noch und was kostet der Eilauftrag?", expected_doc_ids: [vertrieb/kundenakte-nordhafen-frische, vertrieb/kunden-sla-uebersicht]}
+  - {id: h08, type: multi, user: ole, question: "Sonntagnacht ist ELKO tot, wen rufe ich an und ab wann wird zurückgerollt?", expected_doc_ids: [it/bereitschaftsdienst, it/elko-betrieb]}
+  - {id: h09, type: multi, user: bent, question: "Wer springt für Wiebke Thiele ein, wenn sie krank ist, und welche Nummer ruf ich bei Kühlalarm?", expected_doc_ids: [logistik/vertretung-bereitschaft, logistik/eskalationsplan-kuehlkette]}
+  - {id: h10, type: multi, user: ole, question: "Die neue Kollegin fängt Montag an. Wo kriegt sie den Laptop und wo richtet sie die MFA ein?", expected_doc_ids: [alle/onboarding, it/mfa]}
+  - {id: h11, type: multi, user: fiete, question: "Wer entscheidet bei über 10 Grad über die Vernichtung der Ware und wie viele Paletten gingen im Februar bei Tor 7 in die Tonne?", expected_doc_ids: [logistik/eskalationsplan-kuehlkette, logistik/stoerungsbericht-tor7-kuehlkette-2026-02]}
 
   # --- 2 questions whose answer is in no document
-  - {id: h12, type: not_found, user: mira, question: "Wann steigt dieses Jahr die Weihnachtsfeier und muss man sich vorher anmelden?", expected_doc_ids: []}
-  - {id: h13, type: not_found, user: bent, question: "Kann man bei uns ein Sabbatical nehmen, also ein paar Monate unbezahlt raus?", expected_doc_ids: []}
+  - {id: h12, type: not_found, user: mira, question: "Kann man bei uns ein Sabbatical nehmen, also ein paar Monate unbezahlt raus?", expected_doc_ids: []}
+  - {id: h13, type: not_found, user: bent, question: "Wann ist dieses Jahr die Betriebsfeier und muss man sich anmelden?", expected_doc_ids: []}
 
   # --- 2 permission questions: the answer lives only in documents the user may not read
   - {id: h14, type: permission, user: katja, question: "Was verdient man ungefähr in E7?", expected_doc_ids: []}
-  - {id: h15, type: permission, user: ole, question: "Wer sitzt eigentlich bei einem Vorstellungsgespräch mit am Tisch und was darf man da nicht fragen?", expected_doc_ids: []}
+  - {id: h15, type: permission, user: ole, question: "Wie hoch fällt die Elbstern-Prämie bei guter Zielerreichung aus?", expected_doc_ids: []}
