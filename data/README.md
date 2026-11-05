@@ -1,31 +1,39 @@
 # Sample data: Elbkontor Logistik GmbH
 
-Fictional mid-sized logistics company in Hamburg. All names, numbers and rules are invented.
-35 German documents in `data/docs/<department>/` (departments `alle`, `hr`, `it`, `vertrieb`, `logistik`):
-30 Markdown files, 3 PDFs and 2 DOCX files. The PDFs/DOCX are generated from
+Fictional mid-sized logistics company in Hamburg-Billbrook. All names, numbers, extensions and rules are
+invented. The point of the corpus: **every answerable question needs knowledge that exists only inside
+this company** (own systems such as ELKO, Lotse and Zeitanker, status codes, extensions, cost centres,
+customer contracts, incident reports, meeting decisions), so no public chatbot can answer it.
+
+52 German documents in `data/docs/<department>/` (departments `alle`, `hr`, `it`, `vertrieb`, `logistik`):
+47 Markdown files, 3 PDFs and 2 DOCX files. The PDFs/DOCX are generated from
 `scripts/binary_sources/*.md` by `python scripts/make_binary_docs.py` (reproducible).
-`hr/gehaltsbaender.md` is confidential (hr only, like every file in `hr/`).
+`hr/gehaltsbaender.md` (salary bands, allowances, Elbstern bonus) is confidential: hr only, like every file in `hr/`.
 
 | Department | Documents |
 |---|---|
-| alle (8) | reisekostenrichtlinie, urlaubsantrag, onboarding, verhaltenskodex, arbeitszeit-homeoffice, brandschutz-notfall, betriebsrestaurant, datenschutz-grundlagen (pdf) |
+| alle (11) | reisekostenrichtlinie (+ 2023 version), urlaubsantrag, onboarding, arbeitszeit-homeoffice (+ 2024 version), brandschutz-notfall, betriebsrestaurant, verhaltenskodex, standortplan-durchwahlen, datenschutz-grundlagen (pdf) |
 | hr (7) | gehaltsbaender, kuendigungsfristen, bewerbungsprozess, weiterbildung, betriebliche-altersvorsorge, elternzeit, probezeit-feedback (docx) |
-| it (7) | vpn-einrichtung, passwortrichtlinie, mfa, hardware-bestellung, it-support-tickets, software-freigabe, datensicherung (pdf) |
-| vertrieb (7) | rabattstaffel-grosskunden, angebotsprozess, vertrieb-reisekosten, crm-pflege, provisionsmodell, kundenbewirtung, vertragsvorlagen (docx) |
-| logistik (6) | gefahrgut-handling, lagerordnung, fahrzeugpruefung, reklamation-transportschaden, ladungssicherung, zollabwicklung (pdf) |
+| it (11) | vpn-einrichtung, passwortrichtlinie (+ 2022 version), mfa, hardware-bestellung, it-support-tickets, software-freigabe, bereitschaftsdienst, elko-betrieb, stoerungsbericht-elko-ausfall-2026-03, datensicherung (pdf) |
+| vertrieb (10) | rabattstaffel-grosskunden (+ 2024 version), angebotsprozess, vertrieb-reisekosten, crm-pflege, provisionsmodell, kundenbewirtung, kundenakte-nordhafen-frische, kunden-sla-uebersicht, vertragsvorlagen (docx) |
+| logistik (13) | elko-statuscodes, eskalationsplan-kuehlkette, stoerungsbericht-tor7-kuehlkette-2026-02, schichtmodelle, kundenvorgaben-annahmeschluss, protokoll-hallenleitung-2026-09, vertretung-bereitschaft, lagerordnung, gefahrgut-handling, fahrzeugpruefung, reklamation-transportschaden, ladungssicherung, zollabwicklung (pdf) |
 
-## Questions that need two documents
+## Versions
 
-| # | Question | Documents to combine | Answer |
-|---|---|---|---|
-| 1 | Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen? | alle/reisekostenrichtlinie + vertrieb/vertrieb-reisekosten | 140 Euro statt 110 Euro; Abrechnung in 7 statt 14 Tagen |
-| 2 | Welche Kündigungsfrist gilt für mich als Vertriebsmitarbeiter mit sechs Jahren im Unternehmen, wenn die Firma kündigt? | hr/kuendigungsfristen (+ hr/probezeit-feedback for the probation case) | zwei Monate zum Monatsende (ab 5 Jahren); in der Probezeit zwei Wochen |
-| 3 | Wie arbeite ich im Homeoffice auf interne Systeme zu? | alle/arbeitszeit-homeoffice + it/vpn-einrichtung | bis zu 3 Tage pro Woche, VPN "Elbtunnel" mit MFA-Code |
-| 4 | Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt? | vertrieb/rabattstaffel-grosskunden + logistik/gefahrgut-handling | 18 Prozent Gefahrgutzuschlag, nicht rabattierbar |
-| 5 | Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen? | vertrieb/kundenbewirtung + vertrieb/vertrieb-reisekosten | 60 Euro pro Person, Bewirtungsbeleg mit Anlass |
-| 6 | Darf ich ein neues Programm auf meinem bestellten Laptop installieren? | it/hardware-bestellung + it/software-freigabe | nur freigegebene Software; sonst Ticket "Software-Freigabe" (ca. 10 Arbeitstage) |
-| 7 | Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin? | alle/urlaubsantrag + hr/elternzeit | 30 Tage, pro vollem Elternzeit-Monat ein Zwölftel kürzbar (9/12 gekürzt) |
-| 8 | Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein? | it/passwortrichtlinie + it/mfa | Passwort-Reset braucht den zweiten Faktor; MFA-Reset über IT-Support per Rückruf |
-| 9 | Gilt der Großkundenrabatt auch für die Zollabfertigung? | logistik/zollabwicklung + vertrieb/rabattstaffel-grosskunden | nein, 45 Euro Pauschale pro Anmeldung, nicht rabattfähig |
-| 10 | Wer bezahlt den ADR-Schein und zählt er auf mein Bildungsbudget? | hr/weiterbildung + logistik/gefahrgut-handling | das Unternehmen zahlt, kein Anrechnung auf die 1.200 Euro |
-| 11 | Wie viel Zulage bekommt der Gefahrgutbeauftragte? | hr/gehaltsbaender + logistik/gefahrgut-handling | 150 Euro pro Monat (hr-only document: nur sichtbar für hr) |
+Four policies exist twice: the current version and an older one marked `superseded: true` with the same
+`policy` key (reisekostenrichtlinie, arbeitszeit-homeoffice, passwortrichtlinie, rabattstaffel-grosskunden).
+The newest-version rule must pick the current one (hotel 110 instead of 95 euro, 2 instead of 3 home-office
+days, 14 instead of 10 characters, ...). The current documents say "ersetzt Fassung vom ...".
+
+## Cross-references
+
+Documents point at each other ("siehe Eskalationsplan Kühlkette"); the link index turns that into graph edges.
+Some questions need two documents, for example:
+
+| Question | Documents | Answer |
+|---|---|---|
+| Wer gibt meine Vertriebsreise für 1.800 Euro frei und wie viel darf das Hotel kosten? | alle/reisekostenrichtlinie + vertrieb/vertrieb-reisekosten | Bereichsleitung (Tjark Rohwedder); 140 Euro statt 110 Euro |
+| Was tun bei unterbrochener Kühlkette an Tor 7 und was wurde nach dem Februar-Vorfall geändert? | logistik/eskalationsplan-kuehlkette + stoerungsbericht-tor7-kuehlkette-2026-02 | K3/S1, Durchwahl 5299; Lichtschranken alle 6 Monate warten |
+| Wer gibt meinen Urlaub frei, wenn mein Teamleiter in Halle 2 krank ist? | alle/urlaubsantrag + logistik/vertretung-bereitschaft | die Hallenleitung, in Halle 2 Wiebke Thiele |
+| Gilt der Großkundenrabatt auch für die Zollpauschale? | logistik/zollabwicklung + vertrieb/rabattstaffel-grosskunden | nein, 45 Euro je Anmeldung, nicht rabattfähig |
+| Ich gehe neun Monate in Elternzeit: wie viel von 30 Urlaubstagen wird gekürzt? | alle/urlaubsantrag + hr/elternzeit | 9/12, also 22,5 Tage |
