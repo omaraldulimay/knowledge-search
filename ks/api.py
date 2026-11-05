@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field
 
 from ks.auth import DEPARTMENTS, USERS, User, allowed_departments, get_user
 from ks.cache import SemanticCache
-from ks.config import ABLATION, CACHED, Config
+from ks.config import ABLATION, FINAL, FINAL_REWRITE, SERVING, Config
 from ks.embed import Embedder, HashEmbedder, get_embedder
 from ks.eval import RESULTS
 from ks.indexer import load_manifest, save_manifest, sync_index, upsert_documents
@@ -162,7 +162,10 @@ def build_state(
     log.info("index ready: %s chunks (%s)", store.count(), stats)
     if isinstance(store, PgVectorStore):
         save_manifest(index_dir, manifest)
-    cfg = next((c for c in ABLATION if c.name == os.environ.get("KS_CONFIG")), CACHED)
+    cfg = next(
+        (c for c in [*ABLATION, FINAL, FINAL_REWRITE] if c.name == os.environ.get("KS_CONFIG")),
+        SERVING,
+    )
     secret = os.environ.get("APP_SECRET")
     if not secret:
         log.warning("APP_SECRET is not set - using an insecure development secret")

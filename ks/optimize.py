@@ -15,7 +15,7 @@ import yaml
 
 from ks.auth import get_user
 from ks.cache import SemanticCache
-from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, LEAN_AGENTIC, Config
+from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, FINAL_REWRITE, LEAN_AGENTIC, Config
 from ks.eval import QUESTION_SETS, ROOT, _correct, _leaks, load_questions
 from ks.llm import LLM, cost_usd
 from ks.pipeline import answer
@@ -263,7 +263,11 @@ def run_ablation(
 ) -> dict:  # fmt: skip
     """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm).
     With `nodocs` the "no documents" comparison row is added for every set."""
-    configs = configs if configs is not None else [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
+    configs = (
+        configs
+        if configs is not None
+        else [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]
+    )
     facts = load_facts()
     report = (
         json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"rows": [], "ledger": []}
@@ -348,7 +352,10 @@ def format_markdown(report: dict, llm: str) -> str:
     """One markdown table per question set for the README. Rows measured with the real model show
     everything; rows that only ran offline (no model call, free) show retrieval and facts in the
     prompt, and a dash for what only a real model can tell (answer facts, citations, time, cost)."""
-    names = [NODOCS_NAME, *(c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL])]
+    names = [
+        NODOCS_NAME,
+        *(c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]),
+    ]
     head = (
         "| Configuration | measured | hit@5 | both docs | facts in prompt | fact correct "
         "| citation | leaks | agent | p50 | $ / 1,000 |\n"

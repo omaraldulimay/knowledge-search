@@ -141,7 +141,7 @@ def cmd_seed_glossary(args: argparse.Namespace) -> None:
 
 
 def cmd_optimize(args: argparse.Namespace) -> None:
-    from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, LEAN_AGENTIC
+    from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, FINAL_REWRITE, LEAN_AGENTIC
     from ks.eval import open_searcher
     from ks.llm import get_llm
     from ks.optimize import run_ablation
@@ -151,7 +151,7 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     wanted = args.configs.split(",") if args.configs else None
     configs = [
         c
-        for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
+        for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]
         if wanted is None or c.name in wanted
     ]
     if args.nodocs_only:

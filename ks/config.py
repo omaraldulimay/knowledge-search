@@ -14,6 +14,9 @@ class Config:
     graph: bool = False  # lever 1: pull in the best chunk of strongly linked documents
     router: bool = False  # lever 4: mode "auto" + a leaner agent
     cache: bool = False  # lever 5: semantic answer cache (never across permission scopes)
+    rewrite: bool = (
+        False  # lever 6: weak search result -> the model turns the question into keywords
+    )
     mode: str = "classic"  # which answer mode this row uses: classic | agentic | auto
 
 
@@ -30,3 +33,8 @@ LEAN_AGENTIC = replace(AUTO, name="agentic (all levers)", mode="agentic")  # lea
 # Round 2: classic by default (agent only for clearly multi-document questions), facts kept in the
 # compressed context, a more complete prompt, a lean agent that compresses less.
 FINAL = replace(AUTO, name="final (round 2)")
+# Round 3: when the first search is weak, a tiny model call turns the colloquial question into
+# search keywords and the search runs a second time (see ks/rewrite.py).
+FINAL_REWRITE = replace(FINAL, name="final + rewrite", rewrite=True)
+# What the API and the demo run by default: everything on, including the semantic cache.
+SERVING = replace(FINAL_REWRITE, name="serving", cache=True)

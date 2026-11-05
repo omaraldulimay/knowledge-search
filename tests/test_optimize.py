@@ -402,3 +402,33 @@ def test_nodocs_baseline_sends_no_document_and_scores_facts():
     assert [s[0] for s in seen] == ["Frage A?"]  # only answerable questions, no document text
     assert seen[0][1] == NODOCS_MAX_TOKENS == 150
     assert row["questions"] == 1 and row["fact_correct"] == 1.0 and row["citation_correct"] is None
+
+
+def test_rewrite_runs_only_for_weak_searches_and_is_paid_for(linked):
+    from ks.config import FINAL_REWRITE
+    from ks.llm import FakeLLM, LLMResponse, Usage
+
+    class Rewriter(FakeLLM):
+        def __init__(self):
+            super().__init__()
+            self.rewrites = []
+
+        def complete(self, system, user, **kwargs):
+            if system.startswith("Du formulierst"):
+                self.rewrites.append(user)
+                return LLMResponse("Passwort Zeichen Mindestlänge", [], Usage(100, 10), [])
+            return super().complete(system, user, **kwargs)
+
+    llm = Rewriter()
+    res = answer_auto(
+        "xyzzy qwertz plugh", get_user("ole"), linked, llm, cfg=FINAL_REWRITE
+    )  # weak first search: one rewrite call, tokens and cost are added to the result
+    assert len(llm.rewrites) == 1
+    assert any(s["tool"] == "rewrite" for s in res.steps) and res.input_tokens >= 100
+    assert res.cost > 0
+    llm.rewrites.clear()
+    answer_auto(
+        "Passwortrichtlinie Passwortmanager Mindestlänge Zeichen", get_user("ole"), linked, llm,
+        cfg=FINAL_REWRITE,
+    )  # fmt: skip
+    assert llm.rewrites == []  # a strong first search never pays for the rewrite

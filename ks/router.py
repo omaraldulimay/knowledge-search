@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from ks.config import BASELINE, Config
 from ks.llm import LLM, NOT_FOUND, TextCallback
 from ks.rag import AskResult, Tap, classic_answer, finish, relevant_hits
+from ks.rewrite import is_weak, search_with_rewrite
 from ks.search import Hit, HybridSearcher
 
 # "Wie viel darf das kosten UND wie schnell muss ich abrechnen": two question words joined by "und"
@@ -91,6 +92,14 @@ def answer_auto(
     hits = searcher.search(
         question, allowed_departments(user), k=5, expand=cfg.glossary, graph=cfg.graph
     )
+    rewrite_steps: list[dict] = []
+    extra_usage = (0, 0, 0.0)
+    if cfg.rewrite and is_weak(hits, searcher.embedder.name):
+        hits, step, extra_usage = search_with_rewrite(
+            question, searcher, llm, allowed_departments(user), hits,
+            expand=cfg.glossary, graph=cfg.graph,
+        )  # fmt: skip
+        rewrite_steps = [step] if step else []
     decision = decide(hits, searcher.embedder.name, question)
     retrieved = [h.chunk.doc_id for h in hits]
     if decision.route == "none":
@@ -110,6 +119,10 @@ def answer_auto(
         if result.ttft_ms is not None:
             result.ttft_ms += pre_ms
     result.mode = "auto"
+    result.input_tokens += extra_usage[0]
+    result.output_tokens += extra_usage[1]
+    result.cost += extra_usage[2]
     summary = f"{decision.route}: {decision.reason}"
-    result.steps = [{"tool": "router", "args": decision.signals, "summary": summary}, *result.steps]
+    router_step = {"tool": "router", "args": decision.signals, "summary": summary}
+    result.steps = [router_step, *rewrite_steps, *result.steps]
     return result
