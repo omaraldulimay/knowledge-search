@@ -162,7 +162,7 @@ def test_compressed_prompt_is_shorter_and_citations_resolve(linked):
     mira = get_user("mira")
     base = answer_classic(q, mira, linked, FakeLLM(), cfg=BASELINE)
     small = answer_classic(q, mira, linked, FakeLLM(), cfg=COMPRESSION)
-    assert small.input_tokens < base.input_tokens * 0.7
+    assert small.input_tokens < base.input_tokens * 0.9  # numbers and neighbours are kept
     assert small.citations and "hr/kuendigungsfristen" in {c.doc_id for c in small.citations}
     assert "[1]" not in small.answer  # short keys are mapped back to [doc#section] in code
 
@@ -189,9 +189,43 @@ def test_router_decisions(chunks):
     assert decide([], "fastembed").route == "none"
     assert decide([_hit(a, 0.3, 2.0)], "fastembed").route == "none"  # both signals weak
     assert decide([_hit(a, 0.8, 12.0), _hit(b, 0.5, 5.0)], "fastembed").route == "classic"
-    assert decide([_hit(a, 0.48, 12.0)], "fastembed").route == "agentic"  # unsure retrieval
-    split = [_hit(a, 0.6, 5.0), _hit(b, 0.7, None)]  # keyword and vector search disagree
+    # a merely weak best score does NOT escalate: classic with the glossary-expanded search
+    assert decide([_hit(a, 0.48, 12.0)], "fastembed").route == "classic"
+    # rankers disagree but only one document is strong: still classic
+    assert decide([_hit(a, 0.6, 5.0), _hit(b, 0.5, None)], "fastembed").route == "classic"
+    # two strong documents and the rankers disagree: the answer needs several documents
+    split = [_hit(a, 0.7, 5.0), _hit(b, 0.8, None)]
     assert decide(split, "fastembed").route == "agentic"
+
+
+def test_router_multi_part_question_needs_a_second_document(chunks):
+    a, b = chunks[0], next(c for c in chunks if c.doc_id != chunks[0].doc_id)
+    two_part = "Wie viel darf ein Hotel kosten und wie schnell muss ich abrechnen?"
+    one_doc = [_hit(a, 0.8, 12.0), _hit(b, 0.4, 5.0)]
+    assert decide(one_doc, "fastembed", two_part).route == "classic"  # one document covers both
+    two_docs = [_hit(a, 0.8, 12.0), _hit(b, 0.6, 5.0)]
+    assert decide(two_docs, "fastembed", two_part).route == "agentic"
+    assert decide(two_docs, "fastembed", "Wie hoch ist das Budget?").route == "classic"
+
+
+def test_compression_keeps_numbers_and_neighbours(linked):
+    from ks.context import best_sentences
+    from ks.rag import query_scorer
+
+    text = (
+        "Der Zuschuss beträgt 20 Prozent. Alle Mitarbeitenden dürfen teilnehmen. "
+        "Wir freuen uns über Ihre Fragen. Er gilt bis zu 300 Euro pro Monat. "
+        "Zusätzlich gibt es 40 Euro Basisbeitrag."
+    )
+    scorer = query_scorer("Wie hoch ist der Zuschuss?", linked, True)
+    short = best_sentences(text, scorer)
+    full = best_sentences(text, scorer, keep_facts=True)
+    assert "300 Euro" in full and "40 Euro" in full and len(full) > len(short)
+    assert "Alle Mitarbeitenden" in full  # direct neighbour of the best sentence
+    assert (
+        best_sentences("- 5 Tage\n- 7 Tage\n- Sonst nichts", scorer, keep_facts=True).count("Tage")
+        == 2
+    )
 
 
 def test_auto_answers_nothing_without_any_model_call(linked):
@@ -313,7 +347,9 @@ def test_ask_stream_sends_deltas_then_the_full_result(optimized_client):
     res = optimized_client.post(
         "/ask/stream",
         json={"question": q, "mode": "classic"},
-        headers=_auth(optimized_client, "mira"),
+        headers=_auth(
+            optimized_client, "fiete"
+        ),  # the admin also gets ttft_ms and the other details
     )
     assert res.status_code == 200 and res.headers["content-type"].startswith("text/event-stream")
     events = _events(res.text)
@@ -335,9 +371,13 @@ def test_stream_requires_login_and_default_mode_is_auto(optimized_client):
 def test_api_cache_serves_repeat_but_not_across_users(optimized_client):
     q = {"question": "Welche Kündigungsfrist gilt in der Probezeit?", "mode": "classic"}
     mira, katja = _auth(optimized_client, "mira"), _auth(optimized_client, "katja")
-    first = optimized_client.post("/ask", json=q, headers=mira).json()
-    again = optimized_client.post("/ask", json=q, headers=mira).json()
+    admin = _auth(optimized_client, "fiete")  # only the admin sees the cache flag and the cost
+    first = optimized_client.post("/ask", json=q, headers=admin).json()
+    again = optimized_client.post("/ask", json=q, headers=admin).json()
     assert not first["cached"] and again["cached"] and again["cost"] == 0
     other = optimized_client.post("/ask", json=q, headers=katja).json()
-    assert not other["cached"]
+    assert "cached" not in other  # employees never see it, but their scope is separate:
+    assert not any(c["doc_id"].startswith("hr/") for c in other["citations"])
+    employee = optimized_client.post("/ask", json=q, headers=mira).json()
+    assert employee["citations"]
     assert not any(c["doc_id"].startswith("hr/") for c in other["citations"])

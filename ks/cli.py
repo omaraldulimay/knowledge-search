@@ -141,7 +141,7 @@ def cmd_seed_glossary(args: argparse.Namespace) -> None:
 
 
 def cmd_optimize(args: argparse.Namespace) -> None:
-    from ks.config import ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC
+    from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, LEAN_AGENTIC
     from ks.eval import open_searcher
     from ks.llm import get_llm
     from ks.optimize import run_ablation
@@ -150,7 +150,9 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     llm = get_llm("anthropic" if args.real else "fake")
     wanted = args.configs.split(",") if args.configs else None
     configs = [
-        c for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC] if wanted is None or c.name in wanted
+        c
+        for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
+        if wanted is None or c.name in wanted
     ]
     sets = args.sets.split(",")
     budget = {"spent": 0.0, "limit": args.budget} if args.real else None
@@ -168,6 +170,12 @@ def cmd_optimize_table(args: argparse.Namespace) -> None:
 
     report = json.loads(OPTIMIZATION_JSON.read_text(encoding="utf-8"))
     print(format_markdown(report, args.llm))
+
+
+def cmd_optimize_rescore(args: argparse.Namespace) -> None:
+    from ks.optimize import rescore
+
+    print(f"Rescored {rescore()} rows with the current labels and facts (no model call).")
 
 
 def cmd_export_demo(args: argparse.Namespace) -> None:
@@ -240,6 +248,9 @@ def main(argv: list[str] | None = None) -> None:
     p_table = sub.add_parser("optimize-table", help="print the ablation tables as markdown")
     p_table.add_argument("--llm", default="claude-haiku-5-5")
     p_table.set_defaults(func=cmd_optimize_table)
+
+    p_rescore = sub.add_parser("optimize-rescore", help="re-score stored answers after a label fix")
+    p_rescore.set_defaults(func=cmd_optimize_rescore)
 
     from ks.demo import DEMO_JSON
 

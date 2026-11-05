@@ -1,11 +1,15 @@
 """Adaptive mode router (lever 4): decide per question from retrieval signals, no LLM call.
 
    nothing found            -> answer the not-found sentence directly (0 model calls, 0 cost)
-   confident                -> classic (one model call)
-   unsure / rankers differ  -> agentic (the model searches and reads itself)
+   everything else          -> classic (one model call; glossary + document links already help)
+   clearly needs several documents -> agentic (the model searches and reads itself)
+
+Classic is the default. A weak best score does NOT escalate: the glossary-expanded search handles
+colloquial wording. Only evidence that the answer spans several documents sends it to the agent.
 
 Signals come from the hybrid search that has to run anyway."""
 
+import re
 import time
 from dataclasses import dataclass, field
 
@@ -14,8 +18,17 @@ from ks.llm import LLM, NOT_FOUND, TextCallback
 from ks.rag import AskResult, Tap, classic_answer, finish, relevant_hits
 from ks.search import Hit, HybridSearcher
 
-# below this best vector score the retrieval is "unsure"; per embedder like the other thresholds
-UNSURE_VECTOR = {"fastembed": 0.5, "hash": 0.2}
+# "Wie viel darf das kosten UND wie schnell muss ich abrechnen": two question words joined by "und"
+QUESTION_WORD = r"(?:wie|was|wann|wer|wo|wohin|welche[rsmn]?|wieviel|muss|darf|kann|gibt)"
+MULTI_PART = re.compile(
+    rf"\b{QUESTION_WORD}\b[^?]{{6,}}?\bund\b\s+(?:\w+\s+){{0,2}}?{QUESTION_WORD}\b"
+)
+# two different documents both match strongly (vector score) and the two rankers disagree
+STRONG_DOC = {"fastembed": 0.65, "hash": 0.3}
+SECOND_DOC = {
+    "fastembed": 0.5,
+    "hash": 0.2,
+}  # a two-part question needs a 2nd doc at least this good
 
 
 @dataclass(frozen=True)
@@ -42,15 +55,26 @@ def signals(hits: list[Hit]) -> dict:
     }
 
 
-def decide(hits: list[Hit], embedder_name: str = "fastembed") -> Decision:
+def strong_docs(hits: list[Hit], embedder_name: str, bar: float | None = None) -> int:
+    """Number of distinct documents whose best vector score is at least `bar`."""
+    bar = bar if bar is not None else STRONG_DOC.get(embedder_name, 0.65)
+    best: dict[str, float] = {}
+    for h in hits:
+        best[h.chunk.doc_id] = max(best.get(h.chunk.doc_id, 0.0), h.vector_score or 0.0)
+    return sum(1 for v in best.values() if v >= bar)
+
+
+def decide(hits: list[Hit], embedder_name: str = "fastembed", question: str = "") -> Decision:
     sig = signals(hits)
     if not relevant_hits(hits, embedder_name, soft=True):
         return Decision("none", "keine Treffer über der Schwelle", sig)
-    if sig["best_vector"] < UNSURE_VECTOR.get(embedder_name, 0.55):
-        return Decision("agentic", "unsichere Suche (schwacher bester Treffer)", sig)
-    if not sig["rankers_agree"]:
-        return Decision("agentic", "Stichwort- und Bedeutungssuche widersprechen sich", sig)
-    return Decision("classic", "eindeutiger Treffer", sig)
+    # a two-part question only needs the agent if a second document matches too
+    second = SECOND_DOC.get(embedder_name, 0.5)
+    if MULTI_PART.search(question.lower()) and strong_docs(hits, embedder_name, second) >= 2:
+        return Decision("agentic", "mehrteilige Frage, mehrere Dokumente passen", sig)
+    if strong_docs(hits, embedder_name) >= 2 and not sig["rankers_agree"]:
+        return Decision("agentic", "mehrere Dokumente passen stark", sig)
+    return Decision("classic", "ein Dokument genügt", sig)
 
 
 def answer_auto(
@@ -65,7 +89,7 @@ def answer_auto(
     hits = searcher.search(
         question, allowed_departments(user), k=5, expand=cfg.glossary, graph=cfg.graph
     )
-    decision = decide(hits, searcher.embedder.name)
+    decision = decide(hits, searcher.embedder.name, question)
     retrieved = [h.chunk.doc_id for h in hits]
     if decision.route == "none":
         steps = [{"tool": "router", "args": decision.signals, "summary": decision.reason}]

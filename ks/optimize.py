@@ -15,7 +15,7 @@ import yaml
 
 from ks.auth import get_user
 from ks.cache import SemanticCache
-from ks.config import ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, Config
+from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, LEAN_AGENTIC, Config
 from ks.eval import QUESTION_SETS, ROOT, _correct, _leaks, load_questions
 from ks.llm import LLM
 from ks.pipeline import answer
@@ -184,7 +184,7 @@ def run_ablation(
     sets: list[str] | None = None, out: Path = OPTIMIZATION_JSON, budget: dict | None = None,
 ) -> dict:  # fmt: skip
     """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm)."""
-    configs = configs or [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC]
+    configs = configs or [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
     facts = load_facts()
     report = (
         json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"rows": [], "ledger": []}
@@ -223,9 +223,38 @@ def run_ablation(
     return report
 
 
+def rescore(out: Path = OPTIMIZATION_JSON) -> int:
+    """Recompute the answer-dependent columns of every stored real row with the CURRENT labels
+    and facts (after a label correction), from the kept answers. No model call, no cost.
+    Returns the number of rows updated."""
+    from ks.rag import AskResult, Citation
+
+    report = json.loads(out.read_text(encoding="utf-8"))
+    store = json.loads(out.with_name("optimization_answers.json").read_text(encoding="utf-8"))
+    facts = load_facts()
+    n = 0
+    for row in report["rows"]:
+        saved = store.get(row["llm"], {}).get(row["set"], {}).get(row["config"])
+        if not saved:
+            continue
+        labels = {q["id"]: q for q in load_questions(QUESTION_SETS[row["set"]])}
+        rows = []
+        for a in saved:
+            if a["id"] not in labels:
+                continue
+            res = a["result"] | {"citations": [Citation(**c) for c in a["result"]["citations"]]}
+            rows.append({**labels[a["id"]], "result": AskResult(**res)})
+        new = metrics(rows, facts)
+        for key in ("hit_at_5", "coverage", "multi_coverage", "citation_correct", "fact_correct"):
+            row[key] = new[key]
+        n += 1
+    out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    return n
+
+
 def format_markdown(report: dict, llm: str) -> str:
     """One markdown table per question set (rows = configurations) for the README."""
-    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC]]
+    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]]
     head = (
         "| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 "
         "| tokens in / out | $ / question | $ / 1,000 |\n"

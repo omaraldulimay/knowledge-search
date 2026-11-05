@@ -27,3 +27,6 @@ CACHED = replace(AUTO, name="+cache", cache=True)
 ABLATION = [BASELINE, COMPRESSION, GLOSSARY, GRAPH, AUTO, CACHED]
 BASELINE_AGENTIC = replace(BASELINE, name="baseline (agentic)", mode="agentic")
 LEAN_AGENTIC = replace(AUTO, name="agentic (all levers)", mode="agentic")  # lean agent on its own
+# Round 2: classic by default (agent only for clearly multi-document questions), facts kept in the
+# compressed context, a more complete prompt, a lean agent that compresses less.
+FINAL = replace(AUTO, name="final (round 2)")
