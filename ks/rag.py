@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass, field
 
 from ks.auth import User, allowed_departments
 from ks.config import BASELINE, Config
-from ks.context import KeyMap, build_sections
+from ks.context import KeyMap, Scorer, build_sections
 from ks.context import build_prompt as build_compact_prompt
 from ks.ingest import Chunk
 from ks.llm import LABEL_RE, LLM, NOT_FOUND, TextCallback, cost_usd
@@ -147,12 +147,12 @@ def build_prompt(question: str, hits: Collection[Hit]) -> str:
     return f"Frage: {question}\n\nDokumentausschnitte:\n\n{blocks}"
 
 
-def query_terms(question: str, searcher: HybridSearcher, use_glossary: bool) -> set[str]:
-    """Words used to pick the best sentences: the question plus its glossary synonyms."""
+def query_scorer(question: str, searcher: HybridSearcher, use_glossary: bool) -> Scorer:
+    """Sentence scorer for one question; glossary synonyms count as question words."""
     text = question
     if use_glossary and searcher.glossary:
         text += " " + " ".join(searcher.glossary.expand(question))
-    return set(tokenize(text))
+    return Scorer(searcher, question, set(tokenize(text)))
 
 
 def classic_answer(
@@ -170,8 +170,8 @@ def classic_answer(
         return finish(NOT_FOUND, {}, "classic", steps, (0, 0), started, llm, retrieved, route=route)
     if cfg.compress:
         keys = KeyMap()
-        terms = query_terms(question, searcher, cfg.glossary)
-        sections = build_sections(relevant, terms, keys)
+        scorer = query_scorer(question, searcher, cfg.glossary)
+        sections = build_sections(relevant, scorer, keys)
         response = llm.complete(
             COMPACT_SYSTEM_PROMPT, build_compact_prompt(question, sections),
             max_tokens=COMPACT_MAX_TOKENS, on_text=tap,

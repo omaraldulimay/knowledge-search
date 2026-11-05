@@ -102,11 +102,11 @@ def run_mode(
 
 def run_eval(
     modes: list[str], questions: list[dict], searcher: HybridSearcher, llm: LLM, embedder: str,
-    out: Path = RESULTS,
+    out: Path = RESULTS, cfg: Config = BASELINE,
 ) -> dict:  # fmt: skip
-    report: dict = {"llm": llm.model, "embedder": embedder, "modes": {}}
+    report: dict = {"llm": llm.model, "embedder": embedder, "config": cfg.name, "modes": {}}
     for mode in modes:
-        rows = run_mode(mode, questions, searcher, llm)
+        rows = run_mode(mode, questions, searcher, llm, cfg)
         report["modes"][mode] = {
             "metrics": compute_metrics(rows),
             "questions": [

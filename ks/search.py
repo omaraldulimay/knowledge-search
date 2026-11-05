@@ -80,11 +80,17 @@ class HybridSearcher:
         self._query_vectors: dict[str, np.ndarray] = {}  # embedding memo for repeated questions
 
     def embed_query(self, query: str) -> np.ndarray:
-        if query not in self._query_vectors:
-            if len(self._query_vectors) >= 512:
+        return self.embed_texts([query])[0]
+
+    def embed_texts(self, texts: list[str]) -> np.ndarray:
+        """Embeddings with a memo: repeated questions and sentences are not embedded twice."""
+        todo = [t for t in dict.fromkeys(texts) if t not in self._query_vectors]
+        if todo:
+            if len(self._query_vectors) > 4096:
                 self._query_vectors.clear()
-            self._query_vectors[query] = self.embedder.embed([query])[0]
-        return self._query_vectors[query]
+            for text, vec in zip(todo, self.embedder.embed(todo), strict=True):
+                self._query_vectors[text] = vec
+        return np.stack([self._query_vectors[t] for t in texts])
 
     def _bm25_for(self, allowed: frozenset[str]) -> tuple[BM25Okapi, list[Chunk]] | None:
         key = (allowed, self.store.count())  # new data in the store invalidates the cache

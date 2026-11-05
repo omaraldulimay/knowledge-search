@@ -5,6 +5,7 @@ import type { AskResult, Mode, Session, Step } from "../types";
 import SourcePanel from "./SourcePanel";
 
 const MODES: [Mode, string][] = [
+  ["auto", "Automatisch"],
   ["classic", "Einmal suchen"],
   ["agentic", "KI sucht selbst"],
 ];
@@ -14,7 +15,15 @@ const KIND_TAG: Record<string, string> = {
   permission: "Rechte-Test",
 };
 
+const ROUTE_LABEL: Record<string, string> = {
+  classic: "einmal gesucht",
+  agentic: "KI hat selbst gesucht",
+  none: "ohne KI-Aufruf",
+};
+
 function stepLabel(s: Step): string {
+  if (s.tool === "router") return "Router entscheidet";
+  if (s.tool === "cache") return "Antwort aus dem Cache";
   if (s.tool === "search") return `Suche „${String(s.args.query ?? "")}“`;
   if (s.tool === "read_document") return `Dokument gelesen: ${String(s.args.doc_id ?? "")}`;
   if (s.tool === "list_documents") return "Dokumente aufgelistet";
@@ -41,7 +50,8 @@ type Open = { docId: string; section: string };
 
 export default function Ask({ session, devParams }: { session: Session; devParams: URLSearchParams | null }) {
   const [question, setQuestion] = useState(devParams?.get("q") ?? "");
-  const [mode, setMode] = useState<Mode>((devParams?.get("mode") as Mode) || "classic");
+  const [mode, setMode] = useState<Mode>((devParams?.get("mode") as Mode) || "auto");
+  const [streamed, setStreamed] = useState("");
   const [result, setResult] = useState<AskResult | null>(null);
   const [asked, setAsked] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,8 +69,9 @@ export default function Ask({ session, devParams }: { session: Session; devParam
     setLoading(true);
     setError("");
     setOpen(null);
+    setStreamed("");
     try {
-      const r = await api.ask(q.trim(), m);
+      const r = await api.askStream(q.trim(), m, (text) => setStreamed((s) => s + text));
       setResult(r);
       setAsked(q.trim());
       if (devParams?.get("cite") && r.citations[0]) {
@@ -70,6 +81,7 @@ export default function Ask({ session, devParams }: { session: Session; devParam
       setError((e as Error).message);
     } finally {
       setLoading(false);
+      setStreamed("");
     }
   };
 
@@ -168,10 +180,17 @@ export default function Ask({ session, devParams }: { session: Session; devParam
           </p>
         )}
 
-        {result && (
+        {loading && streamed.trim() && (
+          <article className="answer answer--live" aria-live="polite">
+            <p className="asked muted">{question}</p>
+            <p>{streamed.replace(/\[\d+(?:\s*,\s*\d+)*\]/g, "")}</p>
+          </article>
+        )}
+
+        {result && !loading && (
           <article className={result.found ? "answer" : "answer answer--empty"} aria-live="polite">
             <p className="asked muted">{asked}</p>
-            {result.mode === "agentic" && <Timeline steps={result.steps} />}
+            {(result.mode === "agentic" || result.route === "agentic") && <Timeline steps={result.steps} />}
             {result.found ? (
               <div className="answer-body">
                 {lines.map((parts, i) => (
@@ -229,8 +248,10 @@ export default function Ask({ session, devParams }: { session: Session; devParam
               </ul>
             )}
             <p className="meta muted">
+              {result.cached ? "aus dem Cache · " : result.route ? `${ROUTE_LABEL[result.route] ?? result.route} · ` : ""}
               {fmtMs(result.latency_ms)} · {fmtInt(result.input_tokens + result.output_tokens)} Tokens ·{" "}
               {fmtCost(result.cost)}
+              {typeof result.ttft_ms === "number" && ` · erstes Wort nach ${fmtMs(result.ttft_ms)}`}
             </p>
           </article>
         )}

@@ -8,12 +8,11 @@ from collections.abc import Collection
 
 from ks.auth import User, allowed_departments
 from ks.config import BASELINE, Config
-from ks.context import KeyMap, best_sentences
+from ks.context import KeyMap, best_sentences, split_sentences
 from ks.ingest import Chunk
 from ks.llm import LABEL_RE, LLM, NOT_FOUND, TextCallback, ToolCall
-from ks.rag import AskResult, Tap, finish, label, query_terms, relevant_hits
+from ks.rag import AskResult, Tap, finish, label, query_scorer, relevant_hits
 from ks.search import HybridSearcher
-from ks.text import tokenize
 
 MAX_TOOL_CALLS = 6
 DOC_NOT_FOUND = "nicht gefunden"
@@ -114,7 +113,10 @@ class ToolBox:
         self.allowed = frozenset(allowed)
         self.cfg = cfg
         self.lean = cfg.router  # lean tool results (see LEAN_* above)
-        self.terms = query_terms(question, searcher, cfg.glossary)
+        self.question = question
+        self.scorer = (
+            query_scorer(question, searcher, cfg.glossary) if self.lean and question else None
+        )
         self.known: dict[str, Chunk] = {}  # label -> chunk, for validating citations
         self.keys = KeyMap()  # short citation keys (lean mode)
         self.visited: list[str] = []  # doc ids seen via search / read_document
@@ -148,8 +150,8 @@ class ToolBox:
         for h in hits:
             key = self._see(h.chunk)
             if self.lean:
-                terms = self.terms | query_terms(query, self.searcher, self.cfg.glossary)
-                snippet = best_sentences(h.chunk.text, terms, 2, SNIPPET_CHARS)
+                scorer = query_scorer(query, self.searcher, self.cfg.glossary)
+                snippet = best_sentences(h.chunk.text, scorer, 2, SNIPPET_CHARS)
                 lines.append(f"[{key}] {h.chunk.doc_id} > {h.chunk.heading}: {snippet}")
             else:
                 snippet = " ".join(h.chunk.text.split())[:240]
@@ -165,11 +167,12 @@ class ToolBox:
             for c in picked:
                 parts.append(f"[{self._see(c)}] {c.heading}\n{c.text.strip()[:SECTION_CHARS]}")
             return "\n".join(parts)
-        scored = sorted(chunks, key=lambda c: -len(self.terms & set(tokenize(c.text))))
-        top = scored[:2]
+        scorer = self.scorer or query_scorer(self.question, self.searcher, self.cfg.glossary)
+        best = {c.chunk_id: max(scorer.score(split_sentences(c.text) or [c.text])) for c in chunks}
+        top = sorted(chunks, key=lambda c: -best[c.chunk_id])[:2]
         parts = [f"Dokument: {chunks[0].title} ({chunks[0].doc_id})"]
         for c in top:
-            text = best_sentences(c.text, self.terms, 3, SECTION_CHARS)
+            text = best_sentences(c.text, scorer, 3, SECTION_CHARS, heading=c.heading)
             parts.append(f"[{self._see(c)}] {c.heading}\n{text}")
         others = [c.heading for c in chunks if c not in top]
         if others:

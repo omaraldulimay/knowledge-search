@@ -10,7 +10,7 @@ from ks.embed import Embedder, get_embedder
 from ks.eval import QUESTIONS, RESULTS
 from ks.indexer import load_manifest, save_manifest, sync_index
 from ks.ingest import load_documents
-from ks.search import HybridSearcher
+from ks.search import build_searcher
 from ks.store import MemoryStore, PgVectorStore, VectorStore
 
 DEFAULT_DOCS = Path(__file__).resolve().parent.parent / "data" / "docs"
@@ -44,6 +44,7 @@ def cmd_index(args: argparse.Namespace) -> None:
     if args.store == "memory":
         store.save(index_dir, embedder.name)
         save_manifest(index_dir, manifest)
+        build_searcher(store, embedder, index_dir, save=True)  # also writes links.json
     print(
         f"Index '{embedder.name}' ({args.store}): {stats.added} new, {stats.changed} changed, "
         f"{stats.removed} removed, {stats.unchanged} unchanged documents; "
@@ -84,7 +85,10 @@ def cmd_search(args: argparse.Namespace) -> None:
     except KeyError:
         sys.exit(f"Unknown user '{args.user}'. Known: {', '.join(USERS)}")
     store, embedder = _open(args)
-    hits = HybridSearcher(store, embedder).search(args.query, allowed_departments(user), k=args.k)
+    searcher = build_searcher(store, embedder, Path(args.index_dir))
+    hits = searcher.search(
+        args.query, allowed_departments(user), k=args.k, expand=args.optimized, graph=args.optimized
+    )
     print(f"User: {user.name} (departments: alle, {', '.join(user.departments)})")
     if not hits:
         print("No results.")
@@ -101,9 +105,15 @@ def cmd_eval(args: argparse.Namespace) -> None:
     from ks.llm import get_llm
 
     searcher, embedder = open_searcher(Path(args.index_dir), Path(args.docs))
-    modes = ["classic", "agentic"] if args.mode == "both" else [args.mode]
+    from ks.config import ABLATION
+
+    cfg = next((c for c in ABLATION if c.name == args.config), None)
+    if cfg is None:
+        sys.exit(f"Unknown config. Known: {', '.join(c.name for c in ABLATION)}")
+    all_modes = {"both": ["classic", "agentic"], "all": ["auto", "classic", "agentic"]}
+    modes = all_modes.get(args.mode, [args.mode])
     questions = load_questions(Path(args.questions))
-    report = run_eval(modes, questions, searcher, get_llm(), embedder, Path(args.out))
+    report = run_eval(modes, questions, searcher, get_llm(), embedder, Path(args.out), cfg)
     print(format_table(report))
     print(f"Written: {args.out}")
 
@@ -147,6 +157,15 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     print(f"Written: {args.out} ({len(report['rows'])} rows)")
 
 
+def cmd_optimize_table(args: argparse.Namespace) -> None:
+    import json
+
+    from ks.optimize import OPTIMIZATION_JSON, format_markdown
+
+    report = json.loads(OPTIMIZATION_JSON.read_text(encoding="utf-8"))
+    print(format_markdown(report, args.llm))
+
+
 def cmd_export_demo(args: argparse.Namespace) -> None:
     from ks.demo import export_demo
     from ks.eval import open_searcher
@@ -185,10 +204,14 @@ def main(argv: list[str] | None = None) -> None:
     p_search.add_argument("query")
     p_search.add_argument("--user", required=True)
     p_search.add_argument("-k", type=int, default=5)
+    p_search.add_argument("--optimized", action="store_true", help="glossary + graph expansion")
     p_search.set_defaults(func=cmd_search)
 
     p_eval = sub.add_parser("eval", help="run eval/questions.yaml and write eval/results.json")
-    p_eval.add_argument("--mode", choices=["classic", "agentic", "auto", "both"], default="both")
+    p_eval.add_argument(
+        "--mode", choices=["classic", "agentic", "auto", "both", "all"], default="both"
+    )
+    p_eval.add_argument("--config", default="baseline", help="which levers are on (see optimize)")
     p_eval.add_argument("--questions", default=str(QUESTIONS))
     p_eval.add_argument("--out", default=str(RESULTS))
     p_eval.add_argument("--docs", default=str(DEFAULT_DOCS))
@@ -208,6 +231,10 @@ def main(argv: list[str] | None = None) -> None:
     p_opt.add_argument("--out", default=str(OPTIMIZATION_JSON))
     p_opt.add_argument("--docs", default=str(DEFAULT_DOCS))
     p_opt.set_defaults(func=cmd_optimize)
+
+    p_table = sub.add_parser("optimize-table", help="print the ablation tables as markdown")
+    p_table.add_argument("--llm", default="claude-haiku-5-5")
+    p_table.set_defaults(func=cmd_optimize_table)
 
     from ks.demo import DEMO_JSON
 

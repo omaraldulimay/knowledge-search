@@ -4,8 +4,8 @@ import { fmtCost, fmtInt, fmtMs, fmtPct } from "../format";
 import type { Metrics } from "../types";
 import BarChart, { SERIES, type Group } from "./charts";
 
-const NAMES = { classic: "Einmal suchen", agentic: "KI sucht selbst" } as const;
-const MODE_ORDER = ["classic", "agentic"] as const;
+const NAMES = { auto: "Automatisch", classic: "Einmal suchen", agentic: "KI sucht selbst" } as const;
+const MODE_ORDER = ["auto", "classic", "agentic"] as const;
 
 function Tile({ label, value, note }: { label: string; value: string; note?: string }) {
   return (

@@ -10,14 +10,16 @@ from collections.abc import Iterable
 
 from ks.ingest import Chunk
 from ks.llm import KEY_RE
-from ks.search import Hit
+from ks.search import Hit, HybridSearcher
 from ks.text import tokenize
 
 MAX_SENTENCES = 2  # sentences kept per section
-MAX_CHARS = 320  # characters kept per section
-MAX_SECTIONS = 4  # sections in one prompt
+MAX_CHARS = 350  # characters kept per section
+MAX_SECTIONS = 5  # sections in one prompt
 SURE_RANKS = 3  # the best hits are kept even if no word matches (paraphrased questions)
-SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+|\n+")
+SENTENCE_SPLIT = re.compile(r"(?<=[^\W\d][.!?])\s+(?=[A-ZÄÖÜ\"])|\n+")
+SENTENCE_FLOOR = {"fastembed": 0.45, "hash": 0.1}  # weak sections below this are dropped
+WORD_BONUS = 0.1  # score added per question word found in a sentence
 
 
 def label(chunk: Chunk) -> str:
@@ -26,32 +28,48 @@ def label(chunk: Chunk) -> str:
 
 
 def split_sentences(text: str) -> list[str]:
+    """Sentences and list/table lines. "31. März" does not end a sentence (digit before the dot)."""
     return [s.strip() for s in SENTENCE_SPLIT.split(text) if len(s.strip()) > 2]
 
 
+class Scorer:
+    """Scores sentences against one question: embedding similarity (meaning) plus a small bonus
+    for every question word the sentence contains (exact terms such as "E5" or "VPN")."""
+
+    def __init__(self, searcher: HybridSearcher, question: str, terms: set[str]) -> None:
+        self.searcher = searcher
+        self.terms = terms
+        self.vector = searcher.embed_query(question)
+        self.floor = SENTENCE_FLOOR.get(searcher.embedder.name, 0.4)
+
+    def score(self, sentences: list[str]) -> list[float]:
+        sims = self.searcher.embed_texts(sentences) @ self.vector
+        words = [len(self.terms & set(tokenize(s))) for s in sentences]
+        return [float(sim) + WORD_BONUS * min(n, 3) for sim, n in zip(sims, words, strict=True)]
+
+
 def best_sentences(
-    text: str, query_terms: set[str], max_sentences: int = MAX_SENTENCES,
-    max_chars: int = MAX_CHARS, seen: set[str] | None = None, need_match: bool = False,
+    text: str, scorer: Scorer, max_sentences: int | None = None, max_chars: int | None = None,
+    seen: set[str] | None = None, need_match: bool = False, heading: str = "",
 ) -> str:  # fmt: skip
-    """The sentences of `text` that share the most words with the question, in original order.
-    Score = number of different question words in the sentence (+0.3 if it contains a number).
-    Sentences already in `seen` (overlap between chunks) are skipped. If no sentence matches
-    any word: the opening sentence (a paraphrased question), or "" when `need_match` is set."""
+    """The sentences of `text` that fit the question best (see Scorer), in original order.
+    The heading is scored too ("Evakuierung von Besuchern" helps its section). Sentences already
+    in `seen` (overlap between chunks) are skipped. With `need_match` a section whose best
+    sentence is below the similarity floor yields nothing."""
+    max_sentences, max_chars = max_sentences or MAX_SENTENCES, max_chars or MAX_CHARS
     seen = seen if seen is not None else set()
     sentences = [s for s in split_sentences(text) if s.lower() not in seen]
     if not sentences:
         return ""
-    scored = []
-    for i, sentence in enumerate(sentences):
-        hits = len(query_terms & set(tokenize(sentence)))
-        scored.append((hits + (0.3 if hits and re.search(r"\d", sentence) else 0), -i, i))
-    best = [i for score, _, i in sorted(scored, reverse=True)[:max_sentences] if score >= 1]
-    if not best:
-        if need_match:
-            return ""
-        best = [0]
+    scores = scorer.score(sentences)
+    if heading:  # a matching heading lifts every sentence of its section a little
+        bonus = max(scorer.score([heading])[0] - scorer.floor, 0) * 0.5
+        scores = [s + bonus for s in scores]
+    ranked = sorted(range(len(sentences)), key=lambda i: (-scores[i], i))
+    if need_match and scores[ranked[0]] < scorer.floor:
+        return ""
     chosen, used = [], 0
-    for i in sorted(best):
+    for i in sorted(ranked[:max_sentences]):
         if chosen and used + len(sentences[i]) > max_chars:
             break
         chosen.append(sentences[i])
@@ -91,7 +109,7 @@ class KeyMap:
 
 
 def build_sections(
-    hits: Iterable[Hit], query_terms: set[str], keys: KeyMap, max_sections: int = MAX_SECTIONS
+    hits: Iterable[Hit], scorer: Scorer, keys: KeyMap, max_sections: int | None = None
 ) -> list[tuple[str, Chunk, str]]:
     """(key, first chunk, compressed text) per section, best hits first. Chunks of one section
     are merged. Weak hits (rank > SURE_RANKS, or pulled in by a link) need a matching word,
@@ -105,11 +123,15 @@ def build_sections(
         rank, first = parts[0]
         weak = rank >= SURE_RANKS or bool(first.via)
         text = best_sentences(
-            "\n".join(h.chunk.text for _, h in parts), query_terms, seen=seen, need_match=weak
+            "\n".join(h.chunk.text for _, h in parts),
+            scorer,
+            seen=seen,
+            need_match=weak,
+            heading=first.chunk.heading,
         )
         if text:
             sections.append((rank, first.chunk, text))
-    sections = sections[:max_sections]
+    sections = sections[: max_sections or MAX_SECTIONS]
     return [(keys.add(chunk), chunk, text) for _, chunk, text in sections]
 
 

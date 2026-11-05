@@ -11,16 +11,18 @@ from pathlib import Path
 
 import numpy as np
 
-from ks.agent import answer_agentic
 from ks.auth import USERS, User, allowed_departments
+from ks.config import AUTO, Config
 from ks.eval import RESULTS, load_questions
 from ks.llm import LLM
-from ks.rag import answer_classic
+from ks.optimize import OPTIMIZATION_JSON
+from ks.pipeline import answer
 from ks.scale import SCALE_JSON
 from ks.search import HybridSearcher
 
 DEMO_JSON = Path(__file__).resolve().parent.parent / "web" / "public" / "demo" / "demo.json"
 ADMIN_LOGIN = "fiete"
+DEMO_MODES = ("auto", "classic", "agentic")  # "auto" is the default in the UI
 MAX_QUESTIONS = 8
 MIN_QUESTIONS = 6
 
@@ -54,11 +56,13 @@ def candidates(login: str, kind: str, eval_questions: list[dict]) -> list[dict]:
     return sorted(same, key=lambda q: q["user"] != login)
 
 
-def eval_cache(llm: LLM) -> dict:
+def eval_cache(llm: LLM, cfg: Config) -> dict:
     """Answers of the last eval run, keyed by (user, question). Reused for the demo so the same
-    question is not paid for twice. Only valid if the eval was made with the same model."""
+    question is not paid for twice. Only valid if the eval used the same model and levers."""
     report = _read(RESULTS)
     if not report or report.get("llm") != llm.model or llm.model == "fake":
+        return {}
+    if report.get("config", "baseline") != cfg.name:
         return {}
     cache: dict = {}
     for mode, data in report["modes"].items():
@@ -67,13 +71,14 @@ def eval_cache(llm: LLM) -> dict:
     return cache
 
 
-def ask_both(
-    q: dict, user: User, searcher: HybridSearcher, llm: LLM, cache: dict | None = None
-) -> dict:
+def ask_all(
+    q: dict, user: User, searcher: HybridSearcher, llm: LLM, cache: dict | None = None,
+    cfg: Config = AUTO,
+) -> dict:  # fmt: skip
     cached = (cache or {}).get((user.login, q["question"]), {})
     results = {
-        mode: cached.get(mode) or run(q["question"], user, searcher, llm).to_dict()
-        for mode, run in (("classic", answer_classic), ("agentic", answer_agentic))
+        mode: cached.get(mode) or answer(q["question"], user, searcher, llm, mode, cfg).to_dict()
+        for mode in DEMO_MODES
     }
     return {"question": q["question"], "kind": q["type"], "results": results}
 
@@ -85,7 +90,7 @@ def _read(path: Path):
 def _live_metrics(rows: list[tuple[str, dict]]) -> dict:
     """Same shape as GET /metrics, computed from the demo answers themselves."""
     modes: dict[str, dict] = {}
-    for mode in ("classic", "agentic"):
+    for mode in DEMO_MODES:
         sel = [r for m, r in rows if m == mode]
         lat = np.array([r["latency_ms"] for r in sel])
         modes[mode] = {
@@ -108,10 +113,12 @@ def _live_metrics(rows: list[tuple[str, dict]]) -> dict:
     }
 
 
-def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -> dict:
+def build_demo(
+    searcher: HybridSearcher, llm: LLM, eval_questions: list[dict], cfg: Config = AUTO
+) -> dict:
     users, questions, documents, contents = [], {}, {}, {}
     rows: list[tuple[str, dict]] = []
-    cache = eval_cache(llm)
+    cache = eval_cache(llm, cfg)
     for login, user in USERS.items():
         allowed = allowed_departments(user)
         chunks = searcher.store.get_chunks(allowed)
@@ -126,7 +133,8 @@ def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -
         questions[login], cited = [], set()
 
         entries = [
-            ask_both(q, user, searcher, llm, cache) for q in pick_questions(login, eval_questions)
+            ask_all(q, user, searcher, llm, cache, cfg)
+            for q in pick_questions(login, eval_questions)
         ]
         for kind in ("not_found", "permission"):
             if kind == "permission" and login == ADMIN_LOGIN:
@@ -134,7 +142,7 @@ def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -
             # show a case the system handles correctly: the "not found" sentence in both modes
             first = None
             for q in candidates(login, kind, eval_questions):  # stop at the first good case
-                entry = ask_both(q, user, searcher, llm, cache)
+                entry = ask_all(q, user, searcher, llm, cache, cfg)
                 first = first or entry
                 if not any(r["found"] for r in entry["results"].values()):
                     first = entry
@@ -162,6 +170,8 @@ def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -
         "generated_by": llm.model,
         "generated_at": date.today().isoformat(),
         "embedder": searcher.embedder.name,
+        "default_mode": "auto",
+        "config": cfg.name,
         "users": users,
         "questions": questions,
         "documents": documents,
@@ -169,6 +179,7 @@ def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -
         "metrics": {
             **_live_metrics(rows),
             "eval": _read(RESULTS),
+            "optimization": _read(OPTIMIZATION_JSON),
             "scale": _read(SCALE_JSON),
         },
     }

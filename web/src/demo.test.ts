@@ -11,7 +11,7 @@ const DATA = {
   generated_at: "2026-01-01",
   users: [{ login: "mira", name: "Mira", departments: ["alle", "hr"], is_admin: false }],
   questions: {
-    mira: [{ question: "Q1?", kind: "single", results: { classic: result("A"), agentic: result("B") } }],
+    mira: [{ question: "Q1?", kind: "single", results: { auto: result("C"), classic: result("A"), agentic: result("B") } }],
   },
   documents: { mira: [{ doc_id: "hr/x", title: "X", department: "hr" }] },
   contents: { mira: { "hr/x": { doc_id: "hr/x", title: "X", department: "hr", chunks: [] } } },
@@ -24,6 +24,7 @@ describe("demo api", () => {
   it("answers prepared questions per mode", async () => {
     const api = make();
     await api.login("mira");
+    expect((await api.ask("Q1?", "auto")).answer).toBe("C");
     expect((await api.ask("Q1?", "classic")).answer).toBe("A");
     expect((await api.ask("Q1?", "agentic")).answer).toBe("B");
   });

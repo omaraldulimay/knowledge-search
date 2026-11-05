@@ -42,7 +42,13 @@ beforeEach(() => {
       if (url === "/api/users") return json(USERS);
       if (url === "/api/login")
         return json({ token: "t", login: "katja", name: "Katja Sommer", departments: ["alle", "vertrieb"], is_admin: false });
-      if (url === "/api/ask") return json(askResult);
+      if (url === "/api/ask/stream")
+        return Promise.resolve(
+          new Response(
+            `event: delta\ndata: {"text": "Laut den "}\n\nevent: done\ndata: ${JSON.stringify(askResult)}\n\n`,
+            { status: 200 },
+          ),
+        );
       if (url.startsWith("/api/documents/")) return json(DOC);
       return json([]);
     }),

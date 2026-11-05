@@ -11,7 +11,7 @@ from ks.api import create_app
 from ks.auth import allowed_departments, get_user
 from ks.cache import SemanticCache
 from ks.config import AUTO, BASELINE, COMPRESSION, GRAPH
-from ks.context import KeyMap, best_sentences, build_sections
+from ks.context import KeyMap, Scorer, best_sentences, build_sections
 from ks.embed import HashEmbedder
 from ks.glossary import Glossary, seed_from_chunks
 from ks.links import LinkIndex, build_links
@@ -132,13 +132,21 @@ def test_auto_seed_finds_acronyms(chunks, link_index):
 # ---------------------------------------------------------------- compression
 
 
-def test_best_sentences_picks_matching_sentence_and_skips_repeats():
+def test_best_sentences_picks_matching_sentence_and_skips_repeats(linked):
     text = "Der Hund bellt. Die Probezeit dauert sechs Monate. Das Wetter ist schön."
-    terms = set(tokenize("Wie lange dauert die Probezeit?"))
+    scorer = Scorer(
+        linked, "Wie lange dauert die Probezeit?", set(tokenize("lange dauert Probezeit"))
+    )
     seen: set[str] = set()
-    assert best_sentences(text, terms, 1, seen=seen) == "Die Probezeit dauert sechs Monate."
-    assert best_sentences(text, terms, 1, seen=seen) != "Die Probezeit dauert sechs Monate."
-    assert best_sentences("Nur Text ohne Treffer.", terms, need_match=True) == ""
+    assert best_sentences(text, scorer, 1, seen=seen) == "Die Probezeit dauert sechs Monate."
+    assert best_sentences(text, scorer, 1, seen=seen) != "Die Probezeit dauert sechs Monate."
+
+
+def test_sentence_split_keeps_dates_together():
+    from ks.context import split_sentences
+
+    parts = split_sentences("Urlaub verfällt bis zum 31. März des Folgejahres. Danach ist er weg.")
+    assert parts == ["Urlaub verfällt bis zum 31. März des Folgejahres.", "Danach ist er weg."]
 
 
 def test_keymap_restores_long_labels(chunks):
@@ -162,8 +170,9 @@ def test_compressed_prompt_is_shorter_and_citations_resolve(linked):
 def test_sections_are_limited_and_deduplicated(linked):
     mira = allowed_departments(get_user("mira"))
     hits = linked.search("Probezeit Kündigung", mira, k=5)
-    sections = build_sections(hits, set(tokenize("Probezeit Kündigung")), KeyMap())
-    assert 1 <= len(sections) <= 4
+    scorer = Scorer(linked, "Probezeit Kündigung", set(tokenize("Probezeit Kündigung")))
+    sections = build_sections(hits, scorer, KeyMap())
+    assert 1 <= len(sections) <= 5
     texts = [t for _, _, t in sections]
     assert len(set(texts)) == len(texts)
 

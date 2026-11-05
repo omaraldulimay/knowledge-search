@@ -194,3 +194,35 @@ def run_ablation(
     report["embedder"] = searcher.embedder.name
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     return report
+
+
+def format_markdown(report: dict, llm: str) -> str:
+    """One markdown table per question set (rows = configurations) for the README."""
+    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC]]
+    head = (
+        "| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 "
+        "| tokens in / out | $ / question | $ / 1,000 |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|"
+    )
+    out = []
+    for name in ("tuning", "holdout"):
+        rows = {r["config"]: r for r in report["rows"] if r["set"] == name and r["llm"] == llm}
+        if not rows:
+            continue
+        title = "Tuning set (30 questions)" if name == "tuning" else "Held-out set (15 questions)"
+        out.append(f"**{title}**\n\n{head}")
+        for cfg in names:
+            if cfg not in rows:
+                continue
+            r = rows[cfg]
+            cache_note = f" ({r['questions']} q. with repeats)" if "cache" in r else ""
+            out.append(
+                f"| {cfg}{cache_note} | {r['hit_at_5']:.0%} | {r['coverage']:.0%} "
+                f"| {r['citation_correct']:.0%} | {r['fact_correct']:.0%} | {r['leaks']} "
+                f"| {r['p50_ms'] / 1000:.2f} / {r['p95_ms'] / 1000:.2f} s "
+                f"| {r['ttft_p50_ms'] / 1000:.2f} s "
+                f"| {r['tokens_in']:,.0f} / {r['tokens_out']:,.0f} "
+                f"| ${r['cost_per_q']:.5f} | ${r['cost_per_1000']:.2f} |"
+            )
+        out.append("")
+    return "\n".join(out)

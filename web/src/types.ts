@@ -8,7 +8,7 @@ export type Session = {
 export type DemoUser = { login: string; name: string };
 export type Citation = { doc_id: string; title: string; section: string; chunk_id: string };
 export type Step = { tool: string; args: Record<string, unknown>; summary: string };
-export type Mode = "classic" | "agentic";
+export type Mode = "auto" | "classic" | "agentic";
 export type AskResult = {
   answer: string;
   citations: Citation[];
@@ -19,6 +19,9 @@ export type AskResult = {
   cost: number;
   latency_ms: number;
   found: boolean;
+  route?: string; // mode "auto": what the router chose (classic | agentic | none)
+  ttft_ms?: number | null; // time to first streamed token
+  cached?: boolean; // served from the semantic cache
 };
 export type DocItem = { doc_id: string; title: string; department: string };
 export type DocDetail = DocItem & { chunks: { chunk_id: string; heading: string; text: string }[] };

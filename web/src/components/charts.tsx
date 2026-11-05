@@ -5,6 +5,7 @@ export type Group = { label: string; bars: Bar[] };
 
 /** Series colors are CSS variables (validated with the dataviz palette script, light and dark). */
 export const SERIES = {
+  auto: "var(--series-auto)",
   classic: "var(--series-classic)",
   agentic: "var(--series-agentic)",
   scale: "var(--series-scale)",

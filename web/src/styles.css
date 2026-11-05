@@ -10,6 +10,7 @@
   --accent-soft: #e4ebe5;
   --hit: #f3e3b3;
   --danger: #9a3b2e;
+  --series-auto: #2f8f6b;
   --series-classic: #3b6ea8;
   --series-agentic: #c2703d;
   --series-scale: #5d7f73;
@@ -30,6 +31,7 @@
     --accent-soft: #2c3732;
     --hit: #4a4121;
     --danger: #e08a7a;
+    --series-auto: #4cb58c;
     --series-classic: #5b93d1;
     --series-agentic: #cf7943;
     --series-scale: #8db5a2;
@@ -47,6 +49,7 @@
   --accent-soft: #2c3732;
   --hit: #4a4121;
   --danger: #e08a7a;
+  --series-auto: #4cb58c;
   --series-classic: #5b93d1;
   --series-agentic: #cf7943;
   --series-scale: #8db5a2;
@@ -165,6 +168,7 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
 .source:hover { color: var(--accent); }
 .meta { margin-top: 1rem; font-size: 0.8rem; }
 .answer--empty { background: transparent; border-style: dashed; }
+.answer--live { opacity: 0.85; }
 .empty-note { display: flex; gap: 1rem; align-items: flex-start; color: var(--muted); }
 .empty-note svg { flex: none; margin-top: 2px; }
 .empty-note strong { font-family: var(--serif); font-weight: 500; font-size: 1.15rem; color: var(--text); }
