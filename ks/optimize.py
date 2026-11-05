@@ -17,7 +17,7 @@ from ks.auth import get_user
 from ks.cache import SemanticCache
 from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, LEAN_AGENTIC, Config
 from ks.eval import QUESTION_SETS, ROOT, _correct, _leaks, load_questions
-from ks.llm import LLM
+from ks.llm import LLM, cost_usd
 from ks.pipeline import answer
 from ks.search import HybridSearcher
 
@@ -211,12 +211,59 @@ def run_config(
     return out
 
 
+NODOCS_NAME = "no documents"
+NODOCS_SYSTEM = (
+    "Du bist ein hilfreicher Assistent. Beantworte die Frage eines Mitarbeitenden der Elbkontor "
+    "Logistik GmbH in Hamburg kurz auf Deutsch (höchstens drei Sätze)."
+)
+NODOCS_MAX_TOKENS = 150
+
+
+def run_nodocs(
+    questions: list[dict], llm: LLM, facts: dict[str, list[str]], budget: dict | None = None,
+) -> dict:  # fmt: skip
+    """The comparison that shows what the search is worth: ask the model every answerable question
+    WITHOUT any document (short prompt, 150 tokens) and score the facts with the same checker.
+    Not-found and permission questions are skipped: there is nothing to look up."""
+    asked = [q for q in questions if q["expected_doc_ids"] and q["id"] in facts]
+    answers, lat = [], []
+    tokens_in = tokens_out = 0
+    cost = 0.0
+    for q in asked:
+        started = time.perf_counter()
+        res = llm.complete(NODOCS_SYSTEM, q["question"], max_tokens=NODOCS_MAX_TOKENS, think=False)
+        lat.append((time.perf_counter() - started) * 1000)
+        q_cost = cost_usd(llm, res.usage.input_tokens, res.usage.output_tokens)
+        tokens_in += res.usage.input_tokens
+        tokens_out += res.usage.output_tokens
+        cost += q_cost
+        ok = facts_ok(res.text, facts[q["id"]])
+        answers.append({"id": q["id"], "question": q["question"], "answer": res.text,
+                        "facts_ok": ok, "cost": q_cost})  # fmt: skip
+        if budget is not None:
+            budget["spent"] += q_cost
+            if budget["spent"] > budget["limit"]:
+                raise RuntimeError(f"budget exceeded: ${budget['spent']:.4f} > ${budget['limit']}")
+    n = max(len(asked), 1)
+    row = {
+        "config": NODOCS_NAME, "mode": "none", "questions": len(asked),
+        "hit_at_5": None, "coverage": None, "multi_coverage": None, "citation_correct": None,
+        "fact_correct": _ratio(sum(a["facts_ok"] for a in answers), len(answers)),
+        "fact_in_context": None, "leaks": 0, "p50_ms": _pct(lat, 50), "p95_ms": _pct(lat, 95),
+        "ttft_p50_ms": 0.0, "tokens_in": tokens_in / n, "tokens_out": tokens_out / n,
+        "cost_per_q": cost / n, "cost_per_1000": cost / n * 1000, "routes": {"none": len(asked)},
+    }  # fmt: skip
+    return row | {"answers": answers}
+
+
 def run_ablation(
     searcher: HybridSearcher, llm: LLM, configs: list[Config] | None = None,
     sets: list[str] | None = None, out: Path = OPTIMIZATION_JSON, budget: dict | None = None,
+    nodocs: bool = False,
 ) -> dict:  # fmt: skip
-    """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm)."""
-    configs = configs or [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
+    """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm).
+    With `nodocs` the "no documents" comparison row is added for every set."""
+    configs = configs if configs is not None else [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
     facts = load_facts()
     report = (
         json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"rows": [], "ledger": []}
@@ -225,27 +272,30 @@ def run_ablation(
     answer_store = (
         json.loads(answers_file.read_text(encoding="utf-8")) if answers_file.exists() else {}
     )
+
+    def keep(row: dict, answers: list[dict], name: str, started: float) -> None:
+        if llm.model != "fake":  # real answers are kept for inspection and for the demo
+            answer_store.setdefault(llm.model, {}).setdefault(name, {})[row["config"]] = answers
+        row |= {"set": name, "llm": llm.model, "seconds": round(time.perf_counter() - started, 1)}
+        report["rows"] = [
+            r for r in report["rows"]
+            if not (r["config"] == row["config"] and r["set"] == name and r["llm"] == llm.model)
+        ] + [row]  # fmt: skip
+        if llm.model != "fake":
+            report["ledger"].append(
+                {"config": row["config"], "set": name, "cost": row["cost_per_q"] * row["questions"]}
+            )
+
     for name in sets or list(QUESTION_SETS):
         questions = load_questions(QUESTION_SETS[name])
+        if nodocs:
+            started = time.perf_counter()
+            row = run_nodocs(questions, llm, facts, budget)
+            keep(row, row.pop("answers"), name, started)
         for cfg in configs:
             started = time.perf_counter()
             row = run_config(cfg, questions, searcher, llm, facts, budget)
-            answers = row.pop("answers")
-            if llm.model != "fake":  # real answers are kept for inspection and for the demo
-                answer_store.setdefault(llm.model, {}).setdefault(name, {})[cfg.name] = answers
-            row |= {
-                "set": name,
-                "llm": llm.model,
-                "seconds": round(time.perf_counter() - started, 1),
-            }
-            report["rows"] = [
-                r for r in report["rows"]
-                if not (r["config"] == cfg.name and r["set"] == name and r["llm"] == llm.model)
-            ] + [row]  # fmt: skip
-            if llm.model != "fake":
-                report["ledger"].append(
-                    {"config": cfg.name, "set": name, "cost": row["cost_per_q"] * row["questions"]}
-                )
+            keep(row, row.pop("answers"), name, started)
     report["generated"] = date.today().isoformat()
     report["embedder"] = searcher.embedder.name
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -284,34 +334,50 @@ def rescore(out: Path = OPTIMIZATION_JSON) -> int:
     return n
 
 
+def _fmt_pct(value: float | None) -> str:
+    return "–" if value is None else f"{value:.0%}"
+
+
+def agent_share(row: dict) -> float:
+    """Share of the questions the agent answered (route "agentic" or mode agentic)."""
+    routes = row.get("routes", {})
+    return routes.get("agentic", 0) / max(row["questions"], 1)
+
+
 def format_markdown(report: dict, llm: str) -> str:
-    """One markdown table per question set (rows = configurations) for the README."""
-    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]]
+    """One markdown table per question set for the README. Rows measured with the real model show
+    everything; rows that only ran offline (no model call, free) show retrieval and facts in the
+    prompt, and a dash for what only a real model can tell (answer facts, citations, time, cost)."""
+    names = [NODOCS_NAME, *(c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL])]
     head = (
-        "| Configuration | hit@5 | both docs | citation | fact | facts in context | leaks "
-        "| p50 / p95 | TTFT p50 | tokens in / out | $ / question | $ / 1,000 |\n"
-        "|---|---|---|---|---|---|---|---|---|---|---|---|"
+        "| Configuration | measured | hit@5 | both docs | facts in prompt | fact correct "
+        "| citation | leaks | agent | p50 | $ / 1,000 |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|"
     )
     out = []
     for name in ("tuning", "holdout"):
-        rows = {r["config"]: r for r in report["rows"] if r["set"] == name and r["llm"] == llm}
-        if not rows:
+        real = {r["config"]: r for r in report["rows"] if r["set"] == name and r["llm"] == llm}
+        fake = {r["config"]: r for r in report["rows"] if r["set"] == name and r["llm"] == "fake"}
+        if not real and not fake:
             continue
         title = "Tuning set (30 questions)" if name == "tuning" else "Held-out set (15 questions)"
         out.append(f"**{title}**\n\n{head}")
         for cfg in names:
-            if cfg not in rows:
+            r = real.get(cfg) or fake.get(cfg)
+            if r is None:
                 continue
-            r = rows[cfg]
-            cache_note = f" ({r['questions']} q. with repeats)" if "cache" in r else ""
-            out.append(
-                f"| {cfg}{cache_note} | {r['hit_at_5']:.0%} | {r['coverage']:.0%} "
-                f"| {r['citation_correct']:.0%} | {r['fact_correct']:.0%} "
-                f"| {r.get('fact_in_context', 0):.0%} | {r['leaks']} "
-                f"| {r['p50_ms'] / 1000:.2f} / {r['p95_ms'] / 1000:.2f} s "
-                f"| {r['ttft_p50_ms'] / 1000:.2f} s "
-                f"| {r['tokens_in']:,.0f} / {r['tokens_out']:,.0f} "
-                f"| ${r['cost_per_q']:.5f} | ${r['cost_per_1000']:.2f} |"
-            )
+            is_real = cfg in real
+            note = f" ({r['questions']} q. with repeats)" if "cache" in r else ""
+            cells = [
+                f"{cfg}{note}", "real" if is_real else "offline",
+                _fmt_pct(r["hit_at_5"]), _fmt_pct(r["coverage"]),
+                _fmt_pct(r.get("fact_in_context")),
+                _fmt_pct(r["fact_correct"]) if is_real else "–",
+                _fmt_pct(r["citation_correct"]) if is_real else "–", str(r["leaks"]),
+                _fmt_pct(agent_share(r)) if cfg != NODOCS_NAME else "–",
+                f"{r['p50_ms'] / 1000:.2f} s" if is_real else "–",
+                f"${r['cost_per_1000']:.2f}" if is_real else "–",
+            ]  # fmt: skip
+            out.append("| " + " | ".join(cells) + " |")
         out.append("")
     return "\n".join(out)

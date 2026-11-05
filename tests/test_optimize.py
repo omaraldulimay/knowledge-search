@@ -381,3 +381,24 @@ def test_api_cache_serves_repeat_but_not_across_users(optimized_client):
     employee = optimized_client.post("/ask", json=q, headers=mira).json()
     assert employee["citations"]
     assert not any(c["doc_id"].startswith("hr/") for c in other["citations"])
+
+
+def test_nodocs_baseline_sends_no_document_and_scores_facts():
+    from ks.optimize import NODOCS_MAX_TOKENS, run_nodocs
+
+    seen = []
+
+    class Echo(FakeLLM):
+        def complete(self, system, user, **kwargs):
+            seen.append((user, kwargs.get("max_tokens")))
+            return super().complete(system, "[1]\nAntwort 14 Zeichen", **kwargs)
+
+    base = {"user": "ole", "type": "single"}
+    questions = [
+        {**base, "id": "a", "question": "Frage A?", "expected_doc_ids": ["x/y"]},
+        {**base, "id": "b", "question": "Frage B?", "expected_doc_ids": []},
+    ]
+    row = run_nodocs(questions, Echo(), {"a": ["14 zeichen"], "b": ["x"]})
+    assert [s[0] for s in seen] == ["Frage A?"]  # only answerable questions, no document text
+    assert seen[0][1] == NODOCS_MAX_TOKENS == 150
+    assert row["questions"] == 1 and row["fact_correct"] == 1.0 and row["citation_correct"] is None

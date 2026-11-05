@@ -154,9 +154,13 @@ def cmd_optimize(args: argparse.Namespace) -> None:
         for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]
         if wanted is None or c.name in wanted
     ]
+    if args.nodocs_only:
+        configs = []
     sets = args.sets.split(",")
     budget = {"spent": 0.0, "limit": args.budget} if args.real else None
-    report = run_ablation(searcher, llm, configs, sets, Path(args.out), budget)
+    report = run_ablation(
+        searcher, llm, configs, sets, Path(args.out), budget, args.nodocs or args.nodocs_only
+    )
     if budget:
         total = sum(entry["cost"] for entry in report["ledger"])
         print(f"API cost of this run: ${budget['spent']:.4f}; ledger total: ${total:.4f}")
@@ -240,6 +244,10 @@ def main(argv: list[str] | None = None) -> None:
     p_opt.add_argument("--real", action="store_true", help="use the real model (costs money)")
     p_opt.add_argument("--configs", help="comma-separated config names, default: all")
     p_opt.add_argument("--sets", default="tuning,holdout")
+    p_opt.add_argument(
+        "--nodocs", action="store_true", help="add the 'no documents' comparison row"
+    )
+    p_opt.add_argument("--nodocs-only", action="store_true", help="only the 'no documents' row")
     p_opt.add_argument("--budget", type=float, default=0.05, help="abort above this USD amount")
     p_opt.add_argument("--out", default=str(OPTIMIZATION_JSON))
     p_opt.add_argument("--docs", default=str(DEFAULT_DOCS))

@@ -12,7 +12,7 @@ Jede neue Person bekommt eine Patin oder einen Paten aus dem eigenen Team für d
 
 ## Technik am ersten Tag
 
-Der Laptop wird um 09:00 Uhr im IT-Raum 1.04 ausgegeben. Dort richtet der IT-Support auch den zweiten Faktor ein. Im Lager erhalten Neue einen Handscanner mit ELKO-Anmeldung per Chip und sechsstelliger PIN, die erste Schulung "ELKO Basis" dauert zwei Stunden.
+Der Laptop wird um 09:00 Uhr im IT-Raum 1.04 ausgegeben (siehe Hardware-Bestellung). Dort richtet der IT-Support auch den zweiten Faktor ein, siehe Mehrfaktor-Anmeldung (MFA). Im Lager erhalten Neue einen Handscanner mit ELKO-Anmeldung per Chip und sechsstelliger PIN, die erste Schulung "ELKO Basis" dauert zwei Stunden.
 
 ## Pflichtunterweisungen
 
