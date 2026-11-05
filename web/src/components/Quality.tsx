@@ -60,6 +60,12 @@ export default function Quality() {
         }))
       : [];
 
+  const NAMES: Record<string, string> = {
+    "no documents": "ohne Dokumente",
+    "final (round 2)": "final ohne Umformulierung",
+    "final + rewrite": "final mit Umformulierung",
+  };
+  const nice = (c: string) => NAMES[c] ?? c;
   const opt = (m.optimization?.rows ?? []).filter((r) => r.llm !== "fake");
   const usd = (n: number) => "$" + n.toFixed(2);
   const optGroups = (
@@ -70,8 +76,8 @@ export default function Quality() {
     opt
       .filter((r) => r.set === set)
       .map((r) => ({
-        label: r.config,
-        bars: [{ name: r.config, color: SERIES.auto, value: pick(r), text: fmt(pick(r)) }],
+        label: nice(r.config),
+        bars: [{ name: nice(r.config), color: SERIES.auto, value: pick(r), text: fmt(pick(r)) }],
       }));
 
   const first = ev?.classic?.metrics ?? ev?.agentic?.metrics;
