@@ -115,6 +115,7 @@ export default function Ask({ session, devParams }: { session: Session; devParam
     setError("");
     setOpen(null);
     setStreamed("");
+    setQuestion("");
     try {
       const r = await api.askStream(q.trim(), m, (text) => setStreamed((s) => s + text));
       setResult(r);
