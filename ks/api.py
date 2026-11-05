@@ -8,6 +8,7 @@ would put SSO / OIDC in front and derive the user from the verified identity tok
 import json
 import logging
 import os
+import queue
 import re
 import shutil
 import sqlite3
@@ -22,20 +23,22 @@ from typing import Annotated, Any, Literal
 import numpy as np
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from pydantic import BaseModel, Field
 
-from ks.agent import answer_agentic
 from ks.auth import DEPARTMENTS, USERS, User, allowed_departments, get_user
+from ks.cache import SemanticCache
+from ks.config import ABLATION, CACHED, Config
 from ks.embed import Embedder, HashEmbedder, get_embedder
 from ks.eval import RESULTS
 from ks.indexer import load_manifest, save_manifest, sync_index, upsert_documents
 from ks.ingest import LOADERS, load_document, load_documents
 from ks.llm import LLM, get_llm
-from ks.rag import answer_classic
+from ks.pipeline import answer
 from ks.scale import SCALE_JSON
-from ks.search import HybridSearcher
+from ks.search import HybridSearcher, build_searcher
 from ks.store import MemoryStore, PgVectorStore, VectorStore
 
 log = logging.getLogger("ks.api")
@@ -120,6 +123,8 @@ class AppState:
     log: RequestLog
     secret: str
     lock: threading.Lock  # serialises upload / delete (they change store, files and manifest)
+    cfg: Config  # which optimisation levers are on (KS_CONFIG, default: all)
+    cache: SemanticCache
 
 
 def make_embedder() -> Embedder:
@@ -157,14 +162,15 @@ def build_state(
     log.info("index ready: %s chunks (%s)", store.count(), stats)
     if isinstance(store, PgVectorStore):
         save_manifest(index_dir, manifest)
+    cfg = next((c for c in ABLATION if c.name == os.environ.get("KS_CONFIG")), CACHED)
     secret = os.environ.get("APP_SECRET")
     if not secret:
         log.warning("APP_SECRET is not set - using an insecure development secret")
     return AppState(
-        store=store, embedder=embedder, searcher=HybridSearcher(store, embedder),
+        store=store, embedder=embedder, searcher=build_searcher(store, embedder),
         llm=llm or get_llm(), docs_dir=docs_dir, index_dir=index_dir, manifest=manifest,
         log=RequestLog(os.environ.get("KS_METRICS_DB", ":memory:")),
-        secret=secret or DEV_SECRET, lock=threading.Lock(),
+        secret=secret or DEV_SECRET, lock=threading.Lock(), cfg=cfg, cache=SemanticCache(),
     )  # fmt: skip
 
 
@@ -177,7 +183,13 @@ class LoginRequest(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
-    mode: Literal["classic", "agentic"] = "classic"
+    mode: Literal["classic", "agentic", "auto"] = "auto"
+
+
+def refresh_after_change(st: AppState) -> None:
+    """Documents changed: rebuild the link index and forget cached answers."""
+    st.searcher.links = build_searcher(st.store, st.embedder).links
+    st.cache.clear()
 
 
 def _read_json(path: Path) -> Any:
@@ -244,10 +256,41 @@ def create_app(
 
     @app.post("/ask")
     def ask(body: AskRequest, user: Current, st: St) -> dict:
-        run = answer_classic if body.mode == "classic" else answer_agentic
-        result = run(body.question, user, st.searcher, st.llm).to_dict()
+        result = answer(
+            body.question, user, st.searcher, st.llm, body.mode, st.cfg, st.cache
+        ).to_dict()
         st.log.add(user.login, body.question, result)
         return result
+
+    @app.post("/ask/stream")
+    def ask_stream(body: AskRequest, user: Current, st: St) -> StreamingResponse:
+        """Server-sent events: `delta` (answer text as it is written), then `done` with the same
+        JSON as /ask (citations resolved). Tool turns of the agent are not streamed."""
+        events: queue.Queue = queue.Queue()
+
+        def work() -> None:
+            try:
+                result = answer(
+                    body.question, user, st.searcher, st.llm, body.mode, st.cfg, st.cache,
+                    on_text=lambda text: events.put(("delta", {"text": text})),
+                ).to_dict()  # fmt: skip
+                st.log.add(user.login, body.question, result)
+                events.put(("done", result))
+            except Exception:  # the client gets an error event instead of a hanging stream
+                log.exception("streaming answer failed")
+                events.put(("error", {"detail": "Antwort fehlgeschlagen"}))
+
+        def generate():
+            threading.Thread(target=work, daemon=True).start()
+            while True:
+                kind, payload = events.get()
+                yield f"event: {kind}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+                if kind != "delta":
+                    break
+
+        return StreamingResponse(
+            generate(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
+        )
 
     def titles_for(user: User, st: AppState) -> dict[str, tuple[str, str]]:
         """doc_id -> (title, department) of every document this user may see."""
@@ -303,6 +346,7 @@ def create_app(
                     raise HTTPException(422, "Datei konnte nicht gelesen werden") from None
                 shutil.copyfile(candidate, target)
             stats = upsert_documents([doc], st.store, st.embedder, st.manifest)
+            refresh_after_change(st)
             if isinstance(st.store, PgVectorStore):
                 save_manifest(st.index_dir, st.manifest)
         return {"doc_id": doc.doc_id, "title": doc.title, "department": department,
@@ -320,6 +364,7 @@ def create_app(
                     path.unlink()
             st.store.remove_documents([doc_id])
             st.manifest.pop(doc_id, None)
+            refresh_after_change(st)
             if isinstance(st.store, PgVectorStore):
                 save_manifest(st.index_dir, st.manifest)
         return {"deleted": doc_id}

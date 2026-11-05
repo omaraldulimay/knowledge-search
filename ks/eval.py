@@ -1,25 +1,27 @@
 """Evaluation: run eval/questions.yaml in classic and/or agentic mode and compute metrics."""
 
 import json
-from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
 import yaml
 
-from ks.agent import answer_agentic
 from ks.auth import allowed_departments, get_user
+from ks.cache import SemanticCache
+from ks.config import BASELINE, Config
 from ks.embed import HashEmbedder, get_embedder
 from ks.ingest import chunk_documents, embedding_text, load_documents
 from ks.llm import LABEL_RE, LLM, NOT_FOUND
-from ks.rag import AskResult, answer_classic
-from ks.search import HybridSearcher
+from ks.pipeline import answer
+from ks.rag import AskResult
+from ks.search import HybridSearcher, build_searcher
 from ks.store import MemoryStore
 
 ROOT = Path(__file__).resolve().parent.parent
 QUESTIONS = ROOT / "eval" / "questions.yaml"
 RESULTS = ROOT / "eval" / "results.json"
-MODES: dict[str, Callable] = {"classic": answer_classic, "agentic": answer_agentic}
+HOLDOUT = ROOT / "eval" / "holdout.yaml"
+QUESTION_SETS = {"tuning": QUESTIONS, "holdout": HOLDOUT}
 
 
 def load_questions(path: Path = QUESTIONS) -> list[dict]:
@@ -31,14 +33,15 @@ def open_searcher(index_dir: Path, docs_dir: Path) -> tuple[HybridSearcher, str]
     if (index_dir / "meta.json").exists():
         try:
             name = MemoryStore.saved_embedder_name(index_dir)
-            return HybridSearcher(MemoryStore.load(index_dir), get_embedder(name)), name
+            store = MemoryStore.load(index_dir)
+            return build_searcher(store, get_embedder(name), index_dir), name
         except Exception:  # model not downloadable offline etc.: fall through to hash
             pass
     embedder = HashEmbedder()
     chunks = chunk_documents(load_documents(docs_dir))
     store = MemoryStore()
     store.add(chunks, embedder.embed([embedding_text(c) for c in chunks]))
-    return HybridSearcher(store, embedder), embedder.name
+    return build_searcher(store, embedder), embedder.name
 
 
 def _leaks(row: dict) -> bool:
@@ -86,10 +89,13 @@ def compute_metrics(rows: list[dict]) -> dict:
     }
 
 
-def run_mode(mode: str, questions: list[dict], searcher: HybridSearcher, llm: LLM) -> list[dict]:
+def run_mode(
+    mode: str, questions: list[dict], searcher: HybridSearcher, llm: LLM,
+    cfg: Config = BASELINE, cache: SemanticCache | None = None,
+) -> list[dict]:  # fmt: skip
     rows = []
     for q in questions:
-        result = MODES[mode](q["question"], get_user(q["user"]), searcher, llm)
+        result = answer(q["question"], get_user(q["user"]), searcher, llm, mode, cfg, cache)
         rows.append({**q, "result": result})
     return rows
 

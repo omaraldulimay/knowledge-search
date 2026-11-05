@@ -23,6 +23,7 @@ def client(tmp_path, monkeypatch):
     from tests.conftest import DOCS_DIR
 
     monkeypatch.setenv("KS_METRICS_DB", ":memory:")
+    monkeypatch.setenv("KS_CONFIG", "baseline")  # these tests cover the unoptimised behaviour
     docs = tmp_path / "docs"
     shutil.copytree(DOCS_DIR, docs)
     app = create_app(
@@ -152,7 +153,9 @@ def test_admin_delete_removes_document_everywhere(client):
 def test_upload_then_ask_finds_new_document(client):
     question = "Wie reserviere ich die Dachterrasse am Elbkai mit Formular DT-77?"
     mira = auth(client, "mira")
-    before = client.post("/ask", json={"question": question}, headers=mira).json()
+    before = client.post(
+        "/ask", json={"question": question, "mode": "classic"}, headers=mira
+    ).json()
     assert before["answer"] == NOT_FOUND
 
     admin = auth(client, "fiete")

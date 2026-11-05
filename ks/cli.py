@@ -108,6 +108,45 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(f"Written: {args.out}")
 
 
+def cmd_seed_glossary(args: argparse.Namespace) -> None:
+    import yaml
+
+    from ks.auth import DEPARTMENTS
+    from ks.glossary import GLOSSARY_FILE, seed_from_chunks
+    from ks.links import build_links
+
+    store, _ = _open(args)
+    chunks = store.get_chunks(DEPARTMENTS)
+    groups = seed_from_chunks(chunks, build_links(chunks).key_terms)
+    text = yaml.safe_dump(groups, allow_unicode=True, default_flow_style=True, width=100)
+    print(f"{len(groups)} automatic groups:\n{text}")
+    if args.write:  # replace everything after the "auto:" line, keep the curated part as is
+        old = GLOSSARY_FILE.read_text(encoding="utf-8").split("\nauto:")[0]
+        dump = lambda g: yaml.safe_dump(g, allow_unicode=True, default_flow_style=True, width=200)  # noqa: E731
+        lines = "".join(f"  - {dump(g).strip()}\n" for g in groups)
+        GLOSSARY_FILE.write_text(f"{old}\nauto:\n{lines}", encoding="utf-8")
+        print(f"Written: {GLOSSARY_FILE}")
+
+
+def cmd_optimize(args: argparse.Namespace) -> None:
+    from ks.config import ABLATION, BASELINE_AGENTIC
+    from ks.eval import open_searcher
+    from ks.llm import get_llm
+    from ks.optimize import run_ablation
+
+    searcher, _ = open_searcher(Path(args.index_dir), Path(args.docs))
+    llm = get_llm("anthropic" if args.real else "fake")
+    wanted = args.configs.split(",") if args.configs else None
+    configs = [c for c in [*ABLATION, BASELINE_AGENTIC] if wanted is None or c.name in wanted]
+    sets = args.sets.split(",")
+    budget = {"spent": 0.0, "limit": args.budget} if args.real else None
+    report = run_ablation(searcher, llm, configs, sets, Path(args.out), budget)
+    if budget:
+        total = sum(entry["cost"] for entry in report["ledger"])
+        print(f"API cost of this run: ${budget['spent']:.4f}; ledger total: ${total:.4f}")
+    print(f"Written: {args.out} ({len(report['rows'])} rows)")
+
+
 def cmd_export_demo(args: argparse.Namespace) -> None:
     from ks.demo import export_demo
     from ks.eval import open_searcher
@@ -149,11 +188,26 @@ def main(argv: list[str] | None = None) -> None:
     p_search.set_defaults(func=cmd_search)
 
     p_eval = sub.add_parser("eval", help="run eval/questions.yaml and write eval/results.json")
-    p_eval.add_argument("--mode", choices=["classic", "agentic", "both"], default="both")
+    p_eval.add_argument("--mode", choices=["classic", "agentic", "auto", "both"], default="both")
     p_eval.add_argument("--questions", default=str(QUESTIONS))
     p_eval.add_argument("--out", default=str(RESULTS))
     p_eval.add_argument("--docs", default=str(DEFAULT_DOCS))
     p_eval.set_defaults(func=cmd_eval)
+
+    p_seed = sub.add_parser("seed-glossary", help="propose glossary groups from the documents")
+    p_seed.add_argument("--write", action="store_true", help="write them into data/glossary.yaml")
+    p_seed.set_defaults(func=cmd_seed_glossary)
+
+    from ks.optimize import OPTIMIZATION_JSON
+
+    p_opt = sub.add_parser("optimize", help="ablation: every lever on/off, tuning + held-out set")
+    p_opt.add_argument("--real", action="store_true", help="use the real model (costs money)")
+    p_opt.add_argument("--configs", help="comma-separated config names, default: all")
+    p_opt.add_argument("--sets", default="tuning,holdout")
+    p_opt.add_argument("--budget", type=float, default=0.05, help="abort above this USD amount")
+    p_opt.add_argument("--out", default=str(OPTIMIZATION_JSON))
+    p_opt.add_argument("--docs", default=str(DEFAULT_DOCS))
+    p_opt.set_defaults(func=cmd_optimize)
 
     from ks.demo import DEMO_JSON
 
