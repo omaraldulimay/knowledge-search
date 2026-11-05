@@ -25,9 +25,15 @@ export class DemoError extends Error {
   }
 }
 
+/** Employees get answer, citations and found only; the technical fields are for the admin. */
+export function publicResult(r: AskResult): AskResult {
+  return { answer: r.answer, citations: r.citations, mode: r.mode, found: r.found };
+}
+
 /** Same surface as the real API client, answering from the precomputed data. */
 export function createDemoApi(load: () => Promise<DemoData>) {
   let login = "";
+  let isAdmin = false;
   let cache: Promise<DemoData> | null = null;
   const data = () => (cache ??= load());
   const me = async () => {
@@ -48,13 +54,15 @@ export function createDemoApi(load: () => Promise<DemoData>) {
       const u = (await data()).users.find((x) => x.login === username);
       if (!u) throw new DemoError(401, "Unbekannter Benutzer");
       login = u.login;
+      isAdmin = u.is_admin;
       return { token: "demo", login: u.login, name: u.name, departments: u.departments, is_admin: u.is_admin };
     },
     questions: async () => (await me()).questions[login].map((q) => ({ question: q.question, kind: q.kind })),
     ask: async (question: string, mode: Mode): Promise<AskResult> => {
       const q = (await me()).questions[login].find((x) => x.question === question);
       if (!q) throw new DemoError(404, "Diese Frage ist in der Demo nicht vorbereitet");
-      return q.results[mode];
+      const result = q.results[isAdmin ? mode : "auto"]; // employees always get the automatic mode
+      return isAdmin ? result : publicResult(result);
     },
     documents: async (): Promise<DocItem[]> => (await me()).documents[login],
     document: async (id: string): Promise<DocDetail> => {

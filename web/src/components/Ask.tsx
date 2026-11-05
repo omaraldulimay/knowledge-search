@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { IS_DEMO, api, demoApi } from "../api";
 import { examplesFor, fmtCost, fmtInt, fmtMs, parseAnswer } from "../format";
 import type { AskResult, Mode, Session, Step } from "../types";
+import Overview, { type HistoryItem } from "./Overview";
 import SourcePanel from "./SourcePanel";
 
 const MODES: [Mode, string][] = [
@@ -30,6 +31,27 @@ function stepLabel(s: Step): string {
   return s.tool;
 }
 
+const HISTORY_MAX = 8;
+const historyKey = (login: string) => `ks-history:${login}`;
+
+function loadHistory(login: string): HistoryItem[] {
+  try {
+    const raw = sessionStorage.getItem(historyKey(login));
+    const items = raw ? (JSON.parse(raw) as HistoryItem[]) : [];
+    return Array.isArray(items) ? items.slice(0, HISTORY_MAX) : [];
+  } catch {
+    return []; // private window, blocked storage, broken JSON: start with an empty list
+  }
+}
+
+function saveHistory(login: string, items: HistoryItem[]) {
+  try {
+    sessionStorage.setItem(historyKey(login), JSON.stringify(items));
+  } catch {
+    /* the history just stays in memory */
+  }
+}
+
 export function Timeline({ steps }: { steps: Step[] }) {
   return (
     <ol className="timeline" aria-label="Schritte der KI">
@@ -46,11 +68,33 @@ export function Timeline({ steps }: { steps: Step[] }) {
   );
 }
 
+/** Admin only: how the answer was found (steps, route) and what it cost. */
+function TechDetails({ result }: { result: AskResult }) {
+  const parts = [
+    result.cached ? "aus dem Cache" : result.route ? (ROUTE_LABEL[result.route] ?? result.route) : "",
+    typeof result.latency_ms === "number" ? fmtMs(result.latency_ms) : "",
+    typeof result.input_tokens === "number" ? `${fmtInt(result.input_tokens + (result.output_tokens ?? 0))} Tokens` : "",
+    typeof result.cost === "number" ? fmtCost(result.cost) : "",
+    typeof result.ttft_ms === "number" ? `erstes Wort nach ${fmtMs(result.ttft_ms)}` : "",
+  ].filter(Boolean);
+  return (
+    <details className="tech">
+      <summary>Technische Details</summary>
+      {result.steps && result.steps.length > 0 && <Timeline steps={result.steps} />}
+      <p className="meta muted">{parts.join(" · ")}</p>
+    </details>
+  );
+}
+
 type Open = { docId: string; section: string };
 
 export default function Ask({ session, devParams }: { session: Session; devParams: URLSearchParams | null }) {
   const [question, setQuestion] = useState(devParams?.get("q") ?? "");
-  const [mode, setMode] = useState<Mode>((devParams?.get("mode") as Mode) || "auto");
+  const isAdmin = session.is_admin;
+  // Employees always get the automatic mode; only the admin may pick one.
+  const [pickedMode, setMode] = useState<Mode>((isAdmin && (devParams?.get("mode") as Mode)) || "auto");
+  const mode: Mode = isAdmin ? pickedMode : "auto";
+  const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory(session.login));
   const [streamed, setStreamed] = useState("");
   const [result, setResult] = useState<AskResult | null>(null);
   const [asked, setAsked] = useState("");
@@ -74,6 +118,11 @@ export default function Ask({ session, devParams }: { session: Session; devParam
       const r = await api.askStream(q.trim(), m, (text) => setStreamed((s) => s + text));
       setResult(r);
       setAsked(q.trim());
+      setHistory((h) => {
+        const next = [{ question: q.trim(), result: r }, ...h.filter((x) => x.question !== q.trim())];
+        saveHistory(session.login, next.slice(0, HISTORY_MAX));
+        return next.slice(0, HISTORY_MAX);
+      });
       if (devParams?.get("cite") && r.citations[0]) {
         setOpen({ docId: r.citations[0].doc_id, section: r.citations[0].section });
       }
@@ -89,6 +138,14 @@ export default function Ask({ session, devParams }: { session: Session; devParam
     if (devParams?.get("q")) void submit(devParams.get("q")!, mode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const showAgain = (item: HistoryItem) => {
+    setOpen(null);
+    setError("");
+    setResult(item.result);
+    setAsked(item.question);
+    setQuestion(item.question);
+  };
 
   const lines = result ? parseAnswer(result.answer, result.citations) : [];
 
@@ -127,6 +184,7 @@ export default function Ask({ session, devParams }: { session: Session; devParam
             </button>
           </form>
         )}
+        {isAdmin && (
         <div className="modes" role="radiogroup" aria-label="Suchmodus">
           {MODES.map(([id, label]) => (
             <label key={id} className={mode === id ? "mode mode--on" : "mode"}>
@@ -138,9 +196,10 @@ export default function Ask({ session, devParams }: { session: Session; devParam
             </label>
           ))}
         </div>
+        )}
 
         {IS_DEMO && (
-          <div className="examples" role="group" aria-label="Vorbereitete Fragen">
+          <div className="examples examples--narrow" role="group" aria-label="Vorbereitete Fragen">
             {prepared.map((p) => (
               <button
                 key={p.question}
@@ -158,7 +217,7 @@ export default function Ask({ session, devParams }: { session: Session; devParam
         )}
 
         {!IS_DEMO && !result && !loading && (
-          <div className="examples">
+          <div className="examples examples--narrow">
             {examplesFor(session.departments).map((q) => (
               <button
                 key={q}
@@ -190,7 +249,6 @@ export default function Ask({ session, devParams }: { session: Session; devParam
         {result && !loading && (
           <article className={result.found ? "answer" : "answer answer--empty"} aria-live="polite">
             <p className="asked muted">{asked}</p>
-            {(result.mode === "agentic" || result.route === "agentic") && <Timeline steps={result.steps} />}
             {result.found ? (
               <div className="answer-body">
                 {lines.map((parts, i) => (
@@ -247,16 +305,24 @@ export default function Ask({ session, devParams }: { session: Session; devParam
                 ))}
               </ul>
             )}
-            <p className="meta muted">
-              {result.cached ? "aus dem Cache · " : result.route ? `${ROUTE_LABEL[result.route] ?? result.route} · ` : ""}
-              {fmtMs(result.latency_ms)} · {fmtInt(result.input_tokens + result.output_tokens)} Tokens ·{" "}
-              {fmtCost(result.cost)}
-              {typeof result.ttft_ms === "number" && ` · erstes Wort nach ${fmtMs(result.ttft_ms)}`}
-            </p>
+            {isAdmin && <TechDetails result={result} />}
           </article>
         )}
       </div>
-      {open && <SourcePanel docId={open.docId} section={open.section} onClose={closePanel} />}
+      {open ? (
+        <SourcePanel docId={open.docId} section={open.section} onClose={closePanel} />
+      ) : (
+        <Overview
+          history={history}
+          suggestions={IS_DEMO ? prepared.map((p) => p.question) : examplesFor(session.departments)}
+          current={asked}
+          onShow={showAgain}
+          onAsk={(q) => {
+            setQuestion(q);
+            void submit(q);
+          }}
+        />
+      )}
     </div>
   );
 }

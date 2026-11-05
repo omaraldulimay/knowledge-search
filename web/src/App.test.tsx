@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
@@ -29,6 +29,7 @@ const DOC = {
 };
 
 let askResult: AskResult = FOUND;
+let isAdmin = false;
 
 function json(body: unknown) {
   return Promise.resolve(new Response(JSON.stringify(body), { status: 200 }));
@@ -36,12 +37,14 @@ function json(body: unknown) {
 
 beforeEach(() => {
   askResult = FOUND;
+  isAdmin = false;
+  sessionStorage.clear();
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) => {
       if (url === "/api/users") return json(USERS);
       if (url === "/api/login")
-        return json({ token: "t", login: "katja", name: "Katja Sommer", departments: ["alle", "vertrieb"], is_admin: false });
+        return json({ token: "t", login: "katja", name: "Katja Sommer", departments: ["alle", "vertrieb"], is_admin: isAdmin });
       if (url === "/api/ask/stream")
         return Promise.resolve(
           new Response(
@@ -92,6 +95,40 @@ describe("Wissenssuche", () => {
     await ask(user);
     expect(await screen.findByText("Nichts gefunden")).toBeInTheDocument();
     expect(screen.getByText(NOT_FOUND.answer).closest("article")).toHaveClass("answer--empty");
+  });
+});
+
+describe("Mitarbeiter- und Admin-Ansicht", () => {
+  it("shows employees only question, answer and sources", async () => {
+    const user = await loginAsKatja();
+    expect(screen.queryByRole("radiogroup", { name: "Suchmodus" })).not.toBeInTheDocument();
+    await ask(user);
+    await screen.findByRole("button", { name: /Quelle 1/ });
+    expect(screen.queryByText(/Tokens/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Technische Details/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Router entscheidet/)).not.toBeInTheDocument();
+  });
+
+  it("gives the admin the mode switch and collapsible technical details", async () => {
+    isAdmin = true;
+    const user = await loginAsKatja();
+    expect(screen.getByRole("radiogroup", { name: "Suchmodus" })).toBeInTheDocument();
+    await ask(user);
+    await user.click(await screen.findByText("Technische Details"));
+    expect(screen.getByText(/Tokens/)).toBeInTheDocument();
+  });
+
+  it("keeps the last questions of the session and shows an answer again", async () => {
+    const user = await loginAsKatja();
+    await ask(user);
+    await screen.findByRole("button", { name: /Quelle 1/ });
+    expect(sessionStorage.getItem("ks-history:katja")).toContain("Provision");
+    const [fromHistory] = within(screen.getByRole("complementary", { name: "Verlauf und Vorschläge" }))
+      .getAllByRole("button", { name: "Wie wird die Provision ausgezahlt?" });
+    await user.click(fromHistory); // first entry of the list = the history, suggestions come after
+    expect(screen.getByRole("button", { name: /Quelle 1/ })).toBeInTheDocument();
+    expect(screen.getByText("Deine letzten Fragen")).toBeInTheDocument();
+    expect(screen.getByText("Häufig gefragt")).toBeInTheDocument();
   });
 });
 

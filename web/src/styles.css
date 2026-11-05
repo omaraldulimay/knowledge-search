@@ -261,7 +261,8 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
 @media (max-width: 640px) {
   .topbar { gap: 0.6rem 1rem; }
   .topbar nav { order: 3; flex-basis: 100%; }
-  .who { margin-left: auto; }
+  .who { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+  .demobadge { white-space: normal; }
   .grid2 { grid-template-columns: minmax(0, 1fr); }
   .askform { flex-direction: column; }
   .modes { display: flex; }
@@ -271,3 +272,28 @@ button.cite:hover { background: var(--accent); color: var(--accent-ink); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 
 .login .demobadge { display: inline-block; margin-top: 0.6rem; }
+
+/* ---- round 2: two columns on wide screens, technical details for the admin */
+.tech { margin-top: 1rem; font-size: 0.88rem; }
+.tech summary { cursor: pointer; color: var(--muted); }
+.tech summary:hover { color: var(--accent); }
+.tech[open] summary { margin-bottom: 0.8rem; }
+.tech .meta { margin-top: 0.4rem; }
+.side { display: none; }
+.sidelist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+.sideitem {
+  width: 100%; text-align: left; background: none; border: 0; padding: 0.45rem 0.6rem; margin: 0 -0.6rem;
+  border-radius: 8px; font-size: 0.92rem; line-height: 1.4; color: var(--text);
+}
+.sideitem:hover { background: var(--accent-soft); color: var(--accent); }
+.sideitem--on { background: var(--accent-soft); color: var(--accent); }
+@media (min-width: 1100px) {
+  .ask, .ask--panel { grid-template-columns: minmax(0, 1fr) 400px; align-items: start; }
+  .ask-main { max-width: none; }
+  .examples--narrow { display: none; }
+  .side {
+    display: block; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto;
+    padding: 0.2rem 1.4rem 1.4rem; background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  }
+  .side h2 { font-size: 1.05rem; margin-top: 1.3rem; margin-bottom: 0.6rem; }
+}

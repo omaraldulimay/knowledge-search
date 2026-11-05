@@ -13,12 +13,13 @@ export type AskResult = {
   answer: string;
   citations: Citation[];
   mode: Mode;
-  steps: Step[];
-  input_tokens: number;
-  output_tokens: number;
-  cost: number;
-  latency_ms: number;
   found: boolean;
+  // Technical details: only sent to the admin, employees never get them.
+  steps?: Step[];
+  input_tokens?: number;
+  output_tokens?: number;
+  cost?: number;
+  latency_ms?: number;
   route?: string; // mode "auto": what the router chose (classic | agentic | none)
   ttft_ms?: number | null; // time to first streamed token
   cached?: boolean; // served from the semantic cache

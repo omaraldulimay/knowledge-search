@@ -186,6 +186,20 @@ class AskRequest(BaseModel):
     mode: Literal["classic", "agentic", "auto"] = "auto"
 
 
+# Technical details of an answer: only the admin gets them (employees see answer + sources).
+ADMIN_ONLY_FIELDS = (
+    "steps", "input_tokens", "output_tokens", "cost", "latency_ms", "ttft_ms", "cached", "route",
+    "retrieved_doc_ids",
+)  # fmt: skip
+
+
+def visible_result(result: dict, user: User) -> dict:
+    """The /ask response for this user. The request log keeps the full result."""
+    if user.login == ADMIN_LOGIN:
+        return result
+    return {k: v for k, v in result.items() if k not in ADMIN_ONLY_FIELDS}
+
+
 def refresh_after_change(st: AppState) -> None:
     """Documents changed: rebuild the link index and forget cached answers."""
     st.searcher.links = build_searcher(st.store, st.embedder).links
@@ -260,7 +274,7 @@ def create_app(
             body.question, user, st.searcher, st.llm, body.mode, st.cfg, st.cache
         ).to_dict()
         st.log.add(user.login, body.question, result)
-        return result
+        return visible_result(result, user)
 
     @app.post("/ask/stream")
     def ask_stream(body: AskRequest, user: Current, st: St) -> StreamingResponse:
@@ -275,7 +289,7 @@ def create_app(
                     on_text=lambda text: events.put(("delta", {"text": text})),
                 ).to_dict()  # fmt: skip
                 st.log.add(user.login, body.question, result)
-                events.put(("done", result))
+                events.put(("done", visible_result(result, user)))
             except Exception:  # the client gets an error event instead of a hanging stream
                 log.exception("streaming answer failed")
                 events.put(("error", {"detail": "Antwort fehlgeschlagen"}))

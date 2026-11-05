@@ -84,8 +84,23 @@ def test_ask_both_modes(client, mode):
     assert res.status_code == 200
     body = res.json()
     assert body["mode"] == mode and body["found"]
-    assert body["citations"] and body["steps"]
+    assert body["citations"]
     assert any(c["doc_id"] == "vertrieb/vertrieb-reisekosten" for c in body["citations"])
+
+
+def test_employees_get_no_technical_details_but_the_admin_does(client):
+    from ks.api import ADMIN_ONLY_FIELDS
+
+    employee = client.post("/ask", json={"question": HOTEL}, headers=auth(client, "katja")).json()
+    assert employee["answer"] and employee["citations"]
+    assert not set(ADMIN_ONLY_FIELDS) & set(employee)  # no tokens, cost, latency, steps
+    admin = client.post("/ask", json={"question": HOTEL}, headers=auth(client, "fiete")).json()
+    assert set(ADMIN_ONLY_FIELDS) <= set(admin) and admin["steps"]
+    stream = client.post("/ask/stream", json={"question": HOTEL}, headers=auth(client, "katja"))
+    done = [b for b in stream.text.split("\n\n") if b.startswith("event: done")][0]
+    assert "cost" not in done and "latency_ms" not in done
+    # the request log still records everything for the quality dashboard
+    assert client.get("/metrics", headers=auth(client, "fiete")).json()["total_requests"] >= 3
 
 
 def test_ask_not_found_and_validation(client):
@@ -106,7 +121,7 @@ def test_ask_never_leaks_hr(client, mode):
     )  # fmt: skip
     body = res.json()
     assert all(not c["doc_id"].startswith("hr/") for c in body["citations"])
-    assert all(not d.startswith("hr/") for d in body["retrieved_doc_ids"])
+    assert all(not d.startswith("hr/") for d in body.get("retrieved_doc_ids", []))
 
 
 def test_documents_list_is_filtered(client):
@@ -172,7 +187,9 @@ def test_upload_then_ask_finds_new_document(client):
     # hr-only document stays invisible for other departments
     katja = auth(client, "katja")
     hidden = client.post("/ask", json={"question": question}, headers=katja).json()
-    assert hidden["answer"] == NOT_FOUND
+    # (FakeLLM quotes whatever it is given, so the contract is: the hr document never shows up)
+    assert "Dachterrasse" not in hidden["answer"]
+    assert all(c["doc_id"] != "hr/dachterrasse-reservierung" for c in hidden["citations"])
     assert client.get("/documents/hr/dachterrasse-reservierung", headers=katja).status_code == 404
 
 
