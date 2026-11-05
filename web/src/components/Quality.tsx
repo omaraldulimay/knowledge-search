@@ -64,6 +64,7 @@ export default function Quality() {
     "no documents": "ohne Dokumente",
     "final (round 2)": "final ohne Umformulierung",
     "final + rewrite": "final mit Umformulierung",
+    "final (round 4)": "final (Runde 4)",
   };
   const nice = (c: string) => NAMES[c] ?? c;
   const opt = (m.optimization?.rows ?? []).filter((r) => r.llm !== "fake");
@@ -98,7 +99,7 @@ export default function Quality() {
         />
       </div>
 
-      <h2>Die zwei Modi im Vergleich</h2>
+      <h2>Die zwei Modi im Vergleich (Ausgangssystem)</h2>
       {ev ? (
         <div className="grid2">
           <BarChart title="Treffer in den Top 5" groups={compare((x) => x.hit_rate_at_5, fmtPct)} valueHeader="Anteil" />

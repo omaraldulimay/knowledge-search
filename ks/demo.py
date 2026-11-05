@@ -59,7 +59,9 @@ def candidates(login: str, kind: str, eval_questions: list[dict]) -> list[dict]:
 
 
 # Which row of the ablation (eval/optimization.json) holds the answers of each demo mode.
-MODE_CONFIG = {"auto": "final + rewrite", "classic": "baseline", "agentic": "baseline (agentic)"}
+MODE_CONFIG = {
+    "auto": "final (round 4)", "classic": "final (round 4)", "agentic": "baseline (agentic)",
+}  # fmt: skip
 ANSWERS_JSON = OPTIMIZATION_JSON.with_name("optimization_answers.json")
 
 
@@ -73,6 +75,8 @@ def eval_cache(llm: LLM) -> dict:
     for question_set in stored.get(llm.model, {}).values():
         for mode, config in MODE_CONFIG.items():
             for a in question_set.get(config, []):
+                if mode == "classic" and a["result"].get("route") != "classic":
+                    continue  # the auto row only equals a classic answer if it routed to classic
                 cache.setdefault((a["user"], a["question"]), {})[mode] = a["result"]
     return cache
 
