@@ -5,12 +5,13 @@ together and scores how well the chunk answers the question, which is better at 
 wording. It runs on the CPU (fastembed, ONNX), is free and adds some latency, so it only looks at
 the best RERANK_POOL candidates of the hybrid search."""
 
+import os
 from collections.abc import Sequence
 
 import numpy as np
 
-RERANK_MODEL = "BAAI/bge-reranker-v2-m3-int8"
-RERANK_POOL = 20  # candidates of the hybrid search that are reranked
+RERANK_MODEL = os.environ.get("KS_RERANK_MODEL", "jinaai/jina-reranker-v2-base-multilingual")
+RERANK_POOL = int(os.environ.get("KS_RERANK_POOL", "8"))  # hybrid candidates that are reranked
 
 
 class CrossEncoderReranker:

@@ -6,13 +6,13 @@ import sys
 from pathlib import Path
 
 from ks.auth import USERS, allowed_departments, get_user
-from ks.config import SERVING_EMBEDDER, SERVING_HEADERS
+from ks.config import SERVING_EMBEDDER
 from ks.embed import Embedder, get_embedder
 from ks.eval import QUESTIONS, RESULTS
 from ks.indexer import load_manifest, save_manifest, sync_index
 from ks.ingest import load_documents
 from ks.search import build_searcher
-from ks.store import MemoryStore, PgVectorStore, VectorStore, index_options
+from ks.store import MemoryStore, PgVectorStore, VectorStore
 
 DEFAULT_DOCS = Path(__file__).resolve().parent.parent / "data" / "docs"
 DEFAULT_INDEX = Path(os.environ.get("KS_INDEX_DIR", ".ks_index"))
@@ -27,7 +27,6 @@ def _pg_store(dim: int) -> PgVectorStore:
 
 def cmd_index(args: argparse.Namespace) -> None:
     embedder = get_embedder(args.embedder)
-    headers = bool(args.headers)
     docs = load_documents(Path(args.docs))
     index_dir = Path(args.index_dir)
     if args.store == "pgvector":
@@ -38,14 +37,13 @@ def cmd_index(args: argparse.Namespace) -> None:
         not args.full
         and (index_dir / "meta.json").exists()
         and MemoryStore.saved_embedder_name(index_dir) == embedder.spec
-        and index_options(index_dir).get("headers", False) == headers
     ):
         store, manifest = MemoryStore.load(index_dir), load_manifest(index_dir)
     else:  # first run, --full, or another embedder: start from scratch
         store, manifest = MemoryStore(), {}
-    stats = sync_index(docs, store, embedder, manifest, progress=print, headers=headers)
+    stats = sync_index(docs, store, embedder, manifest, progress=print)
     if args.store == "memory":
-        store.save(index_dir, embedder.spec, headers=headers)
+        store.save(index_dir, embedder.spec)
         save_manifest(index_dir, manifest)
         build_searcher(
             store, embedder, index_dir, save=True, warm=True
@@ -145,6 +143,21 @@ def cmd_doc2query(args: argparse.Namespace) -> None:
     print(f"Generated for {len(cache)} chunks in total, cost ${spent:.4f}. Written: {CACHE_FILE}")
 
 
+def cmd_calibrate(args: argparse.Namespace) -> None:
+    """Print the straight line that maps this model's cosine onto the MiniLM scale."""
+    from ks.embed import FASTEMBED_MODEL
+    from ks.eval import calibration_anchors
+
+    ref_yes, ref_no = calibration_anchors("fastembed")
+    yes, no = calibration_anchors(args.embedder)
+    slope = (ref_yes - ref_no) / (yes - no)
+    offset = ref_yes - slope * yes
+    model = args.embedder.split(":", 1)[1] if ":" in args.embedder else FASTEMBED_MODEL
+    print(f"MiniLM medians: answerable {ref_yes:.3f}, unanswerable {ref_no:.3f}")
+    print(f"{model}: answerable {yes:.3f}, unanswerable {no:.3f}")
+    print(f'CALIBRATION["{model}"] = ({slope:.3f}, {offset:.3f})')
+
+
 def cmd_seed_glossary(args: argparse.Namespace) -> None:
     import yaml
 
@@ -224,8 +237,6 @@ def main(argv: list[str] | None = None) -> None:
     p_index.add_argument("--docs", default=str(DEFAULT_DOCS))
     p_index.add_argument("--embedder", default=SERVING_EMBEDDER,
                          help="hash | fastembed (MiniLM) | fastembed:<model name>")  # fmt: skip
-    p_index.add_argument("--headers", type=int, default=int(SERVING_HEADERS),
-                         help="1 = contextual chunk headers")  # fmt: skip
     p_index.set_defaults(func=cmd_index)
 
     p_index.add_argument("--full", action="store_true", help="ignore the old index, rebuild all")
@@ -262,6 +273,10 @@ def main(argv: list[str] | None = None) -> None:
     p_d2q.add_argument("--limit", type=int, default=0, help="only the first N missing chunks")
     p_d2q.add_argument("--budget", type=float, default=0.03, help="stop above this USD amount")
     p_d2q.set_defaults(func=cmd_doc2query)
+
+    p_cal = sub.add_parser("calibrate", help="map a model's cosine scores onto the MiniLM scale")
+    p_cal.add_argument("--embedder", required=True)
+    p_cal.set_defaults(func=cmd_calibrate)
 
     p_seed = sub.add_parser("seed-glossary", help="propose glossary groups from the documents")
     p_seed.add_argument("--write", action="store_true", help="write them into data/glossary.yaml")

@@ -17,7 +17,7 @@ from ks.glossary import Glossary
 from ks.ingest import Chunk, embedding_text
 from ks.links import LinkIndex, build_links
 from ks.rerank import RERANK_POOL, CrossEncoderReranker
-from ks.store import VectorStore, index_options
+from ks.store import VectorStore
 from ks.text import STOPWORDS, UMLAUTS, split_sentences, tokenize  # noqa: F401  (re-exported)
 
 SUPERSEDED_PENALTY = 0.5  # score factor for outdated chunks whose newer version was not found
@@ -76,14 +76,13 @@ class Hit:
 class HybridSearcher:
     def __init__(
         self, store: VectorStore, embedder: Embedder, glossary: Glossary | None = None,
-        links: LinkIndex | None = None, headers: bool = False, doc2query: Doc2Query | None = None,
+        links: LinkIndex | None = None, doc2query: Doc2Query | None = None,
         reranker: CrossEncoderReranker | None = None,
     ) -> None:  # fmt: skip
         self.store = store
         self.embedder = embedder
         self.glossary = glossary  # optional: query expansion (see search(expand=True))
         self.links = links  # optional: document links (see search(graph=True))
-        self.headers = headers  # the index was built with contextual headers (lever 3)
         self.doc2query = doc2query  # optional: generated questions (see search(d2q=True))
         self.reranker = reranker  # optional: cross-encoder (see search(rerank=True))
         self._bm25_cache: dict[tuple[frozenset[str], int, bool], tuple[BM25Okapi, list[Chunk]]] = {}
@@ -97,11 +96,14 @@ class HybridSearcher:
         )
         if directory and (directory / SENTENCES_FILE).exists():
             saved = np.load(directory / SENTENCES_FILE, allow_pickle=False)
-            self._query_vectors.update(zip(saved["texts"].tolist(), saved["vectors"], strict=True))
+            if saved["vectors"].shape[1] == self.embedder.dim:  # not left over from another model
+                self._query_vectors.update(
+                    zip(saved["texts"].tolist(), saved["vectors"], strict=True)
+                )
         missing = [s for s in sentences if s not in self._query_vectors]
         for i in range(0, len(missing), 128):
             self.embed_texts(missing[i : i + 128])
-        if save and directory and (missing or not (directory / SENTENCES_FILE).exists()):
+        if save and directory and missing:
             vectors = np.stack([self._query_vectors[s] for s in sentences])
             np.savez(directory / SENTENCES_FILE, texts=np.array(sentences), vectors=vectors)
 
@@ -142,7 +144,7 @@ class HybridSearcher:
             dq = self.doc2query if d2q else None
             corpus = [
                 tokenize(
-                    embedding_text(c, self.headers) + (" " + dq.text_for(c.chunk_id) if dq else "")
+                    embedding_text(c) + (" " + dq.text_for(c.chunk_id) if dq else "")
                 )
                 for c in chunks
             ]
@@ -180,8 +182,9 @@ class HybridSearcher:
         if bm25 is not None:
             index, chunks = bm25
             terms = tokenize(query)
-            if expand and self.glossary:  # glossary: add synonyms / spelled-out abbreviations
-                terms += tokenize(" ".join(self.glossary.expand(query)))
+            glossary = self.glossary
+            if expand and glossary:  # glossary: add synonyms / spelled-out abbreviations
+                terms += tokenize(" ".join(glossary.expand(query)))
             scores = index.get_scores(terms)
             ranked = np.argsort(-scores)[:candidates]
             bm25_hits = [(chunks[i], float(scores[i])) for i in ranked if scores[i] > 0]
@@ -252,12 +255,11 @@ class HybridSearcher:
 
 def build_searcher(
     store: VectorStore, embedder: Embedder, index_dir: Path | None = None, save: bool = False,
-    warm: bool = False, headers: bool | None = None, reranker: CrossEncoderReranker | None = None,
+    warm: bool = False, reranker: CrossEncoderReranker | None = None,
 ) -> HybridSearcher:  # fmt: skip
     """Searcher with glossary, link index and generated questions. The saved links.json is reused
     if it describes exactly the documents in the store, otherwise the links are rebuilt (and saved
-    if asked). `headers` says whether the index was built with contextual headers (default: read
-    from the saved index in `index_dir`)."""
+    if asked). """
     chunks = store.get_chunks(DEPARTMENTS)  # the link index covers all departments
     doc_ids = {c.doc_id for c in chunks}
     links = LinkIndex.load(index_dir) if index_dir else None
@@ -265,13 +267,11 @@ def build_searcher(
         links = build_links(chunks)
         if save and index_dir:
             links.save(index_dir)
-    if headers is None:
-        headers = bool(index_dir and index_options(index_dir).get("headers", False))
     cache = load_cache()
     d2q = Doc2Query(chunks, cache, embedder) if cache and len(chunks) <= WARM_MAX_CHUNKS else None
     searcher = HybridSearcher(
-        store, embedder, Glossary.load(), links, headers, d2q or None, reranker
-    )
+        store, embedder, Glossary.load(), links, d2q or None, reranker,
+    )  # fmt: skip
     if warm and len(chunks) <= WARM_MAX_CHUNKS:  # small corpus: sentence vectors for all of it
         searcher.warm(chunks, index_dir, save)
     return searcher

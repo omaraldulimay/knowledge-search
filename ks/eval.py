@@ -30,17 +30,32 @@ def load_questions(path: Path = QUESTIONS) -> list[dict]:
 
 
 def build_variant(
-    embedder_name: str, headers: bool, docs_dir: Path | None = None
+    embedder_name: str, docs_dir: Path | None = None
 ) -> HybridSearcher:
-    """In-memory searcher for one index variant (embedding model x contextual headers). Vectors
+    """In-memory searcher for one index variant (embedding model). Vectors
     come from the disk cache of the embedder, so a variant is only slow the first time."""
     embedder = get_embedder(embedder_name)
     chunks = chunk_documents(load_documents(docs_dir or ROOT / "data" / "docs"))
     store = MemoryStore()
-    store.add(chunks, embedder.embed([embedding_text(c, headers) for c in chunks]))
-    searcher = build_searcher(store, embedder, warm=True, headers=headers)
+    store.add(chunks, embedder.embed([embedding_text(c) for c in chunks]))
+    searcher = build_searcher(store, embedder, warm=True)
     getattr(embedder, "flush", lambda: None)()
     return searcher
+
+
+def calibration_anchors(embedder_name: str, docs_dir: Path | None = None) -> tuple[float, float]:
+    """(median top-1 cosine of the answerable tuning questions, same for the unanswerable ones),
+    searching the vectors only. Two numbers per model are enough to put its scores on the scale
+    of the MiniLM model that all thresholds were set on (see CALIBRATION in ks/embed.py)."""
+    import numpy as np
+
+    searcher = build_variant(embedder_name, False, docs_dir)
+    top = {True: [], False: []}
+    for q in load_questions(QUESTIONS):
+        allowed = allowed_departments(get_user(q["user"]))
+        hits = searcher.store.search_vector(searcher.embed_query(q["question"]), 1, allowed)
+        top[bool(q["expected_doc_ids"])].append(hits[0].score)
+    return float(np.median(top[True])), float(np.median(top[False]))
 
 
 class VariantPool:
@@ -48,19 +63,19 @@ class VariantPool:
     that use its embedder and header setting; other variants are built in memory once. The
     cross-encoder is loaded once and only used by rows with rerank=True."""
 
-    def __init__(self, base: HybridSearcher, embedder_name: str, headers: bool) -> None:
+    def __init__(self, base: HybridSearcher, embedder_name: str) -> None:
         self.base = base
-        self.base_key = (embedder_name, headers)
-        self._built: dict[tuple[str, bool], HybridSearcher] = {}
+        self.base_key = embedder_name
+        self._built: dict[str, HybridSearcher] = {}
         self._reranker = None
 
     def get(self, cfg: Config) -> HybridSearcher:
-        key = (cfg.embedder, cfg.headers)
+        key = cfg.embedder
         if key == self.base_key:
             searcher = self.base
         else:
             if key not in self._built:
-                self._built[key] = build_variant(*key)
+                self._built[key] = build_variant(key)
             searcher = self._built[key]
         if cfg.rerank and searcher.reranker is None:
             if self._reranker is None:
@@ -90,7 +105,7 @@ def open_searcher(index_dir: Path, docs_dir: Path) -> tuple[HybridSearcher, str]
 def open_pool(index_dir: Path, docs_dir: Path) -> VariantPool:
     """The saved index as the base searcher plus on-demand in-memory variants (see VariantPool)."""
     searcher, name = open_searcher(index_dir, docs_dir)
-    return VariantPool(searcher, name, searcher.headers)
+    return VariantPool(searcher, name)
 
 
 def _leaks(row: dict) -> bool:

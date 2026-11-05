@@ -67,3 +67,4 @@ def seed_from_chunks(chunks: Iterable[Chunk], key_terms: dict[str, list[str]]) -
             if longer:
                 groups.setdefault(short, [short, *longer[:2]])
     return sorted(groups.values())
+

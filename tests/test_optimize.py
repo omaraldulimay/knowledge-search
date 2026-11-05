@@ -193,9 +193,10 @@ def test_router_decisions(chunks):
     assert decide([_hit(a, 0.48, 12.0)], "fastembed").route == "classic"
     # rankers disagree but only one document is strong: still classic
     assert decide([_hit(a, 0.6, 5.0), _hit(b, 0.5, None)], "fastembed").route == "classic"
-    # two strong documents and the rankers disagree: the answer needs several documents
+    # two strong documents but no explicit two-part question: still classic (agent only for
+    # genuinely complex questions; high scores alone are not enough, doc2query raises them)
     split = [_hit(a, 0.7, 5.0), _hit(b, 0.8, None)]
-    assert decide(split, "fastembed").route == "agentic"
+    assert decide(split, "fastembed").route == "classic"
 
 
 def test_router_multi_part_question_needs_a_second_document(chunks):

@@ -12,7 +12,7 @@ Ask questions about **internal** documents in plain German, get answers with cli
 - **Answers with sources.** Every claim carries a citation (document, section, chunk) that opens the original text. Where a rule has an old and a new version, the newest valid one wins.
 - **Three search modes, measured against each other.** Classic RAG (search once), an agent that calls search tools itself, and `auto`, which picks one per question from the search results.
 - **Rights are enforced in the data layer.** A user never receives a chunk of a department they do not belong to.
-- **Quality and cost are visible.** 30 tuning questions plus 15 held-out ones, a "without our search" comparison, live request log, a scale test with 10,000 filler documents, an ablation of every cost lever.
+- **Quality and cost are visible.** 30 tuning questions plus two held-out sets of 15, a "without our search" comparison, live request log, a scale test with 10,000 filler documents, an ablation of every cost lever.
 
 Fictional company ("Elbkontor Logistik GmbH", Hamburg), 52 invented German documents (md, pdf, docx), five demo users. See `data/README.md` for the corpus.
 
@@ -67,22 +67,44 @@ Every answerable question was also sent to Claude Haiku 5.5 **without any docume
 
 The one hit without documents is the question about parental leave: the 1/12-per-month rule for cutting vacation is public law, only the 30 days are internal. The held-out classic baseline is low for a reason explained below (its strict relevance gate says "not found" too often).
 
-### The final system against its targets
+### The final system against its targets (round 4)
 
-Real Claude Haiku 5.5, `final + rewrite` = mode `auto` with every lever on (without the cache, which is a workload effect):
+The first version of `auto` reached only 73 % facts on colloquial held-out questions. Round 4 fixed the cheap path itself, without sending more questions to the agent. Three changes, each a switch in `ks/config.py`:
 
-| | Tuning (30) | Held-out (15) | Target | Met? |
+1. **A better local embedding model** (`google/embeddinggemma-300m` instead of MiniLM, free, about 1.2 GB, ~3x slower to index).
+2. **Doc2query**: once at index time Claude Haiku writes 4 colloquial questions per chunk (`data/doc2query.json`, committed, one-time cost $0.026, no API at runtime or in CI). They are searched next to the chunk by vector and keyword.
+3. **A local cross-encoder reranker** (`jina-reranker-v2-base-multilingual`) reorders the best 8 hybrid hits. Free, but adds about 0.7 s.
+
+The router now sends a question to the agent only if it is an explicit two-part question and the two halves find *different* documents.
+
+Real Claude Haiku 5.5, mode `auto`, no cache (`eval/optimization.json`). Tuning and the old held-out set were used for tuning; **held-out 2** (15 new colloquial questions, `eval/holdout2.yaml`) was committed before the work and evaluated once at the end.
+
+| | Tuning (30) | Held-out (15) | Held-out 2 (15) | Target |
 |---|---|---|---|---|
-| Fact correct | 91 % | 73 % | at least 90 % | tuning yes, **held-out no** |
-| Citation correct (incl. "not found") | 100 % | 93 % | at least 95 % | tuning yes, **held-out no** |
-| Permission leaks | 0 | 0 | 0 | yes |
-| Routed to the agent | 3 % (1 of 30) | 0 % | at most 10 % | yes |
-| p50 latency | 2.1 s | 2.2 s | – | – |
-| Cost per 1,000 questions | $0.151 | $0.163 | at most $0.15 | **no (tuning by $0.001, held-out by $0.013)** |
+| Fact correct | 95 % | 91 % | **100 %** | at least 90 % |
+| Citation correct | 97 % | 100 % | 100 % | at least 95 % |
+| Permission leaks | 0 | 0 | 0 | 0 |
+| Routed to the agent | 10 % | 20 % | 7 % | at most 10 % |
+| p50 latency | 1.8 s | 2.0 s | 1.9 s | 1.5 s |
+| $ per 1,000 questions | 0.18 | 0.21 | 0.16 | 0.15 |
+| Claude without documents (facts) | 5 % | 0 % | 9 % | – |
+| Previous version (round 2 + rewrite) | 91 % | 73 % | not measured | – |
 
-So the targets are met on the tuning set except for the cost, which is a hair over, and **missed on the held-out set** (fact 73 %, citation 93 %, cost). The agent answers both sets at 100 % fact and 100 % citation but costs $0.66 / $0.74 per 1,000 questions and takes 2.8 s, which is what the cheap path is trying to avoid. The honest summary: on questions phrased like the documents, the cheap path comes close to the agent at about a fifth of the price; on colloquial wording it still loses about a quarter of the answers.
+Quality targets are met on all three sets. **Missed:** p50 (the reranker costs ~0.7 s), cost per 1,000 (agent share and longer prompts), and the agent share on the old held-out set (3 of 15 questions are two-part questions with two documents). The citation miss on tuning is one question.
 
-The query rewrite (lever 6) was added **after** I saw the first held-out numbers of the system without it (fact 45 %, citation 87 %): colloquial questions retrieved the wrong chunks. Its trigger (first search weaker than a best vector score of 0.6) was set from the tuning set, where it changes nothing in quality (fact 91 % both ways), costs 7 % more and adds about 0.9 s at p50. Treat the held-out gain (45 % to 73 %) as measured on a set that influenced that design decision, not as an untouched estimate.
+Offline levers measured one by one on top of round 2 (free, fake model, `facts in prompt` = did the facts reach the prompt):
+
+| Lever alone | Tuning both docs / facts | Held-out both docs / facts |
+|---|---|---|
+| none (round 2) | 95 % / 91 % | 73 % / 60 % |
+| 1 embedding model | 100 % / 91 % | 82 % / 73 % |
+| 2 reranker | 95 % / 95 % | 73 % / 80 % |
+| 4 doc2query | 91 % / 95 % | 91 % / 91 % |
+| 1 + 2 + 4 (final) | 100 % / 95 % | 91 % / 82 % |
+
+Not kept: **contextual chunk headers** (department in the embedded text) gave nothing on the held-out set and **a model-generated glossary** (324 groups) was noisy and did not help; both were removed from the code. The **query rewrite** (lever 6) is off in the final configuration and was not re-measured with the new retrieval; the code is still there. Only one real run per configuration, 11 to 22 answerable questions per set: differences of one question are noise. The numbers on held-out 2 are an honest first look, not a tuned value. Not explored for lack of time: `multilingual-e5-large` (2.2 GB, too slow to index here), Qwen3 embeddings, a faster reranker or reranking only uncertain questions (would bring p50 down), and larger question sets.
+
+Total real API spend for round 4: about $0.05 (doc2query $0.026, discarded glossary experiment $0.012, final runs $0.012).
 
 ### Classic against agentic, the plain baseline
 

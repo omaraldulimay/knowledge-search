@@ -22,9 +22,7 @@ class Config:
     # --- colloquial-wording levers (round 4)
     embedder: str = "fastembed"  # lever 1: embedding model, "fastembed" = the small MiniLM
     rerank: bool = False  # lever 2: local cross-encoder reorders the best 20 hybrid hits
-    headers: bool = False  # lever 3: department + title + heading are part of the embedded text
     doc2query: bool = False  # lever 4: generated colloquial questions are searched next to chunks
-    glossary_plus: bool = False  # lever 5: glossary groups generated from the documents
 
     def search_options(self) -> dict:
         """Keyword arguments for HybridSearcher.search."""
@@ -51,13 +49,22 @@ FINAL = replace(AUTO, name="final (round 2)")
 # search keywords and the search runs a second time (see ks/rewrite.py).
 FINAL_REWRITE = replace(FINAL, name="final + rewrite", rewrite=True)
 # What the API and the demo run by default: everything on, including the semantic cache.
-SERVING = replace(FINAL_REWRITE, name="serving", cache=True)
+SERVING = replace(FINAL_REWRITE, name="serving", cache=True)  # replaced below by FINAL4
 
 # Round 4: colloquial wording. Every lever alone on top of FINAL (round 2, without the rewrite,
 # which needs a real model), then everything that was kept.
 GEMMA = "fastembed:google/embeddinggemma-300m"
-LEVERS: list[Config] = []
+LEVER_EMBEDDER = replace(FINAL, name="+lever 1: embedding model", embedder=GEMMA)
+LEVER_RERANK = replace(FINAL, name="+lever 2: reranker", rerank=True)
+LEVER_DOC2QUERY = replace(FINAL, name="+lever 4: doc2query", doc2query=True)
+# Round 4 final: model + doc2query + reranker (contextual headers and a generated glossary
+# gave nothing and were removed; the rewrite was not re-measured and is off).
+FINAL4 = replace(FINAL, name="final (round 4)", embedder=GEMMA, doc2query=True, rerank=True)
+LEVERS: list[Config] = [
+    LEVER_EMBEDDER, LEVER_RERANK, LEVER_DOC2QUERY, FINAL4,
+]
 # Index-level choices of the served system (a different value needs a re-index):
-# the embedding model (see ks/embed.py: "fastembed" = MiniLM) and contextual chunk headers.
-SERVING_EMBEDDER = os.environ.get("KS_EMBEDDER", "fastembed")
-SERVING_HEADERS = os.environ.get("KS_HEADERS", "0") == "1"
+# the embedding model (see ks/embed.py: "fastembed" = the old MiniLM).
+SERVING_EMBEDDER = os.environ.get("KS_EMBEDDER", GEMMA)
+
+SERVING = replace(FINAL4, name="serving", cache=True)

@@ -2,10 +2,12 @@
 
    nothing found            -> answer the not-found sentence directly (0 model calls, 0 cost)
    everything else          -> classic (one model call; glossary + document links already help)
-   clearly needs several documents -> agentic (the model searches and reads itself)
+   explicitly multi-part question AND two different documents match strongly -> agentic
+                                  (the model searches and reads itself; costs about 4x as much)
 
 Classic is the default. A weak best score does NOT escalate: the glossary-expanded search handles
-colloquial wording. Only evidence that the answer spans several documents sends it to the agent.
+colloquial wording. Only an explicit two-part question with strong evidence in two documents goes
+to the agent; two documents that merely score high (more likely with doc2query) do not.
 
 Signals come from the hybrid search that has to run anyway."""
 
@@ -20,7 +22,10 @@ from ks.rewrite import is_weak, search_with_rewrite
 from ks.search import Hit, HybridSearcher
 
 # "Wie viel darf das kosten UND wie schnell muss ich abrechnen": two question words joined by "und"
-QUESTION_WORD = r"(?:wie|was|wann|wer|wo|wohin|welche[rsmn]?|wieviel|muss|darf|kann|gibt)"
+QUESTION_WORD = (
+    r"(?:wie|was|wann|wer|wen|wem|wo|woher|wohin|welche[rsmn]?|wieviel|wieso|warum|muss|darf|kann"
+    r"|gibt|geht)"
+)
 MULTI_PART = re.compile(
     rf"\b{QUESTION_WORD}\b[^?]{{6,}}?\bund\b\s+(?:\w+\s+){{0,2}}?{QUESTION_WORD}\b"
 )
@@ -67,16 +72,45 @@ def strong_docs(hits: list[Hit], embedder_name: str, bar: float | None = None) -
     return sum(1 for v in best.values() if v >= bar)
 
 
-def decide(hits: list[Hit], embedder_name: str = "fastembed", question: str = "") -> Decision:
+def split_parts(question: str) -> list[str]:
+    """The two halves of an explicit two-part question ("A und wie B"), else an empty list."""
+    m = MULTI_PART.search(question.lower())
+    if not m:
+        return []
+    cut = question.lower().index(" und ", m.start())
+    return [question[:cut], question[cut + 5 :]]
+
+
+def part_docs(parts: list[list[Hit]], embedder_name: str) -> list[str]:
+    """Best document of every part of the question, if its vector score is strong enough."""
+    bar = SECOND_DOC.get(embedder_name, 0.5)
+    best = []
+    for hits in parts:
+        top = max(hits, key=lambda h: h.vector_score or 0.0, default=None)
+        if top is not None and (top.vector_score or 0.0) >= bar:
+            best.append(top.chunk.doc_id)
+    return best
+
+
+def decide(
+    hits: list[Hit], embedder_name: str = "fastembed", question: str = "",
+    parts: list[list[Hit]] | None = None,
+) -> Decision:  # fmt: skip
+    """`parts` = search results for each half of a two-part question (see split_parts). With
+    them the agent is only chosen when the halves point at DIFFERENT documents; without them
+    (tests, old callers) two strongly matching documents are enough."""
     sig = signals(hits)
     if not relevant_hits(hits, embedder_name, soft=True):
         return Decision("none", "keine Treffer über der Schwelle", sig)
-    # a two-part question only needs the agent if a second document matches too
+    # a two-part question only needs the agent if the second part has a document of its own
     second = SECOND_DOC.get(embedder_name, 0.5)
-    if MULTI_PART.search(question.lower()) and strong_docs(hits, embedder_name, second) >= 2:
-        return Decision("agentic", "mehrteilige Frage, mehrere Dokumente passen", sig)
-    if strong_docs(hits, embedder_name) >= 2 and not sig["rankers_agree"]:
-        return Decision("agentic", "mehrere Dokumente passen stark", sig)
+    if MULTI_PART.search(question.lower()):
+        if parts is not None:
+            docs = part_docs(parts, embedder_name)
+            if len(docs) == 2 and docs[0] != docs[1]:
+                return Decision("agentic", "mehrteilige Frage, jeder Teil hat sein Dokument", sig)
+        elif strong_docs(hits, embedder_name, second) >= 2:
+            return Decision("agentic", "mehrteilige Frage, mehrere Dokumente passen", sig)
     return Decision("classic", "ein Dokument genügt", sig)
 
 
@@ -98,7 +132,14 @@ def answer_auto(
             **cfg.search_options(),
         )  # fmt: skip
         rewrite_steps = [step] if step else []
-    decision = decide(hits, searcher.embedder.name, question)
+    parts = None
+    if split_parts(question):  # cheap: two more searches, only for explicit two-part questions
+        options = {**cfg.search_options(), "rerank": False}
+        parts = [
+            searcher.search(part, allowed_departments(user), k=3, **options)
+            for part in split_parts(question)
+        ]
+    decision = decide(hits, searcher.embedder.name, question, parts)
     retrieved = [h.chunk.doc_id for h in hits]
     if decision.route == "none":
         steps = [{"tool": "router", "args": decision.signals, "summary": decision.reason}]

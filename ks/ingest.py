@@ -233,21 +233,6 @@ def chunk_documents(docs: list[Document], **kwargs) -> list[Chunk]:
     return [c for doc in docs for c in chunk_document(doc, **kwargs)]
 
 
-DEPARTMENT_NAMES = {
-    "alle": "Allgemein, für alle Beschäftigten",
-    "hr": "Personalabteilung (HR)",
-    "it": "IT",
-    "vertrieb": "Vertrieb",
-    "logistik": "Logistik und Lager",
-}
-
-
-def embedding_text(chunk: Chunk, headers: bool = False) -> str:
-    """Text that is embedded / keyword-indexed: title and heading give the chunk context.
-    With `headers` (lever 3, contextual chunk headers) the department joins the header, so
-    "Logistik > Lagerordnung > Fahrregeln" tells a chunk where it lives even when its own
-    words are generic."""
-    if headers:
-        dept = DEPARTMENT_NAMES.get(chunk.department, chunk.department)
-        return f"{dept} > {chunk.title} > {chunk.heading}\n{chunk.text}"
+def embedding_text(chunk: Chunk) -> str:
+    """Text that is embedded / keyword-indexed: title and heading give the chunk context."""
     return f"{chunk.title} - {chunk.heading}\n{chunk.text}"

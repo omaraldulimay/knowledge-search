@@ -23,7 +23,9 @@ FASTEMBED_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 # were set on the MiniLM scale, so other models map their cosine onto it with a straight line
 # score = a * cosine + b. The two anchor points (median top-1 cosine of answerable and of
 # unanswerable tuning questions) are measured once with `python -m ks.cli calibrate`.
-CALIBRATION: dict[str, tuple[float, float]] = {}
+CALIBRATION: dict[str, tuple[float, float]] = {
+    "google/embeddinggemma-300m": (0.510, 0.358),
+}
 
 
 class Embedder(Protocol):

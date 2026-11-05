@@ -157,7 +157,7 @@ class MemoryStore:
 
 
 def index_options(directory: Path) -> dict:
-    """Everything saved in meta.json: the embedder name and how the text was prepared (headers)."""
+    """Everything saved in meta.json: the embedder name."""
     path = directory / "meta.json"
     return json.loads(path.read_text()) if path.exists() else {}
 
