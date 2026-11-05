@@ -41,26 +41,32 @@ flowchart LR
 |---|---|---|
 | Flow | hybrid search once, top 5 chunks go into the prompt | model calls `search`, `read_document`, `list_documents` itself |
 | Strength | fast, cheap, predictable | can combine two documents, re-search with better terms |
-| Cost | 1 model call | up to 6 tool calls, about 4x the tokens in the eval |
+| Cost | 1 model call | up to 6 tool calls, about 5x the tokens and 3.5x the cost in the eval |
 | UI | answer + sources | answer + sources + timeline of the steps |
 
 ## Results
 
 30 questions: 14 single-document, 8 need two documents, 4 not in any document, 4 only in documents the user must not see.
 
+Real run with **Claude Haiku 5.5** (`claude-haiku-5-5`), 30 questions, both modes (`eval/results.json`):
+
 | | Classic | Agentic |
 |---|---|---|
 | Right document in top 5 | 100 % | 100 % |
-| Citation correct | 93 % | 93 % |
+| Both documents retrieved (8 two-doc questions) | 86 % | 100 % |
+| Citation correct / "not found" correct | 100 % | 100 % |
 | Permission leaks | 0 | 0 |
-| p95 latency | 25 ms | 11 ms |
-| Cost per question | $0.0001 | $0.0003 |
+| Latency p50 / p95 | 1.4 s / 1.9 s | 3.4 s / 5.2 s |
+| Avg tokens per question (in / out) | 1,033 / 224 | 5,442 / 450 |
+| Cost per question | $0.0002 | $0.0008 |
+| Cost for all 30 questions | $0.0065 | $0.0231 |
+
+Total API spend for the whole project run (smoke test, eval, demo export): well under $0.10. Cost stays low because the prompt only carries the top 5 chunks, the agent is capped at 6 tool calls, answers are short (`effort: low`), and the demo export reuses the eval answers instead of asking twice.
 
 ![Scale test: 35 vs. 10,035 documents](eval/scale.png)
 
-> **Honest note:** these numbers come from the deterministic `FakeLLM` (an extractive stand-in), not from Claude.
-> Latency and cost therefore say little; the real Claude run replaces them (`LLM_PROVIDER=anthropic python -m ks.cli eval`, then `export-demo`).
-> What is already real: retrieval (hit rate, search latency), the permission checks and the scale test.
+> **Which numbers come from which model:** the table above (latency, tokens, cost, citation correctness) is from real Claude Haiku 5.5 answers. Retrieval (hit rate, search latency), the permission checks and the scale test below are model-independent; the scale test used the deterministic `FakeLLM` for its citation numbers.
+> The same eval with `FakeLLM` (extractive stand-in, used in tests and CI) gave 100 % hit rate and 93 % citation correctness for both modes.
 >
 > **The scale drop:** with 10,035 documents the right document is still found (100 % hit rate), but citation correctness falls from 93 % to 77 %.
 > The generated filler contains outdated policy versions and near-duplicate FAQ pages that compete for the cited slots. Search p95 grows from 15 ms to 62 ms (in-memory store, fine for this size). Versions are handled by a "newest valid version wins" rule, but not every distractor is caught.
@@ -88,7 +94,7 @@ python -m ks.cli search "Wie viel Urlaub habe ich?" --user mira
 uvicorn ks.api:app --reload             # API on :8000, OpenAPI page at /docs
 ```
 
-Default LLM is the fake one. Real Claude answers need both `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` (model via `LLM_MODEL`, default `claude-haiku-5-5`).
+Default LLM is the fake one (tests and CI never call the API). Real Claude answers need both `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` (model via `LLM_MODEL`, default `claude-haiku-5-5`).
 
 **Docker Compose** (API + Postgres with pgvector):
 

@@ -54,9 +54,25 @@ def candidates(login: str, kind: str, eval_questions: list[dict]) -> list[dict]:
     return sorted(same, key=lambda q: q["user"] != login)
 
 
-def ask_both(q: dict, user: User, searcher: HybridSearcher, llm: LLM) -> dict:
+def eval_cache(llm: LLM) -> dict:
+    """Answers of the last eval run, keyed by (user, question). Reused for the demo so the same
+    question is not paid for twice. Only valid if the eval was made with the same model."""
+    report = _read(RESULTS)
+    if not report or report.get("llm") != llm.model or llm.model == "fake":
+        return {}
+    cache: dict = {}
+    for mode, data in report["modes"].items():
+        for q in data["questions"]:
+            cache.setdefault((q["user"], q["question"]), {})[mode] = q["result"]
+    return cache
+
+
+def ask_both(
+    q: dict, user: User, searcher: HybridSearcher, llm: LLM, cache: dict | None = None
+) -> dict:
+    cached = (cache or {}).get((user.login, q["question"]), {})
     results = {
-        mode: run(q["question"], user, searcher, llm).to_dict()
+        mode: cached.get(mode) or run(q["question"], user, searcher, llm).to_dict()
         for mode, run in (("classic", answer_classic), ("agentic", answer_agentic))
     }
     return {"question": q["question"], "kind": q["type"], "results": results}
@@ -95,6 +111,7 @@ def _live_metrics(rows: list[tuple[str, dict]]) -> dict:
 def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -> dict:
     users, questions, documents, contents = [], {}, {}, {}
     rows: list[tuple[str, dict]] = []
+    cache = eval_cache(llm)
     for login, user in USERS.items():
         allowed = allowed_departments(user)
         chunks = searcher.store.get_chunks(allowed)
@@ -108,16 +125,21 @@ def build_demo(searcher: HybridSearcher, llm: LLM, eval_questions: list[dict]) -
         ]
         questions[login], cited = [], set()
 
-        entries = [ask_both(q, user, searcher, llm) for q in pick_questions(login, eval_questions)]
+        entries = [
+            ask_both(q, user, searcher, llm, cache) for q in pick_questions(login, eval_questions)
+        ]
         for kind in ("not_found", "permission"):
             if kind == "permission" and login == ADMIN_LOGIN:
                 continue  # the admin may read everything, so there is no permission case
             # show a case the system handles correctly: the "not found" sentence in both modes
-            tries = [
-                ask_both(q, user, searcher, llm) for q in candidates(login, kind, eval_questions)
-            ]
-            good = [t for t in tries if not any(r["found"] for r in t["results"].values())]
-            entries.append((good or tries)[0])
+            first = None
+            for q in candidates(login, kind, eval_questions):  # stop at the first good case
+                entry = ask_both(q, user, searcher, llm, cache)
+                first = first or entry
+                if not any(r["found"] for r in entry["results"].values()):
+                    first = entry
+                    break
+            entries.append(first)
         for entry in entries:
             for mode, res in entry["results"].items():
                 rows.append((mode, {**res, "question": entry["question"]}))

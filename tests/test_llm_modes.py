@@ -153,3 +153,13 @@ def test_eval_metrics_on_tiny_fixture():
     assert m["input_tokens"] == 400 and m["output_tokens"] == 40
     assert m["total_cost_usd"] == pytest.approx(2.0)
     assert m["by_type"]["permission"] == {"n": 1, "correct": 0}
+
+
+def test_not_found_with_extra_text_is_normalised():
+    from ks.llm import NOT_FOUND, FakeLLM
+    from ks.rag import finish
+
+    res = finish(
+        f"{NOT_FOUND} Aber vielleicht [a/b#C].", {}, "classic", [], (1, 1), 0.0, FakeLLM(), []
+    )
+    assert res.answer == NOT_FOUND and not res.found and res.citations == []
