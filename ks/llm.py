@@ -54,14 +54,15 @@ class LLM(Protocol):
 
     def complete(
         self, system: str, user: str, max_tokens: int | None = None,
-        on_text: TextCallback | None = None,
+        on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
-        """Plain completion: one user prompt, no tools. `on_text` receives streamed text."""
+        """Plain completion: one user prompt, no tools. `on_text` receives streamed text.
+        think=False switches the model's own reasoning off (cheaper and faster for extraction)."""
         ...
 
     def chat(
         self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
-        max_tokens: int | None = None, on_text: TextCallback | None = None,
+        max_tokens: int | None = None, on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
         """One step of a tool-use conversation. allow_tools=False forces a text answer."""
         ...
@@ -139,14 +140,14 @@ class FakeLLM:
 
     def complete(
         self, system: str, user: str, max_tokens: int | None = None,
-        on_text: TextCallback | None = None,
+        on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
         text = self._compose(_labelled_blocks(user))
         return self._response(text, [], system + user, on_text)
 
     def chat(
         self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
-        max_tokens: int | None = None, on_text: TextCallback | None = None,
+        max_tokens: int | None = None, on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
         prompt = system + json.dumps(messages, ensure_ascii=False)
         question = messages[0]["content"]
@@ -185,16 +186,18 @@ class AnthropicLLM:
 
     def complete(
         self, system: str, user: str, max_tokens: int | None = None,
-        on_text: TextCallback | None = None,
+        on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
         messages = [{"role": "user", "content": user}]
-        return self.chat(system, messages, [], False, max_tokens, on_text)
+        return self.chat(system, messages, [], False, max_tokens, on_text, think)
 
     def chat(
         self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
-        max_tokens: int | None = None, on_text: TextCallback | None = None,
+        max_tokens: int | None = None, on_text: TextCallback | None = None, think: bool = True,
     ) -> LLMResponse:  # fmt: skip
         kwargs: dict[str, Any] = {}
+        if not think:  # Haiku 5.5 thinks by default; thinking tokens are billed as output
+            kwargs["thinking"] = {"type": "disabled"}
         if tools:
             kwargs["tools"] = tools
             if not allow_tools:

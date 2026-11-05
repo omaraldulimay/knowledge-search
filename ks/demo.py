@@ -56,18 +56,22 @@ def candidates(login: str, kind: str, eval_questions: list[dict]) -> list[dict]:
     return sorted(same, key=lambda q: q["user"] != login)
 
 
-def eval_cache(llm: LLM, cfg: Config) -> dict:
-    """Answers of the last eval run, keyed by (user, question). Reused for the demo so the same
-    question is not paid for twice. Only valid if the eval used the same model and levers."""
-    report = _read(RESULTS)
-    if not report or report.get("llm") != llm.model or llm.model == "fake":
-        return {}
-    if report.get("config", "baseline") != cfg.name:
+# Which row of the ablation (eval/optimization.json) holds the answers of each demo mode.
+MODE_CONFIG = {"auto": "+router (auto)", "classic": "+graph", "agentic": "agentic (all levers)"}
+ANSWERS_JSON = OPTIMIZATION_JSON.with_name("optimization_answers.json")
+
+
+def eval_cache(llm: LLM) -> dict:
+    """Answers of the real ablation run, keyed by (user, question). Reused for the demo so the
+    same question is not paid for twice. Only valid for the model that produced them."""
+    stored = _read(ANSWERS_JSON) or {}
+    if llm.model == "fake":
         return {}
     cache: dict = {}
-    for mode, data in report["modes"].items():
-        for q in data["questions"]:
-            cache.setdefault((q["user"], q["question"]), {})[mode] = q["result"]
+    for question_set in stored.get(llm.model, {}).values():
+        for mode, config in MODE_CONFIG.items():
+            for a in question_set.get(config, []):
+                cache.setdefault((a["user"], a["question"]), {})[mode] = a["result"]
     return cache
 
 
@@ -118,7 +122,7 @@ def build_demo(
 ) -> dict:
     users, questions, documents, contents = [], {}, {}, {}
     rows: list[tuple[str, dict]] = []
-    cache = eval_cache(llm, cfg)
+    cache = eval_cache(llm)
     for login, user in USERS.items():
         allowed = allowed_departments(user)
         chunks = searcher.store.get_chunks(allowed)

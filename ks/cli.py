@@ -178,7 +178,8 @@ def cmd_export_demo(args: argparse.Namespace) -> None:
     searcher, _ = open_searcher(Path(args.index_dir), Path(args.docs))
     demo = export_demo(searcher, get_llm(), Path(args.out))
     n = sum(len(q) for q in demo["questions"].values())
-    print(f"Demo written to {args.out}: {n} questions x 2 modes, by {demo['generated_by']}")
+    by = demo["generated_by"]
+    print(f"Demo written to {args.out}: {n} questions x 3 modes (auto, classic, agentic), by {by}")
 
 
 def main(argv: list[str] | None = None) -> None:

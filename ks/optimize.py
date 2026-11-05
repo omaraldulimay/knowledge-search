@@ -151,6 +151,7 @@ def run_config(
             "facts_ok": facts_ok(r["result"].answer, facts[r["id"]]) if r["id"] in facts else None,
             "cost": r["result"].cost, "latency_ms": r["result"].latency_ms,
             "ttft_ms": r["result"].ttft_ms, "cached": r["result"].cached,
+            "result": r["result"].to_dict(),
             "repeat_of": r.get("repeat_of"),
         }
         for r in rows
@@ -168,6 +169,9 @@ def run_config(
         }
         # a cached paraphrase must give the same answer as the original question
         by_id = {r["id"]: r for r in originals}
+        hit_ms = sorted(r["result"].latency_ms for r in repeats if r["result"].cached)
+        out["cache"]["hit_latency_ms_median"] = hit_ms[len(hit_ms) // 2] if hit_ms else None
+        out["cache"]["hit_latency_ms_max"] = hit_ms[-1] if hit_ms else None
         out["cache"]["repeat_same_answer"] = sum(
             r["result"].answer == by_id[r["repeat_of"]]["result"].answer
             for r in repeats if r["result"].cached

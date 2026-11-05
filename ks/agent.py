@@ -64,7 +64,7 @@ TOOLS = [
 # Lean agent (lever 4): short prompt, short tool descriptions, short citation keys, snippets
 # instead of whole documents, read_document can return just one section.
 LEAN_MAX_CALLS = 4
-LEAN_MAX_TOKENS = 400
+LEAN_MAX_TOKENS = 500
 LEAN_SYSTEM_PROMPT = (
     "Wissensassistent der Elbkontor Logistik GmbH. Du hast Werkzeuge und höchstens "
     f"{LEAN_MAX_CALLS} Aufrufe. Rufe unabhängige Werkzeuge im selben Schritt gleichzeitig auf "
@@ -213,7 +213,7 @@ def answer_agentic(
     lean = cfg.router
     max_calls = max_calls or (LEAN_MAX_CALLS if lean else MAX_TOOL_CALLS)
     system, tools = (LEAN_SYSTEM_PROMPT, LEAN_TOOLS) if lean else (SYSTEM_PROMPT, TOOLS)
-    extra = {"max_tokens": LEAN_MAX_TOKENS} if lean else {}
+    extra = {"max_tokens": LEAN_MAX_TOKENS, "think": False} if lean else {}
     tap = Tap(started, on_text)
     box = ToolBox(searcher, allowed_departments(user), question, cfg)
     messages: list[dict] = [{"role": "user", "content": question}]
