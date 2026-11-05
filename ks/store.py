@@ -133,13 +133,13 @@ class MemoryStore:
         return [c for c in self.get_chunks(allowed) if c.doc_id == doc_id]
 
     # --- persistence so that `index` and `search` can be separate CLI calls
-    def save(self, directory: Path, embedder_name: str) -> None:
+    def save(self, directory: Path, embedder_name: str, **options) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         np.save(directory / "vectors.npy", self._matrix)
         (directory / "chunks.json").write_text(
             json.dumps([asdict(c) for c in self._chunks], ensure_ascii=False), encoding="utf-8"
         )
-        (directory / "meta.json").write_text(json.dumps({"embedder": embedder_name}))
+        (directory / "meta.json").write_text(json.dumps({"embedder": embedder_name, **options}))
 
     @classmethod
     def load(cls, directory: Path) -> "MemoryStore":
@@ -154,6 +154,12 @@ class MemoryStore:
     @staticmethod
     def saved_embedder_name(directory: Path) -> str:
         return json.loads((directory / "meta.json").read_text())["embedder"]
+
+
+def index_options(directory: Path) -> dict:
+    """Everything saved in meta.json: the embedder name and how the text was prepared (headers)."""
+    path = directory / "meta.json"
+    return json.loads(path.read_text()) if path.exists() else {}
 
 
 class PgVectorStore:

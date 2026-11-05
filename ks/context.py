@@ -40,7 +40,7 @@ class Scorer:
         self.floor = SENTENCE_FLOOR.get(searcher.embedder.name, 0.4)
 
     def score(self, sentences: list[str]) -> list[float]:
-        sims = self.searcher.embed_texts(sentences) @ self.vector
+        sims = self.searcher.calibrate(self.searcher.embed_texts(sentences) @ self.vector)
         words = [len(self.terms & set(tokenize(s))) for s in sentences]
         return [float(sim) + WORD_BONUS * min(n, 3) for sim, n in zip(sims, words, strict=True)]
 

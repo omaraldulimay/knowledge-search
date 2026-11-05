@@ -9,3 +9,4 @@ __pycache__/
 .DS_Store
 data/generated/
 .ks_index_*/
+.ks_cache/

@@ -18,8 +18,9 @@ MAX_PER_SCOPE = 500  # oldest entries are dropped first
 
 
 class SemanticCache:
-    def __init__(self, threshold: float = THRESHOLD) -> None:
+    def __init__(self, threshold: float = THRESHOLD, calibrate=None) -> None:
         self.threshold = threshold
+        self.calibrate = calibrate or (lambda x: x)  # embedder cosine -> MiniLM scale
         # one list per scope (department set, mode): [(unit vector, answer)]
         self._entries: dict[tuple[frozenset[str], str], list[tuple[np.ndarray, AskResult]]] = {}
         self.hits = 0
@@ -34,7 +35,7 @@ class SemanticCache:
             (frozenset(allowed), mode), []
         )  # other scopes are never looked at
         if entries:
-            sims = np.stack([v for v, _ in entries]) @ _unit(qvec)
+            sims = self.calibrate(np.stack([v for v, _ in entries]) @ _unit(qvec))
             best = int(np.argmax(sims))
             if sims[best] >= self.threshold:
                 self.hits += 1

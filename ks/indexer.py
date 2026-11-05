@@ -58,6 +58,7 @@ def embed_in_batches(
 def sync_index(
     docs: Sequence[Document], store: VectorStore, embedder: Embedder, manifest: dict[str, str],
     batch_size: int = BATCH_SIZE, progress: Callable[[str], None] | None = None,
+    headers: bool = False,
 ) -> IndexStats:  # fmt: skip
     """Bring `store` and `manifest` in line with `docs`. Mutates both."""
     start = time.perf_counter()
@@ -69,7 +70,9 @@ def sync_index(
     store.remove_documents(removed + changed)  # changed docs are re-added below
     todo = [current[i] for i in added + changed]
     chunks = chunk_documents(todo)
-    vectors = embed_in_batches(embedder, [embedding_text(c) for c in chunks], batch_size, progress)
+    vectors = embed_in_batches(
+        embedder, [embedding_text(c, headers) for c in chunks], batch_size, progress
+    )
     store.add(chunks, vectors)
 
     for doc_id in removed:
@@ -87,14 +90,15 @@ def sync_index(
 
 
 def upsert_documents(
-    docs: Sequence[Document], store: VectorStore, embedder: Embedder, manifest: dict[str, str]
-) -> IndexStats:
+    docs: Sequence[Document], store: VectorStore, embedder: Embedder, manifest: dict[str, str],
+    headers: bool = False,
+) -> IndexStats:  # fmt: skip
     """Add or replace just these documents (upload), leaving everything else untouched."""
     start = time.perf_counter()
     existing = [d.doc_id for d in docs if d.doc_id in manifest]
     store.remove_documents(existing)
     chunks = chunk_documents(list(docs))
-    store.add(chunks, embed_in_batches(embedder, [embedding_text(c) for c in chunks]))
+    store.add(chunks, embed_in_batches(embedder, [embedding_text(c, headers) for c in chunks]))
     for doc in docs:
         manifest[doc.doc_id] = doc.content_hash
     return IndexStats(

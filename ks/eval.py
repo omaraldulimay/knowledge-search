@@ -21,11 +21,54 @@ ROOT = Path(__file__).resolve().parent.parent
 QUESTIONS = ROOT / "eval" / "questions.yaml"
 RESULTS = ROOT / "eval" / "results.json"
 HOLDOUT = ROOT / "eval" / "holdout.yaml"
-QUESTION_SETS = {"tuning": QUESTIONS, "holdout": HOLDOUT}
+HOLDOUT2 = ROOT / "eval" / "holdout2.yaml"
+QUESTION_SETS = {"tuning": QUESTIONS, "holdout": HOLDOUT, "holdout2": HOLDOUT2}
 
 
 def load_questions(path: Path = QUESTIONS) -> list[dict]:
     return yaml.safe_load(path.read_text(encoding="utf-8"))["questions"]
+
+
+def build_variant(
+    embedder_name: str, headers: bool, docs_dir: Path | None = None
+) -> HybridSearcher:
+    """In-memory searcher for one index variant (embedding model x contextual headers). Vectors
+    come from the disk cache of the embedder, so a variant is only slow the first time."""
+    embedder = get_embedder(embedder_name)
+    chunks = chunk_documents(load_documents(docs_dir or ROOT / "data" / "docs"))
+    store = MemoryStore()
+    store.add(chunks, embedder.embed([embedding_text(c, headers) for c in chunks]))
+    searcher = build_searcher(store, embedder, warm=True, headers=headers)
+    getattr(embedder, "flush", lambda: None)()
+    return searcher
+
+
+class VariantPool:
+    """Gives every configuration the searcher it needs. The opened (saved) index serves the rows
+    that use its embedder and header setting; other variants are built in memory once. The
+    cross-encoder is loaded once and only used by rows with rerank=True."""
+
+    def __init__(self, base: HybridSearcher, embedder_name: str, headers: bool) -> None:
+        self.base = base
+        self.base_key = (embedder_name, headers)
+        self._built: dict[tuple[str, bool], HybridSearcher] = {}
+        self._reranker = None
+
+    def get(self, cfg: Config) -> HybridSearcher:
+        key = (cfg.embedder, cfg.headers)
+        if key == self.base_key:
+            searcher = self.base
+        else:
+            if key not in self._built:
+                self._built[key] = build_variant(*key)
+            searcher = self._built[key]
+        if cfg.rerank and searcher.reranker is None:
+            if self._reranker is None:
+                from ks.rerank import CrossEncoderReranker
+
+                self._reranker = CrossEncoderReranker()
+            searcher.reranker = self._reranker
+        return searcher
 
 
 def open_searcher(index_dir: Path, docs_dir: Path) -> tuple[HybridSearcher, str]:
@@ -42,6 +85,12 @@ def open_searcher(index_dir: Path, docs_dir: Path) -> tuple[HybridSearcher, str]
     store = MemoryStore()
     store.add(chunks, embedder.embed([embedding_text(c) for c in chunks]))
     return build_searcher(store, embedder, warm=True), embedder.name
+
+
+def open_pool(index_dir: Path, docs_dir: Path) -> VariantPool:
+    """The saved index as the base searcher plus on-demand in-memory variants (see VariantPool)."""
+    searcher, name = open_searcher(index_dir, docs_dir)
+    return VariantPool(searcher, name, searcher.headers)
 
 
 def _leaks(row: dict) -> bool:

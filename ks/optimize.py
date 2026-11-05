@@ -15,12 +15,14 @@ import yaml
 
 from ks.auth import get_user
 from ks.cache import SemanticCache
-from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, FINAL_REWRITE, LEAN_AGENTIC, Config
-from ks.eval import QUESTION_SETS, ROOT, _correct, _leaks, load_questions
+from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, FINAL_REWRITE, LEAN_AGENTIC, LEVERS, Config
+from ks.eval import QUESTION_SETS, ROOT, VariantPool, _correct, _leaks, load_questions
 from ks.llm import LLM, cost_usd
 from ks.pipeline import answer
 from ks.search import HybridSearcher
 
+DEFAULT_SETS = ["tuning", "holdout"]  # holdout2 is only run on request (see eval/holdout2.yaml)
+ALL_CONFIGS = [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE, *LEVERS]
 OPTIMIZATION_JSON = ROOT / "eval" / "optimization.json"
 FACTS = ROOT / "eval" / "facts.yaml"
 PARAPHRASE_SHARE = 0.30  # share of the workload that repeats an earlier question
@@ -160,7 +162,7 @@ def run_config(
     facts: dict[str, list[str]], budget: dict | None = None,
 ) -> dict:  # fmt: skip
     """Run one configuration over one question set; with cache=True over a workload with repeats."""
-    cache = SemanticCache() if cfg.cache else None
+    cache = SemanticCache(calibrate=searcher.calibrate) if cfg.cache else None
     work = build_workload(questions) if cfg.cache else questions
     rows = []
     rec = Recorder(llm)
@@ -257,17 +259,15 @@ def run_nodocs(
 
 
 def run_ablation(
-    searcher: HybridSearcher, llm: LLM, configs: list[Config] | None = None,
+    searcher: "HybridSearcher | VariantPool", llm: LLM, configs: list[Config] | None = None,
     sets: list[str] | None = None, out: Path = OPTIMIZATION_JSON, budget: dict | None = None,
     nodocs: bool = False,
 ) -> dict:  # fmt: skip
     """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm).
     With `nodocs` the "no documents" comparison row is added for every set."""
-    configs = (
-        configs
-        if configs is not None
-        else [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]
-    )
+    configs = configs if configs is not None else ALL_CONFIGS
+    pool = searcher if isinstance(searcher, VariantPool) else None
+    base = pool.base if pool else searcher
     facts = load_facts()
     report = (
         json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"rows": [], "ledger": []}
@@ -290,7 +290,7 @@ def run_ablation(
                 {"config": row["config"], "set": name, "cost": row["cost_per_q"] * row["questions"]}
             )
 
-    for name in sets or list(QUESTION_SETS):
+    for name in sets or DEFAULT_SETS:
         questions = load_questions(QUESTION_SETS[name])
         if nodocs:
             started = time.perf_counter()
@@ -298,10 +298,10 @@ def run_ablation(
             keep(row, row.pop("answers"), name, started)
         for cfg in configs:
             started = time.perf_counter()
-            row = run_config(cfg, questions, searcher, llm, facts, budget)
+            row = run_config(cfg, questions, pool.get(cfg) if pool else base, llm, facts, budget)
             keep(row, row.pop("answers"), name, started)
     report["generated"] = date.today().isoformat()
-    report["embedder"] = searcher.embedder.name
+    report["embedder"] = base.embedder.name
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     answers_file.write_text(
         json.dumps(answer_store, ensure_ascii=False, indent=1), encoding="utf-8"
@@ -354,7 +354,7 @@ def format_markdown(report: dict, llm: str) -> str:
     prompt, and a dash for what only a real model can tell (answer facts, citations, time, cost)."""
     names = [
         NODOCS_NAME,
-        *(c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]),
+        *(c.name for c in ALL_CONFIGS),
     ]
     head = (
         "| Configuration | measured | hit@5 | both docs | facts in prompt | fact correct "

@@ -195,7 +195,5 @@ def answer_classic(
     cfg: Config = BASELINE, on_text: TextCallback | None = None,
 ) -> AskResult:  # fmt: skip
     started = time.perf_counter()
-    hits = searcher.search(
-        question, allowed_departments(user), k=k, expand=cfg.glossary, graph=cfg.graph
-    )
+    hits = searcher.search(question, allowed_departments(user), k=k, **cfg.search_options())
     return classic_answer(question, hits, searcher, llm, cfg, started, Tap(started, on_text))

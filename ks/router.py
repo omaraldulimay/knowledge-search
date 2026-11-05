@@ -89,15 +89,13 @@ def answer_auto(
 
     started = time.perf_counter()
     tap = Tap(started, on_text)
-    hits = searcher.search(
-        question, allowed_departments(user), k=5, expand=cfg.glossary, graph=cfg.graph
-    )
+    hits = searcher.search(question, allowed_departments(user), k=5, **cfg.search_options())
     rewrite_steps: list[dict] = []
     extra_usage = (0, 0, 0.0)
     if cfg.rewrite and is_weak(hits, searcher.embedder.name):
         hits, step, extra_usage = search_with_rewrite(
             question, searcher, llm, allowed_departments(user), hits,
-            expand=cfg.glossary, graph=cfg.graph,
+            **cfg.search_options(),
         )  # fmt: skip
         rewrite_steps = [step] if step else []
     decision = decide(hits, searcher.embedder.name, question)

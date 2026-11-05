@@ -3,6 +3,7 @@
 BASELINE is exactly the system before the optimisation work. The ABLATION list turns the levers
 on one after the other (each row keeps everything the rows above it switched on)."""
 
+import os
 from dataclasses import dataclass, replace
 
 
@@ -18,6 +19,19 @@ class Config:
         False  # lever 6: weak search result -> the model turns the question into keywords
     )
     mode: str = "classic"  # which answer mode this row uses: classic | agentic | auto
+    # --- colloquial-wording levers (round 4)
+    embedder: str = "fastembed"  # lever 1: embedding model, "fastembed" = the small MiniLM
+    rerank: bool = False  # lever 2: local cross-encoder reorders the best 20 hybrid hits
+    headers: bool = False  # lever 3: department + title + heading are part of the embedded text
+    doc2query: bool = False  # lever 4: generated colloquial questions are searched next to chunks
+    glossary_plus: bool = False  # lever 5: glossary groups generated from the documents
+
+    def search_options(self) -> dict:
+        """Keyword arguments for HybridSearcher.search."""
+        return {
+            "expand": self.glossary, "graph": self.graph, "d2q": self.doc2query,
+            "rerank": self.rerank,
+        }  # fmt: skip
 
 
 BASELINE = Config()
@@ -38,3 +52,12 @@ FINAL = replace(AUTO, name="final (round 2)")
 FINAL_REWRITE = replace(FINAL, name="final + rewrite", rewrite=True)
 # What the API and the demo run by default: everything on, including the semantic cache.
 SERVING = replace(FINAL_REWRITE, name="serving", cache=True)
+
+# Round 4: colloquial wording. Every lever alone on top of FINAL (round 2, without the rewrite,
+# which needs a real model), then everything that was kept.
+GEMMA = "fastembed:google/embeddinggemma-300m"
+LEVERS: list[Config] = []
+# Index-level choices of the served system (a different value needs a re-index):
+# the embedding model (see ks/embed.py: "fastembed" = MiniLM) and contextual chunk headers.
+SERVING_EMBEDDER = os.environ.get("KS_EMBEDDER", "fastembed")
+SERVING_HEADERS = os.environ.get("KS_HEADERS", "0") == "1"

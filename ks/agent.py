@@ -142,7 +142,7 @@ class ToolBox:
     def search(self, query: str, k: int = 5) -> str:
         k = max(1, min(k, 8))
         found = self.searcher.search(
-            query, self.allowed, k=k, expand=self.cfg.glossary, graph=self.cfg.graph
+            query, self.allowed, k=k, **self.cfg.search_options()
         )
         hits = relevant_hits(found, self.searcher.embedder.name, soft=self.lean)
         if not hits:

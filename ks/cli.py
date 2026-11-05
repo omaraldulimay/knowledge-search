@@ -6,12 +6,13 @@ import sys
 from pathlib import Path
 
 from ks.auth import USERS, allowed_departments, get_user
+from ks.config import SERVING_EMBEDDER, SERVING_HEADERS
 from ks.embed import Embedder, get_embedder
 from ks.eval import QUESTIONS, RESULTS
 from ks.indexer import load_manifest, save_manifest, sync_index
 from ks.ingest import load_documents
 from ks.search import build_searcher
-from ks.store import MemoryStore, PgVectorStore, VectorStore
+from ks.store import MemoryStore, PgVectorStore, VectorStore, index_options
 
 DEFAULT_DOCS = Path(__file__).resolve().parent.parent / "data" / "docs"
 DEFAULT_INDEX = Path(os.environ.get("KS_INDEX_DIR", ".ks_index"))
@@ -26,6 +27,7 @@ def _pg_store(dim: int) -> PgVectorStore:
 
 def cmd_index(args: argparse.Namespace) -> None:
     embedder = get_embedder(args.embedder)
+    headers = bool(args.headers)
     docs = load_documents(Path(args.docs))
     index_dir = Path(args.index_dir)
     if args.store == "pgvector":
@@ -35,14 +37,15 @@ def cmd_index(args: argparse.Namespace) -> None:
     elif (
         not args.full
         and (index_dir / "meta.json").exists()
-        and MemoryStore.saved_embedder_name(index_dir) == embedder.name
+        and MemoryStore.saved_embedder_name(index_dir) == embedder.spec
+        and index_options(index_dir).get("headers", False) == headers
     ):
         store, manifest = MemoryStore.load(index_dir), load_manifest(index_dir)
     else:  # first run, --full, or another embedder: start from scratch
         store, manifest = MemoryStore(), {}
-    stats = sync_index(docs, store, embedder, manifest, progress=print)
+    stats = sync_index(docs, store, embedder, manifest, progress=print, headers=headers)
     if args.store == "memory":
-        store.save(index_dir, embedder.name)
+        store.save(index_dir, embedder.spec, headers=headers)
         save_manifest(index_dir, manifest)
         build_searcher(
             store, embedder, index_dir, save=True, warm=True
@@ -120,6 +123,28 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(f"Written: {args.out}")
 
 
+def cmd_doc2query(args: argparse.Namespace) -> None:
+    """Generate colloquial questions for every chunk without an entry (one model call each)."""
+    from ks.doc2query import CACHE_FILE, chunk_key, generate, load_cache, save_cache
+    from ks.ingest import chunk_documents
+    from ks.llm import get_llm
+
+    chunks = chunk_documents(load_documents(Path(args.docs)))
+    cache = load_cache()
+    missing = [c for c in chunks if chunk_key(c) not in cache]
+    words = sum(len(c.text.split()) for c in missing)
+    est = (len(missing) * 220 + words * 1.3) * 0.1 / 1e6 + len(missing) * 80 * 0.5 / 1e6
+    print(f"{len(chunks)} chunks, {len(missing)} without questions; estimated cost ${est:.4f}")
+    if args.estimate or not missing:
+        return
+    llm = get_llm("anthropic")
+    try:
+        spent = generate(missing[: args.limit or None], llm, cache, args.budget)
+    finally:
+        save_cache(cache)  # keep what was generated, even after an error
+    print(f"Generated for {len(cache)} chunks in total, cost ${spent:.4f}. Written: {CACHE_FILE}")
+
+
 def cmd_seed_glossary(args: argparse.Namespace) -> None:
     import yaml
 
@@ -141,19 +166,14 @@ def cmd_seed_glossary(args: argparse.Namespace) -> None:
 
 
 def cmd_optimize(args: argparse.Namespace) -> None:
-    from ks.config import ABLATION, BASELINE_AGENTIC, FINAL, FINAL_REWRITE, LEAN_AGENTIC
-    from ks.eval import open_searcher
+    from ks.eval import open_pool
     from ks.llm import get_llm
-    from ks.optimize import run_ablation
+    from ks.optimize import ALL_CONFIGS, run_ablation
 
-    searcher, _ = open_searcher(Path(args.index_dir), Path(args.docs))
+    searcher = open_pool(Path(args.index_dir), Path(args.docs))
     llm = get_llm("anthropic" if args.real else "fake")
     wanted = args.configs.split(",") if args.configs else None
-    configs = [
-        c
-        for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL, FINAL_REWRITE]
-        if wanted is None or c.name in wanted
-    ]
+    configs = [c for c in ALL_CONFIGS if wanted is None or c.name in wanted]
     if args.nodocs_only:
         configs = []
     sets = args.sets.split(",")
@@ -202,8 +222,10 @@ def main(argv: list[str] | None = None) -> None:
 
     p_index = sub.add_parser("index", help="load documents, embed chunks, store them")
     p_index.add_argument("--docs", default=str(DEFAULT_DOCS))
-    p_index.add_argument("--embedder", choices=["fastembed", "hash"],
-                         default=os.environ.get("KS_EMBEDDER", "fastembed"))  # fmt: skip
+    p_index.add_argument("--embedder", default=SERVING_EMBEDDER,
+                         help="hash | fastembed (MiniLM) | fastembed:<model name>")  # fmt: skip
+    p_index.add_argument("--headers", type=int, default=int(SERVING_HEADERS),
+                         help="1 = contextual chunk headers")  # fmt: skip
     p_index.set_defaults(func=cmd_index)
 
     p_index.add_argument("--full", action="store_true", help="ignore the old index, rebuild all")
@@ -233,6 +255,13 @@ def main(argv: list[str] | None = None) -> None:
     p_eval.add_argument("--out", default=str(RESULTS))
     p_eval.add_argument("--docs", default=str(DEFAULT_DOCS))
     p_eval.set_defaults(func=cmd_eval)
+
+    p_d2q = sub.add_parser("doc2query", help="generate colloquial questions per chunk (real model)")
+    p_d2q.add_argument("--docs", default=str(DEFAULT_DOCS))
+    p_d2q.add_argument("--estimate", action="store_true", help="only print the estimated cost")
+    p_d2q.add_argument("--limit", type=int, default=0, help="only the first N missing chunks")
+    p_d2q.add_argument("--budget", type=float, default=0.03, help="stop above this USD amount")
+    p_d2q.set_defaults(func=cmd_doc2query)
 
     p_seed = sub.add_parser("seed-glossary", help="propose glossary groups from the documents")
     p_seed.add_argument("--write", action="store_true", help="write them into data/glossary.yaml")
