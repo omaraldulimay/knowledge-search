@@ -34,6 +34,12 @@ class VectorStore(Protocol):
         self, query: np.ndarray, k: int, allowed: Collection[str]
     ) -> list[ScoredChunk]: ...
 
+    def search_documents(
+        self, query: np.ndarray, doc_ids: Collection[str], allowed: Collection[str]
+    ) -> list[ScoredChunk]:
+        """The best-matching chunk of each of these documents (only if the user may see it)."""
+        ...
+
     def get_chunks(self, allowed: Collection[str]) -> list[Chunk]:
         """All chunks the user may see (used to build the keyword index)."""
         ...
@@ -104,6 +110,21 @@ class MemoryStore:
         top = np.argpartition(-sims, k - 1)[:k]
         order = top[np.argsort(-sims[top])]
         return [ScoredChunk(self._chunks[i], float(sims[i])) for i in order]
+
+    def search_documents(
+        self, query: np.ndarray, doc_ids: Collection[str], allowed: Collection[str]
+    ) -> list[ScoredChunk]:
+        wanted = set(doc_ids)
+        rows = [i for i in self._allowed_rows(allowed) if self._chunks[i].doc_id in wanted]
+        if not rows:
+            return []
+        sims = self._matrix[rows] @ _unit(query.reshape(1, -1))[0]
+        best: dict[str, ScoredChunk] = {}
+        for i, sim in zip(rows, sims, strict=True):
+            doc = self._chunks[i].doc_id
+            if doc not in best or sim > best[doc].score:
+                best[doc] = ScoredChunk(self._chunks[i], float(sim))
+        return sorted(best.values(), key=lambda sc: -sc.score)
 
     def get_chunks(self, allowed: Collection[str]) -> list[Chunk]:
         return [self._chunks[i] for i in self._allowed_rows(allowed)]
@@ -235,6 +256,22 @@ class PgVectorStore:
                 (q, list(allowed), q, k),
             ).fetchall()
         return [ScoredChunk(self._chunk(r), float(r[10])) for r in rows]
+
+    def search_documents(
+        self, query: np.ndarray, doc_ids: Collection[str], allowed: Collection[str]
+    ) -> list[ScoredChunk]:
+        q = _unit(query.reshape(1, -1))[0]
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT DISTINCT ON (doc_id) chunk_id, doc_id, title, department, heading, text,
+                          position, valid_from, superseded, policy, 1 - (embedding <=> %s) AS score
+                   FROM chunks WHERE doc_id = ANY(%s) AND department = ANY(%s)
+                   ORDER BY doc_id, embedding <=> %s""",
+                (q, list(doc_ids), list(allowed), q),
+            ).fetchall()
+        return sorted(
+            (ScoredChunk(self._chunk(r), float(r[10])) for r in rows), key=lambda x: -x.score
+        )
 
     def get_chunks(self, allowed: Collection[str]) -> list[Chunk]:
         with self._connect() as conn:
