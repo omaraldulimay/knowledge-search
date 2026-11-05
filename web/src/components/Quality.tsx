@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { fmtCost, fmtInt, fmtMs, fmtPct } from "../format";
-import type { Metrics } from "../types";
+import type { Metrics, OptimizationRow } from "../types";
 import BarChart, { SERIES, type Group } from "./charts";
 
 const NAMES = { auto: "Automatisch", classic: "Einmal suchen", agentic: "KI sucht selbst" } as const;
@@ -60,6 +60,20 @@ export default function Quality() {
         }))
       : [];
 
+  const opt = (m.optimization?.rows ?? []).filter((r) => r.llm !== "fake");
+  const usd = (n: number) => "$" + n.toFixed(2);
+  const optGroups = (
+    set: OptimizationRow["set"],
+    pick: (r: OptimizationRow) => number,
+    fmt: (n: number) => string,
+  ): Group[] =>
+    opt
+      .filter((r) => r.set === set)
+      .map((r) => ({
+        label: r.config,
+        bars: [{ name: r.config, color: SERIES.auto, value: pick(r), text: fmt(pick(r)) }],
+      }));
+
   const first = ev?.classic?.metrics ?? ev?.agentic?.metrics;
   const notFound = live.reduce((n, k) => n + m.modes[k].not_found_rate * m.modes[k].count, 0);
 
@@ -93,6 +107,21 @@ export default function Quality() {
         </div>
       ) : (
         <p className="muted">Noch keine Eval-Ergebnisse.</p>
+      )}
+
+      {opt.length > 0 && (
+        <>
+          <h2>Günstiger und schneller</h2>
+          <p className="muted">
+            Jede Zeile schaltet einen Hebel dazu. Eval: 30 Fragen. Neue Fragen: 15 Fragen, die nie zum Abstimmen benutzt wurden.
+          </p>
+          <div className="grid2">
+            <BarChart title="Kosten pro 1.000 Fragen · Eval" hint="weniger ist besser" groups={optGroups("tuning", (r) => r.cost_per_1000, usd)} valueHeader="USD" />
+            <BarChart title="Kosten pro 1.000 Fragen · neue Fragen" hint="weniger ist besser" groups={optGroups("holdout", (r) => r.cost_per_1000, usd)} valueHeader="USD" />
+            <BarChart title="Antwort enthält die Fakten · Eval" groups={optGroups("tuning", (r) => r.fact_correct, fmtPct)} valueHeader="Anteil" />
+            <BarChart title="Antwort enthält die Fakten · neue Fragen" groups={optGroups("holdout", (r) => r.fact_correct, fmtPct)} valueHeader="Anteil" />
+          </div>
+        </>
       )}
 
       <h2>Skalierung</h2>

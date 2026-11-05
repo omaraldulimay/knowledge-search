@@ -46,10 +46,23 @@ export type LiveMode = {
   cost: number;
   not_found_rate: number;
 };
+export type OptimizationRow = {
+  config: string;
+  set: "tuning" | "holdout";
+  llm: string;
+  questions: number;
+  citation_correct: number;
+  fact_correct: number;
+  cost_per_1000: number;
+  p50_ms: number;
+  tokens_in: number;
+  tokens_out: number;
+};
 export type Metrics = {
   total_requests: number;
   modes: Record<string, LiveMode>;
   top_not_found: { question: string; count: number }[];
   eval: { modes: Record<string, { metrics: EvalMetrics }> } | null;
   scale: { small: ScaleRun; large: ScaleRun } | null;
+  optimization?: { rows: OptimizationRow[] } | null;
 };
