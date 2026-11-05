@@ -1,6 +1,6 @@
 # knowledge-search
 
-Ask questions about internal documents in plain German, get answers with clickable sources, and make sure everyone only sees what their department may read.
+Ask questions about **internal** documents in plain German, get answers with clickable sources, and make sure everyone only sees what their department may read.
 
 ![Ask screen with the citation side panel](docs/img/ask.webp)
 
@@ -8,12 +8,13 @@ Ask questions about internal documents in plain German, get answers with clickab
 
 ## What it does
 
-- **Answers with sources.** Every claim carries a citation (document, section, chunk) that opens the original text.
+- **Answers only the company can give.** The corpus is full of things no public chatbot knows: the warehouse system "ELKO" and its status codes (K1 to K5), extensions of the on-call phone, approval limits, customer contracts, incident reports, the reason a shift model was changed. "Was bedeutet K3 in ELKO?" is impossible to answer without the documents; the numbers below prove it (Claude without documents: 5 % / 0 % of the facts right).
+- **Answers with sources.** Every claim carries a citation (document, section, chunk) that opens the original text. Where a rule has an old and a new version, the newest valid one wins.
 - **Three search modes, measured against each other.** Classic RAG (search once), an agent that calls search tools itself, and `auto`, which picks one per question from the search results.
 - **Rights are enforced in the data layer.** A user never receives a chunk of a department they do not belong to.
-- **Quality and cost are visible.** 30 eval questions plus 15 held-out ones, live request log, a scale test with 10,000 filler documents, an ablation of every cost lever.
+- **Quality and cost are visible.** 30 tuning questions plus 15 held-out ones, a "without our search" comparison, live request log, a scale test with 10,000 filler documents, an ablation of every cost lever.
 
-Fictional company ("Elbkontor Logistik GmbH"), 35 invented German documents (md, pdf, docx), five demo users.
+Fictional company ("Elbkontor Logistik GmbH", Hamburg), 52 invented German documents (md, pdf, docx), five demo users. See `data/README.md` for the corpus.
 
 ## Architecture
 
@@ -27,7 +28,8 @@ flowchart LR
   Q["Question + user"] --> CA{"Semantic cache<br/>same question,<br/>same departments?"}
   CA -->|hit| A
   CA -->|miss| H["Hybrid search<br/>vector + BM25 + glossary<br/>+ linked documents"]
-  H --> R{"Router (auto)"}
+  H --> W["Weak result?<br/>rewrite to keywords,<br/>search again"]
+  W --> R{"Router (auto)"}
   R -->|nothing found| A
   R -->|confident| CL["Classic: best sentences<br/>-> Claude"]
   R -->|unsure| T["Lean agent<br/>search / read_document(section)"]
@@ -45,89 +47,125 @@ flowchart LR
 
 | | Auto (default) | Classic ("Einmal suchen") | Agentic ("KI sucht selbst") |
 |---|---|---|---|
-| Flow | search, then the router decides | hybrid search once, best sentences go into the prompt | model calls `search`, `read_document(doc, section)`, `list_documents` itself |
+| Flow | search (rewritten and repeated if weak), then the router decides | hybrid search once, best sentences go into the prompt | model calls `search`, `read_document(doc, section)`, `list_documents` itself |
 | Strength | cheap for easy questions, thorough for unsure ones, free when nothing is found | fast, cheap, predictable | can combine two documents, re-search with better terms |
 | Cost | between the two, see the ablation below | 1 model call | up to 4 tool calls (6 in the baseline agent) |
 | UI | answer + sources + what the router chose | answer + sources | answer + sources + timeline of the steps |
 
 ## Results
 
-30 questions: 14 single-document, 8 need two documents, 4 not in any document, 4 only in documents the user must not see.
+### Without our search, Claude knows nothing
 
-Baseline before the optimisation work. Real run with **Claude Haiku 5.5** (`claude-haiku-5-5`), 30 questions, both modes (`eval/results.json`); the optimised numbers follow in the next section:
+Every answerable question was also sent to Claude Haiku 5.5 **without any document** (one short prompt, `max_tokens` 150) and scored with the same fact checker (`python -m ks.cli optimize --real --nodocs-only`). The questions are about "ELKO", "Lotse", "Tor 7", "Nordhafen Frische" and so on, so a model without the documents can only say that it does not know.
+
+| | Tuning (22 answerable of 30) | Held-out (11 answerable of 15) |
+|---|---|---|
+| Claude **without** documents: facts right | **5 %** (1 of 22) | **0 %** (0 of 11) |
+| Our search, classic baseline | 86 % | 27 % |
+| Our search, final `auto` (with query rewrite) | **91 %** | **73 %** |
+| Our search, agent (every question) | 100 % | 100 % |
+
+The one hit without documents is the question about parental leave: the 1/12-per-month rule for cutting vacation is public law, only the 30 days are internal. The held-out classic baseline is low for a reason explained below (its strict relevance gate says "not found" too often).
+
+### The final system against its targets
+
+Real Claude Haiku 5.5, `final + rewrite` = mode `auto` with every lever on (without the cache, which is a workload effect):
+
+| | Tuning (30) | Held-out (15) | Target | Met? |
+|---|---|---|---|---|
+| Fact correct | 91 % | 73 % | at least 90 % | tuning yes, **held-out no** |
+| Citation correct (incl. "not found") | 100 % | 93 % | at least 95 % | tuning yes, **held-out no** |
+| Permission leaks | 0 | 0 | 0 | yes |
+| Routed to the agent | 3 % (1 of 30) | 0 % | at most 10 % | yes |
+| p50 latency | 2.1 s | 2.2 s | – | – |
+| Cost per 1,000 questions | $0.151 | $0.163 | at most $0.15 | **no (tuning by $0.001, held-out by $0.013)** |
+
+So the targets are met on the tuning set except for the cost, which is a hair over, and **missed on the held-out set** (fact 73 %, citation 93 %, cost). The agent answers both sets at 100 % fact and 100 % citation but costs $0.66 / $0.74 per 1,000 questions and takes 2.8 s, which is what the cheap path is trying to avoid. The honest summary: on questions phrased like the documents, the cheap path comes close to the agent at about a fifth of the price; on colloquial wording it still loses about a quarter of the answers.
+
+The query rewrite (lever 6) was added **after** I saw the first held-out numbers of the system without it (fact 45 %, citation 87 %): colloquial questions retrieved the wrong chunks. Its trigger (first search weaker than a best vector score of 0.6) was set from the tuning set, where it changes nothing in quality (fact 91 % both ways), costs 7 % more and adds about 0.9 s at p50. Treat the held-out gain (45 % to 73 %) as measured on a set that influenced that design decision, not as an untouched estimate.
+
+### Classic against agentic, the plain baseline
+
+Real run with **Claude Haiku 5.5** (`claude-haiku-5-5`), 30 tuning questions, all optimisation levers off (`eval/results.json`):
 
 | | Classic | Agentic |
 |---|---|---|
 | Right document in top 5 | 100 % | 100 % |
-| Both documents retrieved (8 two-doc questions) | 86 % | 100 % |
-| Citation correct / "not found" correct | 100 % | 100 % |
+| Both documents retrieved (answerable questions) | 95 % | 95 % |
+| Citation correct / "not found" correct | 97 % | 100 % |
 | Permission leaks | 0 | 0 |
-| Latency p50 / p95 | 1.4 s / 1.9 s | 3.4 s / 5.2 s |
-| Avg tokens per question (in / out) | 1,033 / 224 | 5,442 / 450 |
-| Cost per question | $0.0002 | $0.0008 |
-| Cost for all 30 questions | $0.0065 | $0.0231 |
+| Latency avg / p95 | 1.6 s / 3.8 s | 3.0 s / 5.4 s |
+| Avg tokens per question (in / out) | 869 / 190 | 4,518 / 373 |
+| Cost per question | $0.00018 | $0.00064 |
+| Cost for all 30 questions | $0.0055 | $0.0191 |
 
-Cost stays low because the prompt only carries the top 5 chunks, the agent is capped at 6 tool calls, answers are short (`effort: low`), and the demo export reuses the eval answers instead of asking twice.
+The 30 tuning questions: 14 single-document, 8 need two documents, 4 not in any document, 4 only in documents the user must not see. The 15 held-out questions (`eval/holdout.yaml`) have the same mix, are written in everyday employee language and were committed before any tuning.
 
 ## Kosten & Tempo optimieren
 
-The baseline was "okay": 1,033 input tokens and $0.21 per 1,000 questions for classic, 5,261 tokens and $0.76 for the agent. The goal was cheaper and faster **without** losing quality, through retrieval design instead of prompt tweaks. Five levers, each one switchable (`ks/config.py`), measured one after the other (`python -m ks.cli optimize`, results in `eval/optimization.json`, every real answer in `eval/optimization_answers.json`).
+Six levers, each one switchable (`ks/config.py`), measured one after the other (`python -m ks.cli optimize`, results in `eval/optimization.json`, every real answer in `eval/optimization_answers.json`). The goal: cheaper and faster than the agent **without** losing the answers, through retrieval design instead of prompt tweaks.
 
-**How it was measured.** Real Claude Haiku 5.5, one run per row, on two question sets: the 30 *tuning* questions (used to choose thresholds) and 15 *held-out* questions (`eval/holdout.yaml`): everyday wording, abbreviations, synonyms, written and committed before any tuning and never tuned against. "fact" = the answer contains the numbers/terms of the right answer (`eval/facts.yaml`), "citation" = cites the right document, or says "not found" when it should. Hit@5, "both docs", leaks and routing do not need a model and are also recorded offline with `FakeLLM`. Prices: $0.10 / $0.50 per million tokens. Total API spend for all of it, including probes and the demo export: about $0.20.
+**How it was measured.** Prices: $0.10 / $0.50 per million tokens. Real runs (Claude Haiku 5.5, one run per row) were done for the rows that matter: *no documents*, *baseline*, *baseline (agentic)*, *final (round 2)* (everything but the rewrite) and *final + rewrite*. All other rows ran **offline** with the fake model (free, deterministic): hit@5, "both docs", leaks and routing do not need a model, and **"facts in prompt"** checks, without any model, whether the facts of the right answer survived retrieval and compression and actually reached the prompt. Answer facts, citations, time and cost need the real model, so offline rows show a dash there. Total API spend for this whole content rework, including the demo export and the plain eval: about $0.09. "fact" = the answer contains the numbers and terms of the right answer (`eval/facts.yaml`); "citation" = cites the right document, or says "not found" when it should. Glossary, links and router were tuned on the tuning questions only.
 
 **Tuning set (30 questions)**
 
-| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 | tokens in / out | $ / question | $ / 1,000 |
+| Configuration | measured | hit@5 | both docs | facts in prompt | fact correct | citation | leaks | agent | p50 | $ / 1,000 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| baseline | 100% | 86% | 100% | 91% | 0 | 1.28 / 1.84 s | 0.62 s | 1,033 / 211 | $0.00021 | $0.21 |
-| +compression | 100% | 86% | 97% | 86% | 0 | 1.03 / 1.61 s | 0.65 s | 581 / 97 | $0.00011 | $0.11 |
-| +glossary | 100% | 91% | 97% | 86% | 0 | 1.10 / 1.33 s | 0.66 s | 595 / 103 | $0.00011 | $0.11 |
-| +graph | 100% | 95% | 97% | 82% | 0 | 1.07 / 1.35 s | 0.62 s | 597 / 100 | $0.00011 | $0.11 |
-| +router (auto) | 100% | 95% | 93% | 82% | 0 | 1.04 / 1.91 s | 0.61 s | 830 / 113 | $0.00014 | $0.14 |
-| +cache (43 q. with repeats) | 100% | 97% | 93% | 83% | 0 | 1.02 / 2.09 s | 0.61 s | 693 / 94 | $0.00012 | $0.12 |
-| baseline (agentic) | 100% | 100% | 100% | 86% | 0 | 3.20 / 5.84 s | 2.49 s | 5,261 / 466 | $0.00076 | $0.76 |
-| agentic (all levers) | 100% | 100% | 97% | 73% | 0 | 2.06 / 2.54 s | 1.60 s | 2,455 / 212 | $0.00035 | $0.35 |
+| no documents | real | – | – | – | 5% | – | 0 | – | 1.43 s | $0.09 |
+| baseline | real | 100% | 95% | 90% | 86% | 97% | 0 | 0% | 1.19 s | $0.18 |
+| +compression | offline | 100% | 95% | 90% | – | – | 0 | 0% | – | – |
+| +glossary | offline | 100% | 95% | 91% | – | – | 0 | 0% | – | – |
+| +graph | offline | 100% | 95% | 91% | – | – | 0 | 0% | – | – |
+| +router (auto) | offline | 100% | 95% | 91% | – | – | 0 | 3% | – | – |
+| +cache (43 q. with repeats) | offline | 100% | 97% | 92% | – | – | 0 | 2% | – | – |
+| baseline (agentic) | real | 100% | 95% | 100% | 100% | 100% | 0 | 100% | 2.82 s | $0.66 |
+| agentic (all levers) | offline | 100% | 95% | 91% | – | – | 0 | 100% | – | – |
+| final (round 2) | real | 100% | 95% | 91% | 91% | 100% | 0 | 3% | 1.23 s | $0.14 |
+| final + rewrite | real | 100% | 95% | 91% | 91% | 100% | 0 | 3% | 2.10 s | $0.15 |
 
 **Held-out set (15 questions)**
 
-| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 | tokens in / out | $ / question | $ / 1,000 |
+| Configuration | measured | hit@5 | both docs | facts in prompt | fact correct | citation | leaks | agent | p50 | $ / 1,000 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| baseline | 100% | 91% | 47% | 27% | 0 | 0.02 / 2.93 s | 0.72 s | 645 / 147 | $0.00014 | $0.14 |
-| +compression | 100% | 91% | 47% | 27% | 0 | 0.02 / 1.06 s | 0.58 s | 341 / 42 | $0.00006 | $0.06 |
-| +glossary | 100% | 91% | 67% | 55% | 0 | 0.91 / 1.27 s | 0.67 s | 438 / 61 | $0.00007 | $0.07 |
-| +graph | 100% | 91% | 67% | 55% | 0 | 0.92 / 1.10 s | 0.62 s | 438 / 63 | $0.00008 | $0.08 |
-| +router (auto) | 100% | 91% | 87% | 82% | 0 | 1.03 / 2.29 s | 0.65 s | 1,104 / 111 | $0.00017 | $0.17 |
-| +cache (21 q. with repeats) | 100% | 94% | 86% | 82% | 0 | 1.01 / 2.07 s | 0.65 s | 880 / 85 | $0.00013 | $0.13 |
-| baseline (agentic) | 100% | 100% | 93% | 100% | 0 | 3.31 / 4.68 s | 2.66 s | 5,466 / 473 | $0.00078 | $0.78 |
-| agentic (all levers) | 100% | 100% | 93% | 91% | 0 | 2.10 / 2.53 s | 1.43 s | 2,685 / 228 | $0.00038 | $0.38 |
+| no documents | real | – | – | – | 0% | – | 0 | – | 1.41 s | $0.09 |
+| baseline | real | 100% | 82% | 67% | 27% | 60% | 0 | 0% | 0.01 s | $0.10 |
+| +compression | offline | 100% | 82% | 67% | – | – | 0 | 0% | – | – |
+| +glossary | offline | 100% | 73% | 67% | – | – | 0 | 0% | – | – |
+| +graph | offline | 100% | 73% | 67% | – | – | 0 | 0% | – | – |
+| +router (auto) | offline | 100% | 73% | 60% | – | – | 0 | 0% | – | – |
+| +cache (21 q. with repeats) | offline | 94% | 76% | 62% | – | – | 0 | 0% | – | – |
+| baseline (agentic) | real | 100% | 91% | 100% | 100% | 100% | 0 | 100% | 2.81 s | $0.74 |
+| agentic (all levers) | offline | 91% | 64% | 64% | – | – | 0 | 100% | – | – |
+| final (round 2) | real | 100% | 73% | 60% | 45% | 87% | 0 | 0% | 1.23 s | $0.12 |
+| final + rewrite | real | 100% | 91% | 73% | 73% | 93% | 0 | 0% | 2.18 s | $0.16 |
 
-*Read the tables with care.* "both docs" = share of answerable questions whose expected documents were all retrieved (the baseline's 86 %; for the 8 two-document questions alone it went from 62 % to 88 %). Every run is one sample of a model whose temperature cannot be set (Haiku 5.5), so on 22 / 11 answerable questions a difference of one or two questions is noise. The baseline row on the held-out set looks fast and cheap only because its strict relevance gate answered "not found" to 8 of 15 questions, 5 of which are answerable (citation 47 %). `+cache` is measured on a workload with about 30 % repeats (43 and 21 requests), so its averages are over more requests than the other rows.
+*Read the tables with care.* Every real run is one sample of a model whose temperature cannot be set, and with 22 / 11 answerable questions a difference of one or two questions is noise. The baseline row on the held-out set looks fast and cheap only because its strict relevance gate answered "not found" to 9 of 15 questions without a model call (citation 60 %, only 6 questions reached the model). The `+cache` rows run a workload with about 30 % repeats (43 and 21 requests). "Agent" is the share of questions the agent answered; for `baseline (agentic)` it is every question by definition.
 
 ### The levers
 
-1. **Document links ("graph-lite").** At ingest a JSON index (`links.json`) links documents by (a) explicit references (a document names another's title or file name, or "siehe ..."), (b) TF-IDF key terms per document, (c) rare key terms two documents share. At search time the best chunk of a strongly linked document is added if it is similar enough to the question (cosine at least 0.5). Permissions are applied inside the store, so a link into a forbidden department adds nothing (tests in `tests/test_optimize.py`). *Effect:* "both docs" 91 % to 95 % on the tuning set (the target was 95 %), no change on the held-out set. It rescued one question; the other links mostly add a weak extra chunk, which the compression then usually drops. A modest lever.
-2. **Glossary / query expansion.** `data/glossary.yaml` holds synonym groups (bAV, Urlaub/Ferien, HO, MFA/Zwei-Faktor, ...); two acronym and compound groups were seeded automatically from the documents (`python -m ks.cli seed-glossary`), the rest is curated by hand. A matching word adds its group to the BM25 query. *Effect:* both docs 86 % to 91 %; on the held-out set citation 47 % to 67 % and fact 27 % to 55 %, because the relevance gate sees a higher keyword score for colloquial questions. *Caveat:* I wrote the glossary after seeing the held-out wording, even though I left out words that occur only there, so its held-out gain is probably a bit optimistic.
-3. **Context compression.** Each section is cut down to its two best sentences, scored by meaning (embedding similarity, computed once at ingest) plus exact question words; sections are merged, overlap is dropped, at most five go into the prompt, cited as [1], [2] and mapped back to (document, section, chunk) in code. The system prompt is short, answers are limited to three sentences, and the model's own thinking is switched off for these extractive answers. *Effect:* input tokens 1,033 to 581 (-44 %), output 211 to 97 (-54 %), cost -49 %, p50 latency 1.28 s to 1.03 s. A 12-question probe split the output saving: thinking off alone gave -26 % output tokens, -5 % latency, -12 % time to first token. *Cost of it:* fact 91 % to 86 %, citation 100 % to 97 % (one or two questions, within noise, but not zero). My first version (lexical sentence scoring, 350 max tokens) lost more facts and truncated answers, because thinking tokens count against `max_tokens`; the fixes are in the final numbers.
-4. **Adaptive router (`auto`).** No model call: after the hybrid search it routes by retrieval signals. Both keyword and vector score weak: answer the not-found sentence directly (zero calls). Weak best vector score or the two rankers disagree on the best document: agentic. Otherwise classic. The agent got leaner too: short tool descriptions, one-line snippets, `read_document(doc, section)` returns only that section (or the best parts plus an outline), short citation keys, parallel tool calls allowed. *Effect:* the lean agent on its own: input tokens 5,261 to 2,455 (-53 %), output -55 %, cost -54 %, p50 3.2 s to 2.1 s, p95 5.8 s to 2.5 s (target was -40 % tokens). `auto` routes 10 % (tuning) and 27 % (held-out) of the questions to the agent, 10 % / 13 % to the free not-found path. *Cost of it:* the agent's facts dropped (tuning 86 % to 73 %, held-out 100 % to 91 %), and `auto` is dearer than classic alone ($0.14 vs $0.11 per 1,000 on the tuning set) because it spends the money on the hard questions: on the held-out set it lifts citation 67 % to 87 % and fact 55 % to 82 % at 22 % of the baseline agent's cost. The relaxed relevance gate (only "both signals weak" means not found) lets more not-found questions reach the model: 3 of 8 tuning not-found/permission questions are answered for free, the old strict gate did 6 of 8.
-5. **Semantic cache + streaming.** An answer is reused when the question embedding has cosine >= 0.95 **and** the department set (and mode) is identical; never across scopes (test). On the paraphrase workload (templates, no LLM) 9 of 13 and 4 of 6 repeats hit (69 % / 67 %, chatty variants fall below 0.95), no new question was wrongly served, a hit takes about 8 ms (embedding + lookup) and costs nothing. At a 30 % repeat share that is -17 % / -22 % cost per request. `/ask/stream` sends server-sent events (`delta`, then `done` with the citations); the UI renders the text while it arrives. Time to first token for classic is 0.6 s while the full answer takes 1.0 to 1.1 s; for the agent 1.4 to 1.6 s against 2.1 s (baseline agent: 2.5 s against 3.2 s). The static demo stays precomputed.
+1. **Document links ("graph-lite").** At ingest a JSON index (`links.json`) links documents by (a) explicit references (a document names another's title or file name, or "siehe ..."), (b) TF-IDF key terms per document, (c) rare key terms two documents share. At search time the best chunk of a strongly linked document is added if it is similar enough to the question. Permissions are applied inside the store, so a link into a forbidden department adds nothing (tests in `tests/test_optimize.py`). *Effect on this corpus:* none that the tuning set can see (both docs 95 % before and after); the links mostly add a weak extra chunk, which the compression then drops.
+2. **Glossary / query expansion.** `data/glossary.yaml` holds synonym groups and the company's own vocabulary (bAV, Urlaub/Ferien, HO, MFA, ELKO/Lagersystem, Lerntopf/Bildungsbudget, Bereitschaft, Annahmeschluss/Cut-off, Kühlkette, K3/gesperrt, ...), curated from the documents; acronym and compound groups are seeded automatically (`python -m ks.cli seed-glossary`). A matching word adds its group to the BM25 query. *Effect:* "facts in prompt" 90 % to 91 % on the tuning set; on the held-out set offline "both docs" went from 82 % to 73 % (one question), so the glossary did not generalise to colloquial wording here. *Caveat:* the groups were written from the documents, not from the held-out questions.
+3. **Context compression.** Each section is cut down to its best sentences, scored by meaning (embedding similarity, computed once at ingest) plus exact question words, with every sentence that holds a number kept; sections are merged, overlap is dropped, at most four go into the prompt, cited as [1], [2] and mapped back to (document, section, chunk) in code. The system prompt is short, answers are limited to four sentences, and the model's own thinking is switched off for these extractive answers. *Effect on the real runs (questions that reached the model):* median input 1,184 tokens (baseline) to 798 (final), median output 137 to 86. *Cost of it:* "facts in prompt" does not drop (90 % to 91 %), but the compressed prompt sometimes keeps the wrong section of a long document (m03 loses the extension 5299).
+4. **Adaptive router (`auto`).** No model call: after the hybrid search it routes by retrieval signals. Both keyword and vector score weak: answer the not-found sentence directly (zero calls). A two-part question ("... und wie ...") whose two best documents both match strongly: agentic. Otherwise classic. The agent got leaner too: short tool descriptions, one-line snippets, `read_document(doc, section)` returns only that section, short citation keys. *Effect:* only 3 % of the tuning questions and 0 % of the held-out questions go to the agent. I first let the "second document matches at 0.5" rule decide (20 % to the agent), but with 52 documents many unrelated ones score 0.5, so the bar for the second document is now the same as for the first (0.65). *Cost of it:* two multi-document questions (m02, m03) that the agent answers completely now depend on the classic prompt, and the classic prompt misses part of the answer for them.
+5. **Semantic cache + streaming.** An answer is reused when the question embedding has cosine >= 0.95 **and** the department set (and mode) is identical; never across scopes (test). On the paraphrase workload (templates, no LLM) repeats hit and no new question is wrongly served; a hit costs nothing. `/ask/stream` sends server-sent events (`delta`, then `done` with the citations); the UI renders the text while it arrives. The static demo stays precomputed.
+6. **Query rewrite for weak searches.** If the best vector score of the first search is below 0.6, one tiny Claude call (about 120 tokens in, 25 out) turns the question into search keywords, the search runs again and both result lists are merged (`ks/rewrite.py`). Strong searches never pay for it. *Effect (real):* held-out fact 45 % to 73 %, citation 87 % to 93 %, both docs 73 % to 91 %; tuning unchanged. *Cost:* +$0.011 / +$0.047 per 1,000 questions and +0.9 s at p50, because 10 of 30 tuning questions and 12 of 15 held-out questions start with a weak search.
 
-**Prompt caching: not applicable.** Haiku 5.5 caches prefixes of at least 512 tokens. The optimised prompts have a fixed prefix (system prompt + tool definitions) of roughly 120 tokens (classic) and 400 tokens (lean agent), below that. Only the baseline agent's prefix (about 590 tokens) would qualify; shrinking it saved more (-54 % cost) than caching it would have (roughly -18 %), and a cache write costs 1.25x.
+**Prompt caching: not applicable.** Haiku 5.5 caches prefixes of at least 512 tokens. The optimised prompts have a fixed prefix (system prompt + tool definitions) of roughly 120 tokens (classic) and 400 tokens (lean agent), below that.
 
 ### What did not help, or got worse
 
-- **Latency barely moved for classic.** The model call dominates: -19 % at p50, but the time to first token stayed at 0.6 s. The big latency win is the agent (-36 % p50).
-- **`auto` has a worse p95 than classic** (1.9 s vs 1.35 s) because it sends the hard questions to the agent. That is the point, but it is not faster at the tail.
-- **Quality dipped a little** on the tuning set: fact 91 % to 82-83 %, citation 100 % to 93 % for the final `auto` rows. Failing cases: a table row dropped by compression (s07), a flaky "not found" for the Jobrad question (s09), and a partial answer to the parking question that the eval counts as wrong because the documents do mention parking by lottery (n03). Held-out: the VPN document was not pulled in by its link and the model said "not found" (h07), and the Christmas question (h12) is labelled "not in the documents" but `alle/betriebsrestaurant` mentions a Christmas dinner; I left the label as committed.
-- **Links are weak evidence.** Only one tuning question needed them; vector similarity cannot tell a useful linked chunk from a noisy one (useful ones scored 0.34 to 0.71, noise up to 0.64).
-- **Router thresholds are tuned on 30 questions** and the held-out set shows more "unsure" cases (colloquial wording scores lower vectors), so it sends more questions to the agent there.
+- **The cheap path does not reach the agent on colloquial questions.** The agent re-phrases its own searches and reads whole sections, which is why it scores 100 %. Classic with rewrite closes about half the gap on the held-out set; the rest is retrieval that a keyword rewrite cannot fix (multi-document questions where the second document shares no words with the question).
+- **Latency got worse, not better.** `final + rewrite` has a p50 of 2.1 s against 1.2 s for classic alone, because most weak searches make two model calls. The agent is 2.8 s.
+- **Cost target missed by a hair.** $0.151 per 1,000 on the tuning set, $0.163 on the held-out set, against a target of $0.15. The rewrite is the reason; without it the numbers are $0.140 and $0.116 but the held-out answers are much worse.
+- **Glossary and links did not help the held-out wording.** Both were tuned on the tuning set, where retrieval was already good; they changed nothing there.
+- **The fact check is strict and the sample is small.** 22 and 11 answerable questions: one question is 4.5 % / 9 %.
+- **Router thresholds** are calibrated on 30 questions, and colloquial wording scores lower vectors, which the rewrite now compensates only partly.
 
-![Scale test: 35 vs. 10,035 documents](eval/scale.png)
+![Scale test: 52 vs. 10,052 documents](eval/scale.png)
 
-> **Which numbers come from which model:** the table above (latency, tokens, cost, citation correctness) is from real Claude Haiku 5.5 answers. Retrieval (hit rate, search latency), the permission checks and the scale test below are model-independent; the scale test used the deterministic `FakeLLM` for its citation numbers.
-> The same eval with `FakeLLM` (extractive stand-in, used in tests and CI) gave 100 % hit rate and 93 % citation correctness for both modes.
+> **Which numbers come from which model:** the real rows of the tables (answer facts, citation, latency, tokens, cost) are from Claude Haiku 5.5. Retrieval (hit rate, search latency), the permission checks, the "facts in prompt" column and the scale test are model-independent; the scale test used the deterministic `FakeLLM` for its citation numbers.
 >
-> **The scale drop:** with 10,035 documents the right document is still found (100 % hit rate), but citation correctness falls from 93 % to 77 %.
-> The generated filler contains outdated policy versions and near-duplicate FAQ pages that compete for the cited slots. Search p95 grows from 15 ms to 62 ms (in-memory store, fine for this size). Versions are handled by a "newest valid version wins" rule, but not every distractor is caught.
+> **The scale drop:** with 10,052 documents the right document is still found (100 % hit rate), but citation correctness falls from 93 % to 77 % (fake model, classic mode). The generated filler contains outdated policy versions and near-duplicate FAQ pages that compete for the cited slots. Search p50 grows from 0.5 ms to 23 ms and p95 from 1 ms to 71 ms (in-memory store, 38,377 chunks, 75 MB index, 1.3 GB peak memory, 11.6 minutes to index on the dev laptop). Versions are handled by a "newest valid version wins" rule, but not every distractor is caught.
 
 ![Quality dashboard](docs/img/quality.webp)
 
@@ -148,7 +186,7 @@ A `vertrieb` user cannot read `hr` documents, by any route. The filter lives in 
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,local]"           # "local" = FastEmbed, downloads a ~220 MB model once
 python -m ks.cli index                  # build the index
-python -m ks.cli search "Wie viel Urlaub habe ich?" --user mira
+python -m ks.cli search "Was bedeutet K3 in ELKO?" --user bent
 uvicorn ks.api:app --reload             # API on :8000, OpenAPI page at /docs
 ```
 
@@ -166,9 +204,9 @@ docker compose up --build               # http://localhost:8000
 TOKEN=$(curl -s -X POST localhost:8000/login -H 'content-type: application/json' \
   -d '{"username": "katja"}' | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
 curl -s -X POST localhost:8000/ask -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
-  -d '{"question": "Wie viel darf ein Hotel pro Nacht kosten?", "mode": "auto"}'     # auto | classic | agentic
+  -d '{"question": "Bis wann ist Annahmeschluss für Seeger Pharma Großhandel?", "mode": "auto"}'     # auto | classic | agentic
 curl -sN -X POST localhost:8000/ask/stream -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
-  -d '{"question": "Wie viel Urlaub habe ich?"}'     # server-sent events: delta ... done
+  -d '{"question": "Wer gibt meine Vertriebsreise für 1.800 Euro frei?"}'     # server-sent events: delta ... done
 curl -s localhost:8000/documents -H "Authorization: Bearer $TOKEN"        # only what katja may see
 ```
 
@@ -181,9 +219,9 @@ cd web && npm ci && npm run dev         # http://localhost:5173
 npm run build:demo                      # static demo build in web/dist-demo (no server)
 ```
 
-**Static demo:** `python -m ks.cli export-demo` writes `web/public/demo/demo.json` with prepared questions in both modes. It now holds all three modes, with `auto` as the default. Run it with `LLM_PROVIDER=anthropic` to refresh the answers with real Claude output (answers from the ablation run are reused); the file records which model produced them. GitHub Pages builds from the committed file and never calls an LLM.
+**Static demo:** `python -m ks.cli export-demo` writes `web/public/demo/demo.json` with prepared questions in all three modes (`auto` is the default). Run it with `LLM_PROVIDER=anthropic` to refresh the answers with real Claude output (answers from the ablation run are reused); the file records which model produced them. GitHub Pages builds from the committed file and never calls an LLM.
 
-**Ablation:** `python -m ks.cli optimize` (offline, free) or `... optimize --real --budget 0.05` (real model, costs money), then `python -m ks.cli optimize-table` for the markdown tables. `KS_CONFIG=baseline` turns every lever off in the API.
+**Ablation:** `python -m ks.cli optimize` (offline, free) or `... optimize --real --nodocs --budget 0.05` (real model, costs money; `--configs` picks rows, `--nodocs-only` runs only the "without documents" comparison), then `python -m ks.cli optimize-table` for the markdown tables. `KS_CONFIG=baseline` turns every lever off in the API.
 
 **Scale test:** `python -m ks.cli bench-scale --n 10000` (seeded, no LLM), `python -m ks.cli clean-generated` removes the generated corpus.
 
@@ -203,14 +241,14 @@ GitHub Actions (`ci.yml`) runs ruff and pytest against a pgvector service (so th
 - **Hybrid search.** Vectors find paraphrases ("Resturlaub" vs. "Urlaubstage verfallen"), BM25 finds exact terms like "E5" or "VPN". Reciprocal rank fusion merges both without tuning score scales.
 - **Rights in the tools, not the prompt.** A prompt can be talked around; a `WHERE department IN (...)` cannot. The model never sees a forbidden chunk.
 - **Agentic max 6 calls.** A hard cap bounds cost and latency, and stops loops. Questions that need more are rare in this corpus.
-- **Cheap decisions before expensive ones.** Everything the router, the links and the cache need is computed from the search that has to run anyway; no extra model call is used to save model calls.
+- **Cheap decisions before expensive ones.** Everything the router, the links and the cache need is computed from the search that has to run anyway. The one exception is the query rewrite, which spends a tiny model call only when the first search is weak.
 - **A fixed not-found sentence.** If no chunk passes the score threshold, the answer is exactly "Dazu habe ich in den Dokumenten nichts gefunden." Classic mode does not even call the model; the agent is instructed to use the same sentence. No invention. The question lands in the "missing documentation" list.
 - **Local embeddings.** FastEmbed (multilingual) runs on the CPU: free, no data leaves the machine, CI stays offline.
 
 ## What I'd do next
 
 - Real SSO instead of the demo login; per-document rights instead of per department.
-- A re-ranker for the large corpus, to win back the lost citation correctness.
+- A re-ranker for the large corpus, to win back the lost citation correctness, and a better answer for questions that need two documents that share no words (today only the agent gets those right).
 - Run the eval on Claude regularly and track it over time; add answer-quality grading, not only citation checks.
 - Persistent request logs; a cross-encoder re-ranker as a better second opinion than the two-signal router.
 - Grade answers with a rubric instead of fact strings, and repeat the real runs a few times to put error bars on the tables.
