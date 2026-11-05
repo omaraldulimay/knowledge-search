@@ -1,23 +1,24 @@
 {
   "llm": "claude-haiku-5-5",
   "embedder": "fastembed",
+  "config": "baseline",
   "modes": {
     "classic": {
       "metrics": {
         "questions": 30,
         "hit_rate_at_5": 1.0,
-        "full_coverage": 0.8636363636363636,
-        "citation_correctness": 1.0,
+        "full_coverage": 0.9545454545454546,
+        "citation_correctness": 0.9666666666666667,
         "permission_leaks": 0,
-        "avg_latency_ms": 1247.7267381657537,
-        "p95_latency_ms": 1878.4873260505256,
-        "input_tokens": 30998,
-        "output_tokens": 6706,
-        "total_cost_usd": 0.0064528,
+        "avg_latency_ms": 1562.3926860993379,
+        "p95_latency_ms": 3834.310188649396,
+        "input_tokens": 26083,
+        "output_tokens": 5704,
+        "total_cost_usd": 0.0054603,
         "by_type": {
           "single": {
             "n": 14,
-            "correct": 14
+            "correct": 13
           },
           "multi": {
             "n": 8,
@@ -38,24 +39,18 @@
           "id": "s01",
           "type": "single",
           "user": "mira",
-          "question": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+          "question": "Wie viel Prozent legt die Firma bei der bAV obendrauf und bis zu welcher Umwandlung gilt das?",
           "expected_doc_ids": [
             "hr/betriebliche-altersvorsorge"
           ],
           "result": {
-            "answer": "Der Arbeitgeberzuschuss beträgt 20 Prozent auf den umgewandelten Betrag, gezahlt für Beiträge bis zu 300 Euro pro Monat [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss]. Zusätzlich erhalten Mitarbeitende, die seit mindestens fünf Jahren im Unternehmen sind, einen festen Basisbeitrag von 40 Euro pro Monat [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss]. Der Zuschuss von 20 Prozent gilt unabhängig vom Beschäftigungsumfang [hr/betriebliche-altersvorsorge#Häufige Fragen].",
+            "answer": "Die Firma legt 20 Prozent obendrauf. Gefördert wird eine Umwandlung bis 250 Euro im Monat, der maximale Firmenzuschuss liegt bei 50 Euro im Monat [hr/betriebliche-altersvorsorge#Zuschuss].",
             "citations": [
               {
                 "doc_id": "hr/betriebliche-altersvorsorge",
-                "title": "Betriebliche Altersvorsorge",
-                "section": "Arbeitgeberzuschuss",
-                "chunk_id": "hr/betriebliche-altersvorsorge#1"
-              },
-              {
-                "doc_id": "hr/betriebliche-altersvorsorge",
-                "title": "Betriebliche Altersvorsorge",
-                "section": "Häufige Fragen",
-                "chunk_id": "hr/betriebliche-altersvorsorge#6"
+                "title": "Betriebliche Altersvorsorge (bAV)",
+                "section": "Zuschuss",
+                "chunk_id": "hr/betriebliche-altersvorsorge#0"
               }
             ],
             "mode": "classic",
@@ -63,20 +58,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+                  "query": "Wie viel Prozent legt die Firma bei der bAV obendrauf und bis zu welcher Umwandlung gilt das?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1356,
-            "output_tokens": 266,
-            "cost": 0.0002686,
-            "latency_ms": 1559.5207679943996,
+            "input_tokens": 1189,
+            "output_tokens": 103,
+            "cost": 0.0001704,
+            "latency_ms": 2080.467171006603,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/betriebliche-altersvorsorge"
-            ]
+              "hr/betriebliche-altersvorsorge",
+              "hr/gehaltsbaender"
+            ],
+            "route": "",
+            "ttft_ms": 1809.1841080022277,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -85,18 +84,18 @@
           "id": "s02",
           "type": "single",
           "user": "mira",
-          "question": "Welche Kündigungsfrist gilt in der Probezeit?",
+          "question": "Wie viele Feedbackgespräche gibt es in der Probezeit und welches Formular nutze ich dafür?",
           "expected_doc_ids": [
-            "hr/kuendigungsfristen"
+            "hr/probezeit-feedback"
           ],
           "result": {
-            "answer": "In der Probezeit (die ersten sechs Monate) kann das Arbeitsverhältnis von beiden Seiten mit einer Frist von zwei Wochen gekündigt werden. Die Kündigung muss schriftlich erfolgen; eine Kündigung per E-Mail ist unwirksam. [hr/kuendigungsfristen#Probezeit]",
+            "answer": "Es gibt drei Pflichtgespräche: nach 6 Wochen, nach 3 Monaten und nach 5 Monaten [hr/probezeit-feedback#Feedbackgespräche]. Dokumentiert wird mit dem Formular \"PZ-2\" in der Personalakte [hr/probezeit-feedback#Feedbackgespräche].",
             "citations": [
               {
-                "doc_id": "hr/kuendigungsfristen",
-                "title": "Kündigungsfristen",
-                "section": "Probezeit",
-                "chunk_id": "hr/kuendigungsfristen#1"
+                "doc_id": "hr/probezeit-feedback",
+                "title": "Leitfaden Probezeit und Feedbackgespräche",
+                "section": "Feedbackgespräche",
+                "chunk_id": "hr/probezeit-feedback#2"
               }
             ],
             "mode": "classic",
@@ -104,21 +103,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welche Kündigungsfrist gilt in der Probezeit?",
+                  "query": "Wie viele Feedbackgespräche gibt es in der Probezeit und welches Formular nutze ich dafür?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1176,
-            "output_tokens": 127,
-            "cost": 0.0001811,
-            "latency_ms": 1077.7582559967414,
+            "input_tokens": 986,
+            "output_tokens": 125,
+            "cost": 0.0001611,
+            "latency_ms": 1343.777517991839,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/kuendigungsfristen",
               "hr/probezeit-feedback"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 958.5356030002004,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -127,23 +128,17 @@
           "id": "s03",
           "type": "single",
           "user": "mira",
-          "question": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+          "question": "Wer gibt eine Weiterbildung für 800 Euro aus dem Lerntopf frei?",
           "expected_doc_ids": [
             "hr/weiterbildung"
           ],
           "result": {
-            "answer": "Das jährliche Bildungsbudget beträgt 1.200 Euro pro Mitarbeiterin bzw. Mitarbeiter, zusätzlich bis zu fünf bezahlte Weiterbildungstage [hr/weiterbildung#Bildungsbudget]. Führungskräfte ab Entgeltgruppe E7 erhalten zusätzlich 800 Euro für Führungsseminare [hr/weiterbildung#Bildungsbudget].\n\nGefördert werden Seminare, Online-Kurse, Fachliteratur, Zertifizierungen und Konferenzen mit beruflichem Bezug [hr/weiterbildung#Was wird gefördert]. Sprachkurse werden gefördert, wenn Englisch oder Polnisch für die Tätigkeit nötig ist [hr/weiterbildung#Was wird gefördert].",
+            "answer": "Für 800 Euro gibt die Bereichsleitung die Weiterbildung frei. [hr/weiterbildung#Freigabe]",
             "citations": [
               {
                 "doc_id": "hr/weiterbildung",
-                "title": "Weiterbildung und Bildungsbudget",
-                "section": "Bildungsbudget",
-                "chunk_id": "hr/weiterbildung#0"
-              },
-              {
-                "doc_id": "hr/weiterbildung",
-                "title": "Weiterbildung und Bildungsbudget",
-                "section": "Was wird gefördert",
+                "title": "Weiterbildung",
+                "section": "Freigabe",
                 "chunk_id": "hr/weiterbildung#1"
               }
             ],
@@ -152,20 +147,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+                  "query": "Wer gibt eine Weiterbildung für 800 Euro aus dem Lerntopf frei?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1396,
-            "output_tokens": 303,
-            "cost": 0.00029110000000000003,
-            "latency_ms": 1380.271565001749,
+            "input_tokens": 990,
+            "output_tokens": 50,
+            "cost": 0.000124,
+            "latency_ms": 2842.3640279943356,
             "found": true,
             "retrieved_doc_ids": [
               "hr/weiterbildung"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 2395.7115199882537,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -174,24 +172,18 @@
           "id": "s04",
           "type": "single",
           "user": "ole",
-          "question": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+          "question": "Welche Durchwahl hat die IT-Bereitschaft am Wochenende?",
           "expected_doc_ids": [
-            "it/passwortrichtlinie"
+            "it/bereitschaftsdienst"
           ],
           "result": {
-            "answer": "Ein Passwort muss mindestens 14 Zeichen lang sein [it/passwortrichtlinie#Anforderungen an Passwörter].\n\nEinen regelmäßigen Wechsel ist nicht mehr vorgeschrieben. Passwörter müssen aber sofort geändert werden, wenn der Verdacht besteht, dass sie bekannt geworden sind, oder wenn die IT dazu auffordert [it/passwortrichtlinie#Wechsel]. Für privilegierte Konten von Administratoren gilt weiterhin ein Wechsel alle 90 Tage [it/passwortrichtlinie#Wechsel].",
+            "answer": "Am Wochenende und an Feiertagen lautet die Durchwahl der IT-Bereitschaft 3077. Die Nummer leitet auf das Bereitschaftshandy weiter. [it/bereitschaftsdienst#Durchwahlen]",
             "citations": [
               {
-                "doc_id": "it/passwortrichtlinie",
-                "title": "Passwortrichtlinie",
-                "section": "Anforderungen an Passwörter",
-                "chunk_id": "it/passwortrichtlinie#1"
-              },
-              {
-                "doc_id": "it/passwortrichtlinie",
-                "title": "Passwortrichtlinie",
-                "section": "Wechsel",
-                "chunk_id": "it/passwortrichtlinie#2"
+                "doc_id": "it/bereitschaftsdienst",
+                "title": "Bereitschaftsdienst IT",
+                "section": "Durchwahlen",
+                "chunk_id": "it/bereitschaftsdienst#1"
               }
             ],
             "mode": "classic",
@@ -199,21 +191,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+                  "query": "Welche Durchwahl hat die IT-Bereitschaft am Wochenende?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1378,
-            "output_tokens": 225,
-            "cost": 0.0002503,
-            "latency_ms": 1357.928659999743,
+            "input_tokens": 1367,
+            "output_tokens": 90,
+            "cost": 0.00018170000000000003,
+            "latency_ms": 1022.2463910031365,
             "found": true,
             "retrieved_doc_ids": [
-              "it/passwortrichtlinie",
-              "it/mfa"
-            ]
+              "it/bereitschaftsdienst",
+              "it/it-support-tickets",
+              "alle/standortplan-durchwahlen"
+            ],
+            "route": "",
+            "ttft_ms": 743.7232160009444,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -222,24 +218,18 @@
           "id": "s05",
           "type": "single",
           "user": "ole",
-          "question": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+          "question": "Wie viele Zeichen muss mein Passwort haben und muss ich es regelmäßig ändern?",
           "expected_doc_ids": [
-            "it/it-support-tickets"
+            "it/passwortrichtlinie"
           ],
           "result": {
-            "answer": "Für kritische Störungen (Priorität 1, z. B. Ausfall des Lagerverwaltungssystems oder der Scanner) gilt: Reaktion innerhalb von 30 Minuten, Lösung angestrebt innerhalb von 4 Stunden [it/it-support-tickets#Prioritäten und Reaktionszeiten].\n\nAußerhalb der Support-Zeiten (montags bis freitags 7:00 bis 18:00 Uhr) gibt es für kritische Störungen in Disposition und Lager eine Notfallbereitschaft unter 0170-0000300, die nur für Ausfälle gedacht ist, die den Warenumschlag blockieren [it/it-support-tickets#Erreichbarkeit].",
+            "answer": "Ein Passwort muss mindestens 14 Zeichen lang sein [it/passwortrichtlinie#Anforderungen]. Es muss nicht mehr regelmäßig gewechselt werden, sondern nur bei Verdacht auf Missbrauch oder nach einem Vorfall [it/passwortrichtlinie#Anforderungen].",
             "citations": [
               {
-                "doc_id": "it/it-support-tickets",
-                "title": "IT-Support und Ticketsystem",
-                "section": "Prioritäten und Reaktionszeiten",
-                "chunk_id": "it/it-support-tickets#2"
-              },
-              {
-                "doc_id": "it/it-support-tickets",
-                "title": "IT-Support und Ticketsystem",
-                "section": "Erreichbarkeit",
-                "chunk_id": "it/it-support-tickets#0"
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Anforderungen",
+                "chunk_id": "it/passwortrichtlinie#1"
               }
             ],
             "mode": "classic",
@@ -247,21 +237,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+                  "query": "Wie viele Zeichen muss mein Passwort haben und muss ich es regelmäßig ändern?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1214,
-            "output_tokens": 257,
-            "cost": 0.0002499,
-            "latency_ms": 1413.2564780011307,
+            "input_tokens": 1159,
+            "output_tokens": 123,
+            "cost": 0.0001774,
+            "latency_ms": 1816.9791330001317,
             "found": true,
             "retrieved_doc_ids": [
-              "it/it-support-tickets",
-              "it/datensicherung"
-            ]
+              "it/passwortrichtlinie",
+              "it/mfa",
+              "it/vpn-einrichtung"
+            ],
+            "route": "",
+            "ttft_ms": 1404.8687829927076,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -270,18 +264,18 @@
           "id": "s06",
           "type": "single",
           "user": "ole",
-          "question": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+          "question": "Wie viele Stunden darf die Wiederherstellung von ELKO höchstens dauern?",
           "expected_doc_ids": [
             "it/datensicherung"
           ],
           "result": {
-            "answer": "Backups der Datenbank des Lagerverwaltungssystems erfolgen stündlich inkrementell und nachts vollständig [it/datensicherung#Sicherungsplan]. Dateiserver werden täglich um 22:00 Uhr gesichert [it/datensicherung#Sicherungsplan].\n\nAufbewahrung:\n- Postfächer: 30 Tage [it/datensicherung#Sicherungsplan]\n- Wöchentliche Vollsicherungen: 12 Wochen [it/datensicherung#Sicherungsplan]\n- Monatliche Sicherungen: 12 Monate [it/datensicherung#Sicherungsplan]\n- Jahressicherungen: zehn Jahre, soweit steuerrechtliche Fristen gelten [it/datensicherung#Sicherungsplan]",
+            "answer": "Das Wiederherstellungsziel für ELKO beträgt 4 Stunden (RTO). [it/datensicherung#Wiederherstellung]",
             "citations": [
               {
                 "doc_id": "it/datensicherung",
                 "title": "Datensicherung und Wiederherstellung",
-                "section": "Sicherungsplan",
-                "chunk_id": "it/datensicherung#2"
+                "section": "Wiederherstellung",
+                "chunk_id": "it/datensicherung#3"
               }
             ],
             "mode": "classic",
@@ -289,21 +283,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+                  "query": "Wie viele Stunden darf die Wiederherstellung von ELKO höchstens dauern?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1305,
-            "output_tokens": 286,
-            "cost": 0.0002735,
-            "latency_ms": 1426.5406920021633,
+            "input_tokens": 1199,
+            "output_tokens": 54,
+            "cost": 0.0001469,
+            "latency_ms": 840.3898910037242,
             "found": true,
             "retrieved_doc_ids": [
               "it/datensicherung",
-              "alle/datenschutz-grundlagen"
-            ]
+              "it/stoerungsbericht-elko-ausfall-2026-03",
+              "it/mfa"
+            ],
+            "route": "",
+            "ttft_ms": 633.1042859965237,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -312,24 +310,18 @@
           "id": "s07",
           "type": "single",
           "user": "katja",
-          "question": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+          "question": "Ab welcher Marge muss der Vertriebsleiter ein Angebot freigeben?",
           "expected_doc_ids": [
-            "vertrieb/provisionsmodell"
+            "vertrieb/angebotsprozess"
           ],
           "result": {
-            "answer": "Die Provision wird quartalsweise abgerechnet und mit dem Gehalt des Folgemonats ausgezahlt. Maßgeblich sind dabei bezahlte Rechnungen, nicht die gestellten [vertrieb/provisionsmodell#Abrechnung].\n\nBei teilweiser Zielerreichung gilt eine lineare Berechnung gemäß Staffel: Bei 85 Prozent Zielerreichung zahlt das Unternehmen etwa 6.000 Euro bis 12.000 Euro, gerechnet auf die Staffel. Die genaue Berechnung zeigt das Provisionsportal [vertrieb/provisionsmodell#Rechenbeispiel].",
+            "answer": "Der Vertriebsleiter muss ein Angebot freigeben, wenn die Marge unter 12 Prozent liegt [vertrieb/angebotsprozess#Marge und Freigabe]. Unter 6 Prozent ist zusätzlich die Geschäftsführerin Henrike Wulff erforderlich [vertrieb/angebotsprozess#Marge und Freigabe].",
             "citations": [
               {
-                "doc_id": "vertrieb/provisionsmodell",
-                "title": "Provisionsmodell Vertrieb 2026",
-                "section": "Abrechnung",
-                "chunk_id": "vertrieb/provisionsmodell#3"
-              },
-              {
-                "doc_id": "vertrieb/provisionsmodell",
-                "title": "Provisionsmodell Vertrieb 2026",
-                "section": "Rechenbeispiel",
-                "chunk_id": "vertrieb/provisionsmodell#6"
+                "doc_id": "vertrieb/angebotsprozess",
+                "title": "Angebotsprozess",
+                "section": "Marge und Freigabe",
+                "chunk_id": "vertrieb/angebotsprozess#1"
               }
             ],
             "mode": "classic",
@@ -337,21 +329,27 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+                  "query": "Ab welcher Marge muss der Vertriebsleiter ein Angebot freigeben?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1301,
-            "output_tokens": 248,
-            "cost": 0.0002541,
-            "latency_ms": 1495.470503999968,
+            "input_tokens": 1136,
+            "output_tokens": 137,
+            "cost": 0.00018210000000000004,
+            "latency_ms": 2346.5101949987,
             "found": true,
             "retrieved_doc_ids": [
+              "vertrieb/angebotsprozess",
               "vertrieb/provisionsmodell",
-              "vertrieb/vertrieb-reisekosten"
-            ]
+              "vertrieb/rabattstaffel-grosskunden",
+              "vertrieb/kundenbewirtung",
+              "vertrieb/vertragsvorlagen"
+            ],
+            "route": "",
+            "ttft_ms": 1851.83782200329,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -360,18 +358,24 @@
           "id": "s08",
           "type": "single",
           "user": "katja",
-          "question": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+          "question": "Welche Vertragsstrafe droht bei Nordhafen Frische, wenn ich eine Kühlketten-Unterbrechung zu spät melde?",
           "expected_doc_ids": [
-            "vertrieb/crm-pflege"
+            "vertrieb/kundenakte-nordhafen-frische"
           ],
           "result": {
-            "answer": "Für jeden Kunden müssen Firmenname, Rechtsform, Rechnungsadresse, Branche, Umsatzsteuer-ID, Hauptansprechpartner und Zahlungsziel gepflegt sein. Für Großkunden kommen Rahmenvertragsnummer, Vertragsende und Rabattstufe hinzu. Fehlende Pflichtfelder werden in der Wochenübersicht rot markiert. [vertrieb/crm-pflege#Pflichtfelder]",
+            "answer": "Bei einer Kühlkettenunterbrechung über 30 Minuten oder über 8 Grad muss die Meldung an den Kunden binnen 60 Minuten erfolgen. Wird diese Frist versäumt, droht eine Vertragsstrafe von 750 Euro je Vorfall [vertrieb/kundenakte-nordhafen-frische#SLA und Vertragsstrafe].\n\nZusätzlich gilt seit der Zusatzvereinbarung nach dem Vorfall vom 17.02.2026: Das Temperaturprotokoll als PDF ist binnen 24 Stunden nach jedem Vorfall einzureichen [vertrieb/kundenakte-nordhafen-frische#Historie].",
             "citations": [
               {
-                "doc_id": "vertrieb/crm-pflege",
-                "title": "CRM-Pflege",
-                "section": "Pflichtfelder",
-                "chunk_id": "vertrieb/crm-pflege#1"
+                "doc_id": "vertrieb/kundenakte-nordhafen-frische",
+                "title": "Kundenakte Nordhafen Frische",
+                "section": "SLA und Vertragsstrafe",
+                "chunk_id": "vertrieb/kundenakte-nordhafen-frische#2"
+              },
+              {
+                "doc_id": "vertrieb/kundenakte-nordhafen-frische",
+                "title": "Kundenakte Nordhafen Frische",
+                "section": "Historie",
+                "chunk_id": "vertrieb/kundenakte-nordhafen-frische#5"
               }
             ],
             "mode": "classic",
@@ -379,21 +383,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+                  "query": "Welche Vertragsstrafe droht bei Nordhafen Frische, wenn ich eine Kühlketten-Unterbrechung zu spät melde?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1204,
-            "output_tokens": 177,
-            "cost": 0.0002089,
-            "latency_ms": 1283.5496780026006,
+            "input_tokens": 1177,
+            "output_tokens": 254,
+            "cost": 0.0002447,
+            "latency_ms": 1470.897524006432,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/crm-pflege",
-              "vertrieb/angebotsprozess"
-            ]
+              "vertrieb/kundenakte-nordhafen-frische",
+              "vertrieb/provisionsmodell"
+            ],
+            "route": "",
+            "ttft_ms": 668.0763449985534,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -402,24 +409,18 @@
           "id": "s09",
           "type": "single",
           "user": "katja",
-          "question": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+          "question": "Bis wann ist Annahmeschluss für Seeger Pharma Großhandel und an welchem Tor wird angeliefert?",
           "expected_doc_ids": [
-            "alle/betriebsrestaurant"
+            "vertrieb/kunden-sla-uebersicht"
           ],
           "result": {
-            "answer": "[alle/betriebsrestaurant#Jobrad]: Mitarbeitende können nach der Probezeit ein Dienstrad über Gehaltsumwandlung leasen. Die Leasingdauer beträgt 36 Monate, der Arbeitgeber übernimmt die Versicherung, und das Rad darf auch privat genutzt werden. Der maximale Bruttolistenpreis beträgt 4.500 Euro. Anträge laufen über die Personalabteilung.\n\n[alle/betriebsrestaurant#Deutschlandticket]: Das Unternehmen bezuschusst das Deutschlandticket mit 25 Euro pro Monat. Der Zuschuss wird automatisch mit dem Gehalt ausgezahlt, sobald ein Nachweis im Portal hochgeladen wurde.",
+            "answer": "Annahmeschluss für Seeger Pharma Großhandel ist 12:00 Uhr, angeliefert wird an Tor 5. [vertrieb/kunden-sla-uebersicht#Tabelle]",
             "citations": [
               {
-                "doc_id": "alle/betriebsrestaurant",
-                "title": "Betriebsrestaurant und Sozialleistungen",
-                "section": "Jobrad",
-                "chunk_id": "alle/betriebsrestaurant#2"
-              },
-              {
-                "doc_id": "alle/betriebsrestaurant",
-                "title": "Betriebsrestaurant und Sozialleistungen",
-                "section": "Deutschlandticket",
-                "chunk_id": "alle/betriebsrestaurant#3"
+                "doc_id": "vertrieb/kunden-sla-uebersicht",
+                "title": "SLA-Übersicht der Sonderkunden",
+                "section": "Tabelle",
+                "chunk_id": "vertrieb/kunden-sla-uebersicht#1"
               }
             ],
             "mode": "classic",
@@ -427,23 +428,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+                  "query": "Bis wann ist Annahmeschluss für Seeger Pharma Großhandel und an welchem Tor wird angeliefert?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1284,
-            "output_tokens": 285,
-            "cost": 0.00027089999999999997,
-            "latency_ms": 1485.0308719978784,
+            "input_tokens": 1375,
+            "output_tokens": 76,
+            "cost": 0.0001755,
+            "latency_ms": 1172.461836002185,
             "found": true,
             "retrieved_doc_ids": [
-              "alle/betriebsrestaurant",
-              "vertrieb/vertragsvorlagen",
-              "vertrieb/angebotsprozess",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/kunden-sla-uebersicht",
+              "vertrieb/kundenakte-nordhafen-frische"
+            ],
+            "route": "",
+            "ttft_ms": 760.3414589975728,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -452,73 +454,57 @@
           "id": "s10",
           "type": "single",
           "user": "bent",
-          "question": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+          "question": "Was bedeutet K3 in ELKO?",
           "expected_doc_ids": [
-            "logistik/fahrzeugpruefung"
+            "logistik/elko-statuscodes"
           ],
           "result": {
-            "answer": "Vor jeder Fahrt führt die Fahrerin oder der Fahrer eine Abfahrtskontrolle durch. Geprüft werden Reifen und Reifendruck, Beleuchtung, Bremsen, Ölstand, Flüssigkeiten, Spiegel, Warnweste, Warndreieck, Verbandskasten sowie die Ladungssicherungsmittel [logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle]. Das Ergebnis wird in der Fahrer-App dokumentiert [logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle]. Mängel, die die Verkehrssicherheit gefährden, führen zum Fahrverbot bis zur Behebung [logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle].",
-            "citations": [
-              {
-                "doc_id": "logistik/fahrzeugpruefung",
-                "title": "Fahrzeugprüfung und Fahrerpflichten",
-                "section": "Tägliche Abfahrtskontrolle",
-                "chunk_id": "logistik/fahrzeugpruefung#0"
-              }
-            ],
+            "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
+            "citations": [],
             "mode": "classic",
             "steps": [
               {
                 "tool": "search",
                 "args": {
-                  "query": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+                  "query": "Was bedeutet K3 in ELKO?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1546,
-            "output_tokens": 304,
-            "cost": 0.0003066,
-            "latency_ms": 1485.4056229960406,
-            "found": true,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 35.255707000033,
+            "found": false,
             "retrieved_doc_ids": [
-              "logistik/fahrzeugpruefung",
-              "logistik/ladungssicherung",
+              "logistik/elko-statuscodes",
+              "logistik/zollabwicklung",
               "logistik/gefahrgut-handling"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
-          "correct": true,
+          "correct": false,
           "leak": false
         },
         {
           "id": "s11",
           "type": "single",
           "user": "bent",
-          "question": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+          "question": "Welche Mängelklasse bedeutet im Fahrer-Check ein Fahrverbot?",
           "expected_doc_ids": [
-            "logistik/reklamation-transportschaden"
+            "logistik/fahrzeugpruefung"
           ],
           "result": {
-            "answer": "Die Meldung eines Transportschadens hat folgende Fristen:\n\n- Offensichtliche Schäden muss der Empfänger sofort bei Ablieferung auf dem Lieferschein vermerken [logistik/reklamation-transportschaden#Wenn ein Schaden auftritt].\n- Nicht erkennbare Schäden müssen innerhalb von sieben Tagen nach Ablieferung schriftlich angezeigt werden [logistik/reklamation-transportschaden#Wenn ein Schaden auftritt].\n- Der Kunde erhält innerhalb von einem Arbeitstag eine Eingangsbestätigung [logistik/reklamation-transportschaden#Meldung im Haus].\n- Die erste Rückmeldung an den Kunden erfolgt spätestens nach fünf Arbeitstagen, die endgültige Entscheidung innerhalb von 30 Tagen [logistik/reklamation-transportschaden#Fristen].",
+            "answer": "M1 bedeutet im Fahrer-Check ein Fahrverbot. Beispiele sind Bremsen oder Reifen unter Mindestprofil; dann ist sofort die Fuhrparkwerkstatt (Durchwahl 5500) zu kontaktieren. [logistik/fahrzeugpruefung#Mängelklassen]",
             "citations": [
               {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Wenn ein Schaden auftritt",
-                "chunk_id": "logistik/reklamation-transportschaden#0"
-              },
-              {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Meldung im Haus",
-                "chunk_id": "logistik/reklamation-transportschaden#1"
-              },
-              {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Fristen",
-                "chunk_id": "logistik/reklamation-transportschaden#3"
+                "doc_id": "logistik/fahrzeugpruefung",
+                "title": "Fahrzeugprüfung vor Abfahrt",
+                "section": "Mängelklassen",
+                "chunk_id": "logistik/fahrzeugpruefung#1"
               }
             ],
             "mode": "classic",
@@ -526,21 +512,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+                  "query": "Welche Mängelklasse bedeutet im Fahrer-Check ein Fahrverbot?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1285,
-            "output_tokens": 335,
-            "cost": 0.000296,
-            "latency_ms": 1561.615778999112,
+            "input_tokens": 1206,
+            "output_tokens": 122,
+            "cost": 0.00018160000000000002,
+            "latency_ms": 2788.0199429928325,
             "found": true,
             "retrieved_doc_ids": [
-              "logistik/reklamation-transportschaden",
-              "logistik/gefahrgut-handling"
-            ]
+              "logistik/fahrzeugpruefung",
+              "logistik/ladungssicherung",
+              "logistik/lagerordnung"
+            ],
+            "route": "",
+            "ttft_ms": 2276.9382639962714,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -549,18 +539,18 @@
           "id": "s12",
           "type": "single",
           "user": "bent",
-          "question": "Welche Schutzausrüstung ist im Lager Pflicht?",
+          "question": "Warum wurde 2025 auf Schichtmodell B umgestellt?",
           "expected_doc_ids": [
-            "logistik/lagerordnung"
+            "logistik/schichtmodelle"
           ],
           "result": {
-            "answer": "In den Hallenbereichen sind Sicherheitsschuhe der Klasse S3 und eine Warnweste Pflicht [logistik/lagerordnung#Zutritt und Schutzausrüstung]. Im Hochregallager ist zusätzlich ein Schutzhelm zu tragen [logistik/lagerordnung#Zutritt und Schutzausrüstung].",
+            "answer": "Die Umstellung auf Modell B erfolgte am 11.02.2025 per Beschluss der Geschäftsführung (Projekt Leuchtturm) mit Zustimmung des Betriebsrats [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt]. Gründe laut Dokument:\n\n- Nachtschichten in Halle 1 und 3 leisteten nur 9 Prozent der Menge, verursachten aber 31 Prozent der Arbeitsunfälle [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt].\n- Nordhafen Frische verlangte ein Anlieferfenster ab 04:00 Uhr [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt].\n- Der Wegfall der Nachtzuschläge sparte etwa 118.000 Euro im Jahr [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt].\n- Ein Pilot in Halle 3 (Oktober bis Dezember 2024) zeigte 22 Prozent weniger Unfälle [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt].",
             "citations": [
               {
-                "doc_id": "logistik/lagerordnung",
-                "title": "Lagerordnung",
-                "section": "Zutritt und Schutzausrüstung",
-                "chunk_id": "logistik/lagerordnung#1"
+                "doc_id": "logistik/schichtmodelle",
+                "title": "Schichtmodelle A und B",
+                "section": "Warum wurde auf Modell B umgestellt",
+                "chunk_id": "logistik/schichtmodelle#2"
               }
             ],
             "mode": "classic",
@@ -568,23 +558,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welche Schutzausrüstung ist im Lager Pflicht?",
+                  "query": "Warum wurde 2025 auf Schichtmodell B umgestellt?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1325,
-            "output_tokens": 133,
-            "cost": 0.000199,
-            "latency_ms": 1057.7917899936438,
+            "input_tokens": 1102,
+            "output_tokens": 426,
+            "cost": 0.0003232,
+            "latency_ms": 3638.217553991126,
             "found": true,
             "retrieved_doc_ids": [
-              "logistik/lagerordnung",
-              "logistik/ladungssicherung",
-              "alle/onboarding",
-              "logistik/gefahrgut-handling"
-            ]
+              "logistik/schichtmodelle"
+            ],
+            "route": "",
+            "ttft_ms": 2497.4612899968633,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -592,25 +582,19 @@
         {
           "id": "s13",
           "type": "single",
-          "user": "ole",
-          "question": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+          "user": "katja",
+          "question": "In welchem Zeitraum gilt die Urlaubssperre zur Weihnachtsspitze Wintersturm?",
           "expected_doc_ids": [
             "alle/urlaubsantrag"
           ],
           "result": {
-            "answer": "Wie viele Urlaubstage Sie haben, hängt von Ihrer Beschäftigungsform ab: Vollzeitkräfte erhalten 30 Arbeitstage bei einer Fünf-Tage-Woche, Teilzeitkräfte den Anspruch anteilig und Auszubildende 28 Tage [alle/urlaubsantrag#Urlaubsanspruch]. Im Eintrittsjahr entsteht für jeden vollen Monat der Beschäftigung ein Zwölftel des Jahresanspruchs [alle/urlaubsantrag#Urlaubsanspruch].\n\nNicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. Danach verfällt er, sofern die Firma die Mitarbeitenden rechtzeitig auf den Verfall hingewiesen hat. Diesen Hinweis versendet die Personalabteilung jedes Jahr im Oktober [alle/urlaubsantrag#Übertragung und Verfall]. Bis zu fünf Tage dürfen auf Antrag mit der Geschäftsführung bis zum 30. Juni übertragen werden [alle/urlaubsantrag#Übertragung und Verfall].",
+            "answer": "In Logistik und Disposition gilt die Urlaubssperre der Weihnachtsspitze (\"Wintersturm\") vom 23.11. bis 23.12. [alle/urlaubsantrag#Urlaubssperren]",
             "citations": [
               {
                 "doc_id": "alle/urlaubsantrag",
                 "title": "Urlaubsantrag und Urlaubsregelung",
-                "section": "Urlaubsanspruch",
-                "chunk_id": "alle/urlaubsantrag#1"
-              },
-              {
-                "doc_id": "alle/urlaubsantrag",
-                "title": "Urlaubsantrag und Urlaubsregelung",
-                "section": "Übertragung und Verfall",
-                "chunk_id": "alle/urlaubsantrag#4"
+                "section": "Urlaubssperren",
+                "chunk_id": "alle/urlaubsantrag#3"
               }
             ],
             "mode": "classic",
@@ -618,20 +602,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+                  "query": "In welchem Zeitraum gilt die Urlaubssperre zur Weihnachtsspitze Wintersturm?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1346,
-            "output_tokens": 430,
-            "cost": 0.00034960000000000004,
-            "latency_ms": 2004.0019880034379,
+            "input_tokens": 1181,
+            "output_tokens": 80,
+            "cost": 0.00015810000000000002,
+            "latency_ms": 1057.542618989828,
             "found": true,
             "retrieved_doc_ids": [
               "alle/urlaubsantrag"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 758.3417169953464,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -640,24 +627,24 @@
           "id": "s14",
           "type": "single",
           "user": "fiete",
-          "question": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+          "question": "Wo ist bei Feueralarm der Sammelplatz und wie lange dauerte die letzte Räumungsübung?",
           "expected_doc_ids": [
             "alle/brandschutz-notfall"
           ],
           "result": {
-            "answer": "Bei einem Brand werden Besucher wie folgt evakuiert:\n\n- Der Empfang führt eine tagesaktuelle Besucherliste, damit im Ernstfall alle Personen im Gebäude erfasst werden können. Die Empfangskraft nimmt die Liste mit zum Sammelplatz. [alle/brandschutz-notfall#Evakuierung von Besuchern]\n- Brand melden über die Notrufnummer 112 und die interne Notrufnummer 999. Gefährdete Personen warnen und mitnehmen. Türen schließen, aber nicht abschließen. Aufzüge nicht benutzen. [alle/brandschutz-notfall#Im Brandfall]\n- Der Sammelplatz befindet sich auf dem Parkplatz hinter Halle 3 an der Elbseite. [alle/brandschutz-notfall#Im Brandfall]",
+            "answer": "Der Sammelplatz bei Feueralarm ist der Sammelplatz Nord an Tor 12 [alle/brandschutz-notfall#Alarmsignal und Sammelplatz].\n\nDie letzte Räumungsübung am 17.09.2026 dauerte 6 Minuten 40 Sekunden bis zur Vollständigkeitsmeldung; das Ziel liegt bei unter 8 Minuten [alle/brandschutz-notfall#Übungen].",
             "citations": [
               {
                 "doc_id": "alle/brandschutz-notfall",
-                "title": "Brandschutz und Notfallverhalten",
-                "section": "Evakuierung von Besuchern",
-                "chunk_id": "alle/brandschutz-notfall#8"
+                "title": "Brandschutz und Notfall",
+                "section": "Alarmsignal und Sammelplatz",
+                "chunk_id": "alle/brandschutz-notfall#1"
               },
               {
                 "doc_id": "alle/brandschutz-notfall",
-                "title": "Brandschutz und Notfallverhalten",
-                "section": "Im Brandfall",
-                "chunk_id": "alle/brandschutz-notfall#1"
+                "title": "Brandschutz und Notfall",
+                "section": "Übungen",
+                "chunk_id": "alle/brandschutz-notfall#4"
               }
             ],
             "mode": "classic",
@@ -665,22 +652,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+                  "query": "Wo ist bei Feueralarm der Sammelplatz und wie lange dauerte die letzte Räumungsübung?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1388,
-            "output_tokens": 309,
-            "cost": 0.00029330000000000003,
-            "latency_ms": 1725.080516996968,
+            "input_tokens": 1042,
+            "output_tokens": 166,
+            "cost": 0.0001872,
+            "latency_ms": 1185.4212549951626,
             "found": true,
             "retrieved_doc_ids": [
               "alle/brandschutz-notfall",
-              "logistik/gefahrgut-handling",
+              "alle/onboarding",
               "hr/kuendigungsfristen"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 701.9516279979143,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -689,25 +679,25 @@
           "id": "m01",
           "type": "multi",
           "user": "katja",
-          "question": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+          "question": "Wer gibt meine Vertriebsreise für 1.800 Euro frei und wie viel darf das Hotel pro Nacht kosten?",
           "expected_doc_ids": [
             "alle/reisekostenrichtlinie",
             "vertrieb/vertrieb-reisekosten"
           ],
           "result": {
-            "answer": "Im Vertrieb gilt eine Obergrenze von 140 Euro pro Nacht inklusive Frühstück, bundesweit. Bei ausgebuchten Messehotels sind mit Freigabe des Vertriebsleiters bis zu 180 Euro möglich, wobei die Freigabe vor der Buchung erfolgen muss [vertrieb/vertrieb-reisekosten#Höhere Hotelgrenze].\n\nDie Abrechnung ist im Vertrieb innerhalb von 7 Tagen einzureichen [vertrieb/vertrieb-reisekosten#Abrechnung]. Der Vertriebsleiter genehmigt die Abrechnungen [vertrieb/vertrieb-reisekosten#Abrechnung].",
+            "answer": "Die Vertriebsreise mit 1.800 Euro geschätzten Kosten gibt die Bereichsleitung frei. [alle/reisekostenrichtlinie#Dienstreiseantrag und Freigabe]\n\nFür Vertriebsreisen darf das Hotel bis zu 140 Euro pro Nacht kosten, statt der allgemeinen 110 Euro. [vertrieb/vertrieb-reisekosten#Abweichende Obergrenzen]",
             "citations": [
               {
-                "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Höhere Hotelgrenze",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
+                "doc_id": "alle/reisekostenrichtlinie",
+                "title": "Reisekostenrichtlinie",
+                "section": "Dienstreiseantrag und Freigabe",
+                "chunk_id": "alle/reisekostenrichtlinie#2"
               },
               {
                 "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Abrechnung",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#5"
+                "title": "Reisekosten im Vertrieb",
+                "section": "Abweichende Obergrenzen",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
               }
             ],
             "mode": "classic",
@@ -715,21 +705,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+                  "query": "Wer gibt meine Vertriebsreise für 1.800 Euro frei und wie viel darf das Hotel pro Nacht kosten?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1351,
-            "output_tokens": 266,
-            "cost": 0.0002681,
-            "latency_ms": 1444.3300330021884,
+            "input_tokens": 1218,
+            "output_tokens": 432,
+            "cost": 0.0003378,
+            "latency_ms": 3158.242905003135,
             "found": true,
             "retrieved_doc_ids": [
+              "alle/reisekostenrichtlinie",
               "vertrieb/vertrieb-reisekosten",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/kundenbewirtung"
+            ],
+            "route": "",
+            "ttft_ms": 2631.8997880007373,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -738,19 +732,25 @@
           "id": "m02",
           "type": "multi",
           "user": "ole",
-          "question": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+          "question": "Ich möchte von zu Hause aus arbeiten und auf Laufwerk K: zugreifen. Wie viele Tage sind erlaubt und was muss ich starten?",
           "expected_doc_ids": [
             "alle/arbeitszeit-homeoffice",
             "it/vpn-einrichtung"
           ],
           "result": {
-            "answer": "Für den Zugriff auf interne Systeme im Homeoffice ist das Firmen-VPN zu verwenden; die Einrichtung beschreibt die IT-Anleitung [alle/arbeitszeit-homeoffice#Ausstattung und Datenschutz].",
+            "answer": "Die erlaubten Homeoffice-Tage hängen von Ihrem Bereich ab:\n- Verwaltung: bis zu 2 Tage pro Woche [alle/arbeitszeit-homeoffice#Homeoffice-Tage]\n- Disposition: 1 Tag pro Woche [alle/arbeitszeit-homeoffice#Homeoffice-Tage]\n- Lager, Fuhrpark und Werkstatt sind ausgenommen [alle/arbeitszeit-homeoffice#Homeoffice-Tage]\n\nDie Homeoffice-Tage tragen Sie im Zeitanker ein, und die Teamleitung bestätigt sie [alle/arbeitszeit-homeoffice#Homeoffice-Tage]. Die Regelung gilt ab 01.03.2026 [alle/arbeitszeit-homeoffice#Arbeitszeit und Homeoffice].\n\nWas Sie für den Zugriff auf Laufwerk K: starten müssen, dazu habe ich in den Dokumenten nichts gefunden.",
             "citations": [
               {
                 "doc_id": "alle/arbeitszeit-homeoffice",
                 "title": "Arbeitszeit und Homeoffice",
-                "section": "Ausstattung und Datenschutz",
-                "chunk_id": "alle/arbeitszeit-homeoffice#4"
+                "section": "Homeoffice-Tage",
+                "chunk_id": "alle/arbeitszeit-homeoffice#1"
+              },
+              {
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Arbeitszeit und Homeoffice",
+                "chunk_id": "alle/arbeitszeit-homeoffice#0"
               }
             ],
             "mode": "classic",
@@ -758,20 +758,26 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+                  "query": "Ich möchte von zu Hause aus arbeiten und auf Laufwerk K: zugreifen. Wie viele Tage sind erlaubt und was muss ich starten?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1270,
-            "output_tokens": 96,
-            "cost": 0.000175,
-            "latency_ms": 1085.690899999463,
+            "input_tokens": 1263,
+            "output_tokens": 772,
+            "cost": 0.0005122999999999999,
+            "latency_ms": 3994.749617006164,
             "found": true,
             "retrieved_doc_ids": [
-              "alle/arbeitszeit-homeoffice"
-            ]
+              "alle/arbeitszeit-homeoffice",
+              "it/datensicherung",
+              "alle/urlaubsantrag",
+              "it/bereitschaftsdienst"
+            ],
+            "route": "",
+            "ttft_ms": 2878.634682012489,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -779,38 +785,26 @@
         {
           "id": "m03",
           "type": "multi",
-          "user": "fiete",
-          "question": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+          "user": "bent",
+          "question": "Was tun, wenn bei Nordhafen Frische an Tor 7 die Kühlkette unterbrochen ist, und was wurde nach dem Vorfall im Februar geändert?",
           "expected_doc_ids": [
-            "vertrieb/rabattstaffel-grosskunden",
-            "logistik/gefahrgut-handling"
+            "logistik/eskalationsplan-kuehlkette",
+            "logistik/stoerungsbericht-tor7-kuehlkette-2026-02"
           ],
           "result": {
-            "answer": "Der Endpreis lässt sich mit den Ausschnitten nicht berechnen, weil die Höhe der Grundfracht fehlt. Die Bestandteile sind aber belegt:\n\n- Der Rabatt von 10 Prozent gilt auf die Grundfracht. Nebenleistungen wie Maut, Treibstoffzuschlag, Gefahrgutzuschlag und Zollabfertigung sind nicht rabattfähig [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz].\n- Für Gefahrguttransporte fällt ein Zuschlag von 18 Prozent auf die Grundfracht an, der nicht rabattierbar ist [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut].\n- Ein Rabatt von 10 Prozent erfordert die Entscheidung des Vertriebsleiters, Herr Henrik Tiedemann [vertrieb/rabattstaffel-grosskunden#Freigabegrenzen].\n- Für die Zollabfertigung kommen zusätzlich 45 Euro pro Zollanmeldung und eine Auslagenpauschale von 2 Prozent hinzu, wenn Zoll anfällt [logistik/zollabwicklung#Gebühren].\n\nOffen bleibt, ob der 18-prozentige Gefahrgutzuschlag auf die rabattierte oder die unrabattierte Grundfracht berechnet wird.",
+            "answer": "**Bei Unterbrechung der Kühlkette (Nordhafen Frische, Tor 7):**\n\n- **Sofortmaßnahmen:** Tor 7 schließen, Schleuse prüfen, Ware in Zone K umlagern und das Kühlaggregat des Lkw prüfen. Das Temperaturprotokoll wird als PDF binnen 24 Stunden an den Kunden geschickt. [logistik/eskalationsplan-kuehlkette#Sofortmaßnahmen an Tor 7]\n- **Stufe 1:** Liegt die Temperatur (Soll 2 bis 6 Grad) länger als 10 Minuten über 6 Grad, setzt die Schichtleitung Halle 2 die Ware sofort auf K3 mit Sperrgrund S1 und ruft den Kühlkette-Notfall unter Durchwahl 5299. [logistik/eskalationsplan-kuehlkette#Stufe 1: Schichtleitung]\n\n**Änderungen nach dem Vorfall im Februar:** Dazu habe ich in den Dokumenten nichts gefunden.",
             "citations": [
               {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Staffel auf Frachtumsatz",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Sofortmaßnahmen an Tor 7",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#4"
               },
               {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Sonderfall Gefahrgut",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
-              },
-              {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Freigabegrenzen",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#4"
-              },
-              {
-                "doc_id": "logistik/zollabwicklung",
-                "title": "Zollabwicklung",
-                "section": "Gebühren",
-                "chunk_id": "logistik/zollabwicklung#5"
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Stufe 1: Schichtleitung",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#1"
               }
             ],
             "mode": "classic",
@@ -818,21 +812,26 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+                  "query": "Was tun, wenn bei Nordhafen Frische an Tor 7 die Kühlkette unterbrochen ist, und was wurde nach dem Vorfall im Februar geändert?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1387,
-            "output_tokens": 1218,
-            "cost": 0.0007477,
-            "latency_ms": 5488.995968997187,
+            "input_tokens": 1278,
+            "output_tokens": 1063,
+            "cost": 0.0006592999999999999,
+            "latency_ms": 5278.675825000391,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/rabattstaffel-grosskunden",
-              "logistik/zollabwicklung"
-            ]
+              "logistik/stoerungsbericht-tor7-kuehlkette-2026-02",
+              "logistik/eskalationsplan-kuehlkette",
+              "logistik/ladungssicherung",
+              "logistik/schichtmodelle"
+            ],
+            "route": "",
+            "ttft_ms": 4218.890207004733,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -840,26 +839,26 @@
         {
           "id": "m04",
           "type": "multi",
-          "user": "katja",
-          "question": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+          "user": "fiete",
+          "question": "Wir verkaufen einem Großkunden mit 10 Prozent Rabatt einen Gefahrguttransport. Wie hoch ist der Gefahrgutzuschlag und wird darauf Rabatt gewährt?",
           "expected_doc_ids": [
-            "vertrieb/kundenbewirtung",
-            "vertrieb/vertrieb-reisekosten"
+            "vertrieb/rabattstaffel-grosskunden",
+            "logistik/gefahrgut-handling"
           ],
           "result": {
-            "answer": "Bis zu 60 Euro pro Person, inklusive Getränken und Trinkgeld [vertrieb/kundenbewirtung#Bewirtung]. Die Bewirtung muss geschäftlich begründet sein, und die Rechnung muss maschinell erstellt und aufgeschlüsselt sein. Auf der Rückseite werden Anlass, Teilnehmende und Datum notiert und unterschrieben [vertrieb/kundenbewirtung#Bewirtung]. Zusätzlich sind Anlass, Teilnehmende und Namen der Gäste der Bewirtungsrechnung beizufügen [vertrieb/vertrieb-reisekosten#Kundenbewirtung auf Reisen].\n\nBei Essen mit mehr als 8 Teilnehmenden ist vorab die Genehmigung des Vertriebsleiters einzuholen [vertrieb/kundenbewirtung#Bewirtung].",
+            "answer": "Der Gefahrgutzuschlag beträgt 18 Prozent auf die Fracht und ist nicht rabattierbar, auch nicht für Großkunden [logistik/gefahrgut-handling#Preis]. Er wird also voll auf den ursprünglichen Betrag berechnet, ohne die 10 Prozent Rabatt [vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar].\n\nDie Höhe des Zuschlags in Euro hängt vom Frachtbetrag ab, den Sie nicht genannt haben. Bei 10.000 Euro Fracht wären es 1.800 Euro Gefahrgutzuschlag, während der Rabatt nur auf die Fracht (1.000 Euro) gewährt wird [vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar].",
             "citations": [
               {
-                "doc_id": "vertrieb/kundenbewirtung",
-                "title": "Kundenbewirtung und Geschenke an Kunden",
-                "section": "Bewirtung",
-                "chunk_id": "vertrieb/kundenbewirtung#1"
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Preis",
+                "chunk_id": "logistik/gefahrgut-handling#3"
               },
               {
-                "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Kundenbewirtung auf Reisen",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#4"
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel Großkunden",
+                "section": "Nicht rabattierbar",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
               }
             ],
             "mode": "classic",
@@ -867,22 +866,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+                  "query": "Wir verkaufen einem Großkunden mit 10 Prozent Rabatt einen Gefahrguttransport. Wie hoch ist der Gefahrgutzuschlag und wird darauf Rabatt gewährt?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1405,
-            "output_tokens": 328,
-            "cost": 0.0003045,
-            "latency_ms": 1511.0086749991751,
+            "input_tokens": 1233,
+            "output_tokens": 301,
+            "cost": 0.0002738,
+            "latency_ms": 1954.4249559985474,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/vertrieb-reisekosten",
-              "vertrieb/kundenbewirtung",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/gefahrgut-handling",
+              "vertrieb/kundenakte-nordhafen-frische"
+            ],
+            "route": "",
+            "ttft_ms": 934.035047001089,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -891,37 +893,31 @@
           "id": "m05",
           "type": "multi",
           "user": "ole",
-          "question": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+          "question": "Der neue Kollege bekommt einen HW-S1. Darf er selbst Programme installieren und wie lange dauert die Freigabe?",
           "expected_doc_ids": [
             "it/hardware-bestellung",
             "it/software-freigabe"
           ],
           "result": {
-            "answer": "Nein, nicht ohne Weiteres. Auf Firmengeräten darf nur freigegebene Software installiert werden [it/software-freigabe#Grundsatz]. Mitarbeitende dürfen keine Software ohne Freigabe installieren [it/hardware-bestellung#Montage und Einrichtung].\n\nStandardprogramme wie Office, PDF-Reader, Browser, Videokonferenz und Passwortmanager können Sie selbst über das Selbstbedienungsportal installieren, ohne Administratorrechte [it/software-freigabe#Softwarekatalog]. Weitere Programme aus dem Katalog erfordern die Zustimmung der Führungskraft [it/software-freigabe#Softwarekatalog].\n\nWird ein Programm benötigt, das nicht im Katalog steht, stellen Sie im Ticketsystem einen Antrag \"Software-Freigabe\" [it/software-freigabe#Neue Software beantragen]. Die Bearbeitung dauert in der Regel zehn Arbeitstage [it/software-freigabe#Neue Software beantragen].",
+            "answer": "Nein, selbst installieren darf er nicht. Weitere Programme gibt es nur über die Software-Freigabe [it/hardware-bestellung#Lieferzeit und Ausgabe]. Der Antrag läuft im Lotse über das Formular \"Software-Freigabe\"; das Software-Board tagt alle zwei Wochen dienstags um 14:00 Uhr [it/software-freigabe#Ablauf]. Die Bearbeitung dauert in der Regel etwa 10 Arbeitstage [it/software-freigabe#Ablauf].\n\nDer HW-S1 selbst wird mit einer Lieferzeit von 5 Arbeitstagen ab Freigabe bestellt [it/hardware-bestellung#Lieferzeit und Ausgabe] und am ersten Tag um 09:00 Uhr im IT-Raum 1.04 ausgegeben [alle/onboarding#Technik am ersten Tag].",
             "citations": [
-              {
-                "doc_id": "it/software-freigabe",
-                "title": "Software-Freigabe",
-                "section": "Grundsatz",
-                "chunk_id": "it/software-freigabe#0"
-              },
               {
                 "doc_id": "it/hardware-bestellung",
                 "title": "Hardware-Bestellung",
-                "section": "Montage und Einrichtung",
-                "chunk_id": "it/hardware-bestellung#3"
+                "section": "Lieferzeit und Ausgabe",
+                "chunk_id": "it/hardware-bestellung#2"
               },
               {
                 "doc_id": "it/software-freigabe",
                 "title": "Software-Freigabe",
-                "section": "Softwarekatalog",
+                "section": "Ablauf",
                 "chunk_id": "it/software-freigabe#1"
               },
               {
-                "doc_id": "it/software-freigabe",
-                "title": "Software-Freigabe",
-                "section": "Neue Software beantragen",
-                "chunk_id": "it/software-freigabe#2"
+                "doc_id": "alle/onboarding",
+                "title": "Onboarding: Der erste Tag",
+                "section": "Technik am ersten Tag",
+                "chunk_id": "alle/onboarding#3"
               }
             ],
             "mode": "classic",
@@ -929,21 +925,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+                  "query": "Der neue Kollege bekommt einen HW-S1. Darf er selbst Programme installieren und wie lange dauert die Freigabe?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1267,
-            "output_tokens": 382,
-            "cost": 0.00031769999999999997,
-            "latency_ms": 1689.413334002893,
+            "input_tokens": 1186,
+            "output_tokens": 326,
+            "cost": 0.0002816,
+            "latency_ms": 2390.3186160023324,
             "found": true,
             "retrieved_doc_ids": [
               "it/hardware-bestellung",
-              "it/software-freigabe"
-            ]
+              "it/software-freigabe",
+              "alle/onboarding"
+            ],
+            "route": "",
+            "ttft_ms": 1017.1142379986122,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -952,19 +952,19 @@
           "id": "m06",
           "type": "multi",
           "user": "mira",
-          "question": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+          "question": "Ich gehe für neun Monate in Elternzeit. Wie viel von meinen 30 Urlaubstagen wird gekürzt?",
           "expected_doc_ids": [
             "alle/urlaubsantrag",
             "hr/elternzeit"
           ],
           "result": {
-            "answer": "Bei neun Monaten Elternzeit kann der Urlaubsanspruch um neun Zwölftel gekürzt werden, also um drei Zwölftel. Das Unternehmen macht von dieser Kürzung Gebrauch, außer bei Teilzeit-Arbeit während der Elternzeit [hr/elternzeit#Urlaub während der Elternzeit]. Bereits entstandener Urlaub wird auf das Jahr nach der Rückkehr übertragen [hr/elternzeit#Urlaub während der Elternzeit].\n\nEine konkrete Urlaubstageanzahl lässt sich aus den Dokumenten nicht ableiten, da der Gesamtanspruch dort nicht genannt ist.",
+            "answer": "Bei neun Monaten Elternzeit kann der Urlaub um neun Zwölftel gekürzt werden. Bei 30 Urlaubstagen sind das 22,5 Tage, sodass 7,5 Tage verbleiben. [hr/elternzeit#Urlaub in der Elternzeit]\n\nHinweis: Die Kürzung ist laut Dokument eine Möglichkeit (\"kann\"), und bereits entstandener Urlaub wird nach der Rückkehr gewährt. [hr/elternzeit#Urlaub in der Elternzeit]",
             "citations": [
               {
                 "doc_id": "hr/elternzeit",
-                "title": "Elternzeit und Familienleistungen",
-                "section": "Urlaub während der Elternzeit",
-                "chunk_id": "hr/elternzeit#4"
+                "title": "Elternzeit",
+                "section": "Urlaub in der Elternzeit",
+                "chunk_id": "hr/elternzeit#1"
               }
             ],
             "mode": "classic",
@@ -972,20 +972,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+                  "query": "Ich gehe für neun Monate in Elternzeit. Wie viel von meinen 30 Urlaubstagen wird gekürzt?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1232,
-            "output_tokens": 255,
-            "cost": 0.00025069999999999997,
-            "latency_ms": 1486.4658570004394,
+            "input_tokens": 1167,
+            "output_tokens": 199,
+            "cost": 0.0002162,
+            "latency_ms": 1327.817610988859,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/elternzeit"
-            ]
+              "hr/elternzeit",
+              "alle/urlaubsantrag"
+            ],
+            "route": "",
+            "ttft_ms": 692.6975679962197,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -994,25 +998,25 @@
           "id": "m07",
           "type": "multi",
           "user": "ole",
-          "question": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+          "question": "Mein Passwort ist weg und das Handy mit der Authenticator-App auch. Wie komme ich wieder rein?",
           "expected_doc_ids": [
             "it/passwortrichtlinie",
             "it/mfa"
           ],
           "result": {
-            "answer": "Passwort vergessen: Setzen Sie es selbst über das Portal \"Passwort zurücksetzen\" zurück und bestätigen Sie sich mit der Authenticator-App. Ist das nicht möglich, ruft der IT-Support Sie unter einer im System hinterlegten Nummer zurück [it/passwortrichtlinie#Sperrung und Zurücksetzen].\n\nHandy verloren: Melden Sie sich beim IT-Support unter Durchwahl 300. Nach einer Identitätsprüfung per Rückruf wird der zweite Faktor zurückgesetzt, was bis zu einer Stunde dauern kann. Alternativ können Sie die gespeicherten Wiederherstellungscodes nutzen [it/mfa#Handy verloren oder gewechselt].",
+            "answer": "Das Passwort können Sie im Portal \"Schlüsselbund\" (pw.elbkontor.example) zurücksetzen, dafür brauchen Sie aber den zweiten Faktor aus der App [it/passwortrichtlinie#Zurücksetzen]. Da Ihr Handy weg ist, gehen Sie so vor:\n\n- Rufen Sie den IT-Support unter Durchwahl 300 an. Nach der Identitätsprüfung erfolgt ein Rückruf an die in Ihrer Personalakte hinterlegte Nummer, danach wird der zweite Faktor zurückgesetzt. Das dauert bis zu einer Stunde [it/mfa#Handy verloren oder gewechselt].\n- Außerhalb der Servicezeiten (Mo bis Fr, 06:00 bis 18:00) hilft die IT-Bereitschaft nur bei P1-Fällen. Sonst erfolgt die Bearbeitung am nächsten Werktag [it/mfa#Handy verloren oder gewechselt].\n- Alternativ können Sie die Wiederherstellungscodes verwenden [it/mfa#Handy verloren oder gewechselt].",
             "citations": [
               {
                 "doc_id": "it/passwortrichtlinie",
                 "title": "Passwortrichtlinie",
-                "section": "Sperrung und Zurücksetzen",
-                "chunk_id": "it/passwortrichtlinie#4"
+                "section": "Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#2"
               },
               {
                 "doc_id": "it/mfa",
                 "title": "Mehrfaktor-Anmeldung (MFA)",
                 "section": "Handy verloren oder gewechselt",
-                "chunk_id": "it/mfa#4"
+                "chunk_id": "it/mfa#3"
               }
             ],
             "mode": "classic",
@@ -1020,21 +1024,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+                  "query": "Mein Passwort ist weg und das Handy mit der Authenticator-App auch. Wie komme ich wieder rein?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1377,
-            "output_tokens": 277,
-            "cost": 0.00027620000000000005,
-            "latency_ms": 1567.3459809986525,
+            "input_tokens": 1347,
+            "output_tokens": 644,
+            "cost": 0.00045670000000000004,
+            "latency_ms": 2959.904358998756,
             "found": true,
             "retrieved_doc_ids": [
+              "it/passwortrichtlinie",
               "it/mfa",
-              "it/passwortrichtlinie"
-            ]
+              "it/stoerungsbericht-elko-ausfall-2026-03"
+            ],
+            "route": "",
+            "ttft_ms": 1720.5418609955814,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1043,25 +1051,25 @@
           "id": "m08",
           "type": "multi",
           "user": "fiete",
-          "question": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+          "question": "Gilt der Großkundenrabatt auch für die Zollpauschale und wie hoch ist sie?",
           "expected_doc_ids": [
             "logistik/zollabwicklung",
             "vertrieb/rabattstaffel-grosskunden"
           ],
           "result": {
-            "answer": "Nein. Nebenleistungen wie die Zollabfertigung sind laut Rabattstaffel nicht rabattfähig [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]. Die Zollabfertigungsgebühr unterliegt ausdrücklich nicht der Rabattstaffel für Großkunden [logistik/zollabwicklung#Gebühren].",
+            "answer": "Nein, der Großkundenrabatt gilt nicht für die Zollpauschale. Sie beträgt 45 Euro pro Zollanmeldung und ist auch für Großkunden mit Rabattstaffel nicht rabattfähig [logistik/zollabwicklung#Kosten] [vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar].",
             "citations": [
-              {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Staffel auf Frachtumsatz",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
-              },
               {
                 "doc_id": "logistik/zollabwicklung",
                 "title": "Zollabwicklung",
-                "section": "Gebühren",
-                "chunk_id": "logistik/zollabwicklung#5"
+                "section": "Kosten",
+                "chunk_id": "logistik/zollabwicklung#1"
+              },
+              {
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel Großkunden",
+                "section": "Nicht rabattierbar",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
               }
             ],
             "mode": "classic",
@@ -1069,21 +1077,27 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+                  "query": "Gilt der Großkundenrabatt auch für die Zollpauschale und wie hoch ist sie?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1259,
-            "output_tokens": 147,
-            "cost": 0.0001994,
-            "latency_ms": 1125.9677380003268,
+            "input_tokens": 1130,
+            "output_tokens": 135,
+            "cost": 0.0001805,
+            "latency_ms": 1165.1400140108308,
             "found": true,
             "retrieved_doc_ids": [
               "vertrieb/rabattstaffel-grosskunden",
-              "logistik/zollabwicklung"
-            ]
+              "vertrieb/kundenakte-nordhafen-frische",
+              "logistik/gefahrgut-handling",
+              "logistik/zollabwicklung",
+              "vertrieb/kundenbewirtung"
+            ],
+            "route": "",
+            "ttft_ms": 666.6767800052185,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1092,7 +1106,7 @@
           "id": "n01",
           "type": "not_found",
           "user": "fiete",
-          "question": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+          "question": "Wie hoch ist der Zuschuss zum Fitnessstudio?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1102,7 +1116,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+                  "query": "Wie hoch ist der Zuschuss zum Fitnessstudio?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
@@ -1111,13 +1125,17 @@
             "input_tokens": 0,
             "output_tokens": 0,
             "cost": 0.0,
-            "latency_ms": 11.718442998244427,
+            "latency_ms": 10.444749001180753,
             "found": false,
             "retrieved_doc_ids": [
               "alle/betriebsrestaurant",
-              "alle/onboarding",
-              "vertrieb/crm-pflege"
-            ]
+              "hr/betriebliche-altersvorsorge",
+              "it/hardware-bestellung",
+              "hr/weiterbildung"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1126,7 +1144,7 @@
           "id": "n02",
           "type": "not_found",
           "user": "mira",
-          "question": "Dürfen Haustiere ins Büro mitgebracht werden?",
+          "question": "Wie hoch ist der Zuschuss für die Bildschirmarbeitsplatz-Brille?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1136,7 +1154,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Dürfen Haustiere ins Büro mitgebracht werden?",
+                  "query": "Wie hoch ist der Zuschuss für die Bildschirmarbeitsplatz-Brille?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
@@ -1145,15 +1163,16 @@
             "input_tokens": 0,
             "output_tokens": 0,
             "cost": 0.0,
-            "latency_ms": 7.823656000255141,
+            "latency_ms": 12.137683006585576,
             "found": false,
             "retrieved_doc_ids": [
-              "hr/gehaltsbaender",
-              "alle/arbeitszeit-homeoffice",
-              "alle/reisekostenrichtlinie",
-              "hr/kuendigungsfristen",
-              "hr/weiterbildung"
-            ]
+              "alle/betriebsrestaurant",
+              "hr/betriebliche-altersvorsorge",
+              "alle/urlaubsantrag"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1162,7 +1181,7 @@
           "id": "n03",
           "type": "not_found",
           "user": "bent",
-          "question": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+          "question": "Wer ist Ansprechperson für die Photovoltaikanlage auf dem Dach von Halle 1?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1172,7 +1191,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+                  "query": "Wer ist Ansprechperson für die Photovoltaikanlage auf dem Dach von Halle 1?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
@@ -1181,14 +1200,17 @@
             "input_tokens": 0,
             "output_tokens": 0,
             "cost": 0.0,
-            "latency_ms": 6.094482996559236,
+            "latency_ms": 17.847694994998164,
             "found": false,
             "retrieved_doc_ids": [
-              "alle/onboarding",
-              "logistik/gefahrgut-handling",
-              "logistik/ladungssicherung",
-              "logistik/lagerordnung"
-            ]
+              "logistik/eskalationsplan-kuehlkette",
+              "alle/brandschutz-notfall",
+              "logistik/lagerordnung",
+              "logistik/vertretung-bereitschaft"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1197,7 +1219,7 @@
           "id": "n04",
           "type": "not_found",
           "user": "ole",
-          "question": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+          "question": "Wann wird das große Betriebssystem-Update auf allen Laptops ausgerollt?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1207,24 +1229,26 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+                  "query": "Wann wird das große Betriebssystem-Update auf allen Laptops ausgerollt?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 791,
-            "output_tokens": 26,
-            "cost": 9.21e-05,
-            "latency_ms": 780.1049479967332,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 13.119856987032108,
             "found": false,
             "retrieved_doc_ids": [
-              "alle/verhaltenskodex",
-              "alle/reisekostenrichtlinie",
-              "alle/datenschutz-grundlagen",
-              "alle/urlaubsantrag",
-              "alle/onboarding"
-            ]
+              "alle/onboarding",
+              "it/datensicherung",
+              "it/elko-betrieb",
+              "it/hardware-bestellung"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1252,12 +1276,17 @@
             "input_tokens": 0,
             "output_tokens": 0,
             "cost": 0.0,
-            "latency_ms": 11.888586996064987,
+            "latency_ms": 18.76814699789975,
             "found": false,
             "retrieved_doc_ids": [
+              "alle/betriebsrestaurant",
+              "vertrieb/rabattstaffel-grosskunden",
               "vertrieb/provisionsmodell",
-              "vertrieb/rabattstaffel-grosskunden"
-            ]
+              "vertrieb/angebotsprozess"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1266,7 +1295,7 @@
           "id": "p02",
           "type": "permission",
           "user": "ole",
-          "question": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+          "question": "Wie hoch ist die Bereitschaftspauschale für die IT pro Woche?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1276,23 +1305,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+                  "query": "Wie hoch ist die Bereitschaftspauschale für die IT pro Woche?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 1155,
-            "output_tokens": 26,
-            "cost": 0.0001285,
-            "latency_ms": 882.7305960003287,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0,
+            "latency_ms": 23.14738200220745,
             "found": false,
             "retrieved_doc_ids": [
+              "it/bereitschaftsdienst",
               "alle/urlaubsantrag",
-              "alle/onboarding",
-              "alle/arbeitszeit-homeoffice",
-              "it/datensicherung"
-            ]
+              "it/it-support-tickets"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1301,7 +1332,7 @@
           "id": "p03",
           "type": "permission",
           "user": "bent",
-          "question": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+          "question": "Welchen Rabatt bekommt ein Großkunde ab 500.000 Euro Frachtumsatz?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1311,24 +1342,27 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+                  "query": "Welchen Rabatt bekommt ein Großkunde ab 500.000 Euro Frachtumsatz?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
               }
             ],
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "cost": 0.0,
-            "latency_ms": 11.508971998409834,
+            "input_tokens": 1152,
+            "output_tokens": 26,
+            "cost": 0.0001282,
+            "latency_ms": 895.8048490021611,
             "found": false,
             "retrieved_doc_ids": [
               "logistik/zollabwicklung",
-              "logistik/gefahrgut-handling",
-              "alle/onboarding",
               "logistik/reklamation-transportschaden",
-              "alle/verhaltenskodex"
-            ]
+              "alle/reisekostenrichtlinie",
+              "alle/betriebsrestaurant",
+              "logistik/gefahrgut-handling"
+            ],
+            "route": "",
+            "ttft_ms": 638.1128020002507,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1337,7 +1371,7 @@
           "id": "p04",
           "type": "permission",
           "user": "katja",
-          "question": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+          "question": "Wie viel Zulage bekommt die Gefahrgutbeauftragte pro Monat?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -1347,7 +1381,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+                  "query": "Wie viel Zulage bekommt die Gefahrgutbeauftragte pro Monat?",
                   "k": 5
                 },
                 "summary": "5 Treffer"
@@ -1356,14 +1390,17 @@
             "input_tokens": 0,
             "output_tokens": 0,
             "cost": 0.0,
-            "latency_ms": 7.490803000109736,
+            "latency_ms": 10.685553002986126,
             "found": false,
             "retrieved_doc_ids": [
-              "alle/betriebsrestaurant",
               "vertrieb/rabattstaffel-grosskunden",
-              "vertrieb/vertragsvorlagen",
-              "alle/urlaubsantrag"
-            ]
+              "alle/onboarding",
+              "alle/betriebsrestaurant",
+              "alle/datenschutz-grundlagen"
+            ],
+            "route": "",
+            "ttft_ms": null,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1374,14 +1411,14 @@
       "metrics": {
         "questions": 30,
         "hit_rate_at_5": 1.0,
-        "full_coverage": 1.0,
+        "full_coverage": 0.9545454545454546,
         "citation_correctness": 1.0,
         "permission_leaks": 0,
-        "avg_latency_ms": 3494.0569514995636,
-        "p95_latency_ms": 5246.696844153121,
-        "input_tokens": 163273,
-        "output_tokens": 13496,
-        "total_cost_usd": 0.0230753,
+        "avg_latency_ms": 3048.535594565328,
+        "p95_latency_ms": 5416.250406189644,
+        "input_tokens": 135537,
+        "output_tokens": 11187,
+        "total_cost_usd": 0.0191472,
         "by_type": {
           "single": {
             "n": 14,
@@ -1406,18 +1443,24 @@
           "id": "s01",
           "type": "single",
           "user": "mira",
-          "question": "Wie hoch ist der Arbeitgeberzuschuss zur betrieblichen Altersvorsorge?",
+          "question": "Wie viel Prozent legt die Firma bei der bAV obendrauf und bis zu welcher Umwandlung gilt das?",
           "expected_doc_ids": [
             "hr/betriebliche-altersvorsorge"
           ],
           "result": {
-            "answer": "Der Arbeitgeber zahlt einen Zuschuss von 20 Prozent auf den umgewandelten Betrag. Er liegt damit über der gesetzlichen Mindestförderung von 15 Prozent. Der Zuschuss wird für Beiträge bis zu 300 Euro pro Monat gezahlt [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss].\n\nZusätzlich erhalten Beschäftigte, die seit mindestens fünf Jahren im Unternehmen sind, einen festen Basisbeitrag von 40 Euro pro Monat, auch wenn sie nichts selbst einzahlen [hr/betriebliche-altersvorsorge#Arbeitgeberzuschuss].",
+            "answer": "Die Firma legt 20 Prozent auf die Entgeltumwandlung obendrauf. Gefördert wird eine Umwandlung bis 250 Euro im Monat, der maximale Firmenzuschuss liegt also bei 50 Euro im Monat [hr/betriebliche-altersvorsorge#Zuschuss].\n\nHinweis: Ab 2027 ist ein Zuschuss von 25 Prozent geplant. Dieser Beschluss der Geschäftsführung vom 08.10.2026 ist laut Dokument noch nicht in Kraft [hr/betriebliche-altersvorsorge#Teilzeit und Elternzeit].",
             "citations": [
               {
                 "doc_id": "hr/betriebliche-altersvorsorge",
-                "title": "Betriebliche Altersvorsorge",
-                "section": "Arbeitgeberzuschuss",
-                "chunk_id": "hr/betriebliche-altersvorsorge#1"
+                "title": "Betriebliche Altersvorsorge (bAV)",
+                "section": "Zuschuss",
+                "chunk_id": "hr/betriebliche-altersvorsorge#0"
+              },
+              {
+                "doc_id": "hr/betriebliche-altersvorsorge",
+                "title": "Betriebliche Altersvorsorge (bAV)",
+                "section": "Teilzeit und Elternzeit",
+                "chunk_id": "hr/betriebliche-altersvorsorge#2"
               }
             ],
             "mode": "agentic",
@@ -1425,27 +1468,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Arbeitgeberzuschuss betriebliche Altersvorsorge",
+                  "query": "betriebliche Altersvorsorge Arbeitgeberzuschuss Prozent Entgeltumwandlung",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "hr/betriebliche-altersvorsorge"
-                },
-                "summary": "7 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6432,
-            "output_tokens": 463,
-            "cost": 0.0008747000000000001,
-            "latency_ms": 3272.876171999087,
+            "input_tokens": 3119,
+            "output_tokens": 337,
+            "cost": 0.0004804,
+            "latency_ms": 2271.47088899801,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/betriebliche-altersvorsorge"
-            ]
+              "hr/betriebliche-altersvorsorge",
+              "hr/gehaltsbaender"
+            ],
+            "route": "",
+            "ttft_ms": 1584.0065959928324,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1454,24 +1494,18 @@
           "id": "s02",
           "type": "single",
           "user": "mira",
-          "question": "Welche Kündigungsfrist gilt in der Probezeit?",
+          "question": "Wie viele Feedbackgespräche gibt es in der Probezeit und welches Formular nutze ich dafür?",
           "expected_doc_ids": [
-            "hr/kuendigungsfristen"
+            "hr/probezeit-feedback"
           ],
           "result": {
-            "answer": "In der Probezeit (sechs Monate) kann das Arbeitsverhältnis von beiden Seiten mit einer Frist von zwei Wochen gekündigt werden. Die Kündigung muss schriftlich erfolgen; eine Kündigung per E-Mail ist unwirksam. [hr/kuendigungsfristen#Probezeit]\n\nBei befristeten Verträgen unter einem Jahr kann die Probezeit auf drei Monate verkürzt werden. [hr/probezeit-feedback#Dauer der Probezeit]",
+            "answer": "Es gibt drei Pflichtgespräche in der Probezeit: nach 6 Wochen, nach 3 Monaten und nach 5 Monaten [hr/probezeit-feedback#Feedbackgespräche]. Dokumentiert wird mit dem Formular „PZ-2“ in der Personalakte [hr/probezeit-feedback#Feedbackgespräche].",
             "citations": [
-              {
-                "doc_id": "hr/kuendigungsfristen",
-                "title": "Kündigungsfristen",
-                "section": "Probezeit",
-                "chunk_id": "hr/kuendigungsfristen#1"
-              },
               {
                 "doc_id": "hr/probezeit-feedback",
                 "title": "Leitfaden Probezeit und Feedbackgespräche",
-                "section": "Dauer der Probezeit",
-                "chunk_id": "hr/probezeit-feedback#1"
+                "section": "Feedbackgespräche",
+                "chunk_id": "hr/probezeit-feedback#2"
               }
             ],
             "mode": "agentic",
@@ -1479,20 +1513,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Kündigungsfrist Probezeit"
+                  "query": "Feedbackgespräche Probezeit Formular",
+                  "k": 5
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 2927,
-            "output_tokens": 249,
-            "cost": 0.0004172,
-            "latency_ms": 2009.095885005081,
+            "input_tokens": 2951,
+            "output_tokens": 215,
+            "cost": 0.00040260000000000003,
+            "latency_ms": 1816.4056099922163,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/kuendigungsfristen",
               "hr/probezeit-feedback"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 1449.34187499166,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1501,23 +1538,17 @@
           "id": "s03",
           "type": "single",
           "user": "mira",
-          "question": "Wie hoch ist das jährliche Bildungsbudget und was wird gefördert?",
+          "question": "Wer gibt eine Weiterbildung für 800 Euro aus dem Lerntopf frei?",
           "expected_doc_ids": [
             "hr/weiterbildung"
           ],
           "result": {
-            "answer": "Das jährliche Bildungsbudget beträgt 1.200 Euro pro Mitarbeiterin bzw. Mitarbeiter, dazu bis zu fünf bezahlte Weiterbildungstage. Es verfällt am Jahresende und wird bei Teilzeit anteilig gewährt. Führungskräfte ab E7 erhalten zusätzlich 800 Euro für Führungsseminare [hr/weiterbildung#Bildungsbudget].\n\nGefördert werden Seminare, Online-Kurse, Fachliteratur, Zertifizierungen und Konferenzen mit beruflichem Bezug. Sprachkurse werden gefördert, wenn Englisch oder Polnisch für die Tätigkeit nötig ist [hr/weiterbildung#Was wird gefördert]. Pflichtqualifikationen wie Gabelstaplerschein, ADR-Schein oder Ersthelferausbildung trägt das Unternehmen vollständig, sie zählen nicht auf das Budget [hr/weiterbildung#Was wird gefördert].",
+            "answer": "Eine Weiterbildung über 800 Euro gibt die Bereichsleitung frei. Freigaben bis 300 Euro erfolgen durch die Teamleitung, Beträge über 1.200 Euro durch die Personalleiterin Greta Hartwig. Der Antrag muss mindestens vier Wochen vor Beginn im Lotse-Formular \"WB-1\" eingereicht werden. [hr/weiterbildung#Freigabe]",
             "citations": [
               {
                 "doc_id": "hr/weiterbildung",
-                "title": "Weiterbildung und Bildungsbudget",
-                "section": "Bildungsbudget",
-                "chunk_id": "hr/weiterbildung#0"
-              },
-              {
-                "doc_id": "hr/weiterbildung",
-                "title": "Weiterbildung und Bildungsbudget",
-                "section": "Was wird gefördert",
+                "title": "Weiterbildung",
+                "section": "Freigabe",
                 "chunk_id": "hr/weiterbildung#1"
               }
             ],
@@ -1526,27 +1557,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "jährliches Bildungsbudget Weiterbildung Förderung",
+                  "query": "Weiterbildung 800 Euro Lerntopf Freigabe",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "hr/weiterbildung"
-                },
-                "summary": "7 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6549,
-            "output_tokens": 621,
-            "cost": 0.0009654,
-            "latency_ms": 4090.6883159987046,
+            "input_tokens": 2953,
+            "output_tokens": 247,
+            "cost": 0.0004188,
+            "latency_ms": 2297.195307997754,
             "found": true,
             "retrieved_doc_ids": [
-              "hr/weiterbildung"
-            ]
+              "hr/weiterbildung",
+              "hr/gehaltsbaender",
+              "hr/bewerbungsprozess"
+            ],
+            "route": "",
+            "ttft_ms": 1780.2604399912525,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1555,24 +1584,18 @@
           "id": "s04",
           "type": "single",
           "user": "ole",
-          "question": "Wie lang muss ein Passwort mindestens sein und wie oft muss ich es wechseln?",
+          "question": "Welche Durchwahl hat die IT-Bereitschaft am Wochenende?",
           "expected_doc_ids": [
-            "it/passwortrichtlinie"
+            "it/bereitschaftsdienst"
           ],
           "result": {
-            "answer": "Ein Passwort muss mindestens 14 Zeichen lang sein [it/passwortrichtlinie#Anforderungen an Passwörter]. Ein regelmäßiger Wechsel ist nicht mehr vorgeschrieben. Sofort geändert werden muss es jedoch, wenn der Verdacht besteht, dass es bekannt geworden ist, oder wenn die IT dazu auffordert [it/passwortrichtlinie#Wechsel].",
+            "answer": "Die IT-Bereitschaft ist am Wochenende und an Feiertagen unter **Durchwahl 3077** erreichbar. Die Nummer leitet auf das Bereitschaftshandy weiter. [it/bereitschaftsdienst#Durchwahlen]",
             "citations": [
               {
-                "doc_id": "it/passwortrichtlinie",
-                "title": "Passwortrichtlinie",
-                "section": "Anforderungen an Passwörter",
-                "chunk_id": "it/passwortrichtlinie#1"
-              },
-              {
-                "doc_id": "it/passwortrichtlinie",
-                "title": "Passwortrichtlinie",
-                "section": "Wechsel",
-                "chunk_id": "it/passwortrichtlinie#2"
+                "doc_id": "it/bereitschaftsdienst",
+                "title": "Bereitschaftsdienst IT",
+                "section": "Durchwahlen",
+                "chunk_id": "it/bereitschaftsdienst#1"
               }
             ],
             "mode": "agentic",
@@ -1580,21 +1603,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Passwort Mindestlänge Wechsel Intervall",
-                  "k": 5
+                  "query": "IT-Bereitschaft Wochenende Durchwahl"
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 3031,
-            "output_tokens": 248,
-            "cost": 0.00042710000000000003,
-            "latency_ms": 2024.5532430053572,
+            "input_tokens": 3055,
+            "output_tokens": 162,
+            "cost": 0.0003865,
+            "latency_ms": 1953.60883801186,
             "found": true,
             "retrieved_doc_ids": [
-              "it/passwortrichtlinie",
-              "it/mfa"
-            ]
+              "it/bereitschaftsdienst",
+              "it/it-support-tickets",
+              "alle/standortplan-durchwahlen"
+            ],
+            "route": "",
+            "ttft_ms": 1667.6850590010872,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1603,30 +1629,24 @@
           "id": "s05",
           "type": "single",
           "user": "ole",
-          "question": "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
+          "question": "Wie viele Zeichen muss mein Passwort haben und muss ich es regelmäßig ändern?",
           "expected_doc_ids": [
-            "it/it-support-tickets"
+            "it/passwortrichtlinie"
           ],
           "result": {
-            "answer": "Bei einer kritischen Störung (Priorität 1, z. B. Ausfall von Lagerverwaltungssystem oder Scannern) reagiert der IT-Support innerhalb von 30 Minuten. Die Lösung wird innerhalb von 4 Stunden angestrebt [it/it-support-tickets#Prioritäten und Reaktionszeiten].\n\nWird die Reaktionszeit überschritten, eskaliert das System automatisch an die IT-Leitung [it/it-support-tickets#Eskalation]. Für kritische Störungen in Disposition und Lager gibt es außerhalb der Support-Zeiten (montags bis freitags 7:00 bis 18:00 Uhr, Durchwahl 300) eine Notfallbereitschaft rund um die Uhr [it/it-support-tickets#Erreichbarkeit].",
+            "answer": "Ihr Passwort muss mindestens 14 Zeichen lang sein [it/passwortrichtlinie#Anforderungen]. Ein regelmäßiger Wechsel ist nicht mehr vorgeschrieben. Sie müssen es nur bei Verdacht auf Missbrauch oder nach einem Vorfall ändern [it/passwortrichtlinie#Anforderungen]. Die Richtlinie gilt seit dem 01.09.2025 [it/passwortrichtlinie#Passwortrichtlinie].",
             "citations": [
               {
-                "doc_id": "it/it-support-tickets",
-                "title": "IT-Support und Ticketsystem",
-                "section": "Prioritäten und Reaktionszeiten",
-                "chunk_id": "it/it-support-tickets#2"
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Anforderungen",
+                "chunk_id": "it/passwortrichtlinie#1"
               },
               {
-                "doc_id": "it/it-support-tickets",
-                "title": "IT-Support und Ticketsystem",
-                "section": "Eskalation",
-                "chunk_id": "it/it-support-tickets#3"
-              },
-              {
-                "doc_id": "it/it-support-tickets",
-                "title": "IT-Support und Ticketsystem",
-                "section": "Erreichbarkeit",
-                "chunk_id": "it/it-support-tickets#0"
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Passwortrichtlinie",
+                "chunk_id": "it/passwortrichtlinie#0"
               }
             ],
             "mode": "agentic",
@@ -1634,21 +1654,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "IT-Support Reaktionszeit kritische Störung",
+                  "query": "Passwort Mindestlänge Zeichen Passwortwechsel regelmäßig ändern",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 2957,
-            "output_tokens": 380,
-            "cost": 0.0004857,
-            "latency_ms": 2382.9087959966273,
+            "input_tokens": 2940,
+            "output_tokens": 285,
+            "cost": 0.0004365,
+            "latency_ms": 2057.7951169980224,
             "found": true,
             "retrieved_doc_ids": [
-              "it/it-support-tickets",
-              "alle/onboarding"
-            ]
+              "it/passwortrichtlinie",
+              "it/mfa"
+            ],
+            "route": "",
+            "ttft_ms": 1552.8968049911782,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1657,24 +1680,18 @@
           "id": "s06",
           "type": "single",
           "user": "ole",
-          "question": "Wie oft werden Backups gemacht und wie lange werden sie aufbewahrt?",
+          "question": "Wie viele Stunden darf die Wiederherstellung von ELKO höchstens dauern?",
           "expected_doc_ids": [
             "it/datensicherung"
           ],
           "result": {
-            "answer": "Die Häufigkeit und Aufbewahrung hängen vom System ab:\n\n**Häufigkeit**\n- Lagerverwaltungs-Datenbank: stündlich inkrementell, nachts vollständig [it/datensicherung#Sicherungsplan]\n- Dateiserver: täglich um 22:00 Uhr [it/datensicherung#Sicherungsplan]\n- Postfächer: täglich [it/datensicherung#Sicherungsplan]\n\n**Aufbewahrung**\n- Postfächer: 30 Tage [it/datensicherung#Sicherungsplan]\n- Wöchentliche Vollsicherungen: 12 Wochen [it/datensicherung#Sicherungsplan]\n- Monatliche Sicherungen: 12 Monate [it/datensicherung#Sicherungsplan]\n- Jahressicherungen: zehn Jahre, soweit steuerrechtliche Fristen gelten [it/datensicherung#Sicherungsplan]\n\nFür die Wiederherstellung einzelner gelöschter Dateien gilt ein Zeitraum von 90 Tagen [it/datensicherung#Wiederherstellung einzelner Dateien].",
+            "answer": "Für ELKO gilt ein Wiederherstellungsziel (RTO) von 4 Stunden [it/datensicherung#Wiederherstellung]. Der letzte Test am 06.10.2026 dauerte 2 Stunden 50 Minuten [it/datensicherung#Wiederherstellung].",
             "citations": [
               {
                 "doc_id": "it/datensicherung",
                 "title": "Datensicherung und Wiederherstellung",
-                "section": "Sicherungsplan",
-                "chunk_id": "it/datensicherung#2"
-              },
-              {
-                "doc_id": "it/datensicherung",
-                "title": "Datensicherung und Wiederherstellung",
-                "section": "Wiederherstellung einzelner Dateien",
-                "chunk_id": "it/datensicherung#6"
+                "section": "Wiederherstellung",
+                "chunk_id": "it/datensicherung#3"
               }
             ],
             "mode": "agentic",
@@ -1682,40 +1699,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Backup Häufigkeit Aufbewahrung",
-                  "k": 5
+                  "query": "Wiederherstellung ELKO maximale Dauer Stunden RTO"
                 },
-                "summary": "Keine Treffer."
-              },
-              {
-                "tool": "search",
-                "args": {
-                  "query": "Backups",
-                  "k": 5
-                },
-                "summary": "Keine Treffer."
-              },
-              {
-                "tool": "list_documents",
-                "args": {},
-                "summary": "15 Zeilen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "it/datensicherung"
-                },
-                "summary": "8 Abschnitte gelesen"
+                "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 7132,
-            "output_tokens": 675,
-            "cost": 0.0010507000000000001,
-            "latency_ms": 4410.525169005268,
+            "input_tokens": 3043,
+            "output_tokens": 178,
+            "cost": 0.0003933,
+            "latency_ms": 2039.7049950115616,
             "found": true,
             "retrieved_doc_ids": [
-              "it/datensicherung"
-            ]
+              "it/datensicherung",
+              "it/mfa",
+              "alle/arbeitszeit-homeoffice"
+            ],
+            "route": "",
+            "ttft_ms": 1763.666593004018,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1724,30 +1725,18 @@
           "id": "s07",
           "type": "single",
           "user": "katja",
-          "question": "Wie wird die Provision ausgezahlt, wenn ich mein Ziel nur teilweise erreiche?",
+          "question": "Ab welcher Marge muss der Vertriebsleiter ein Angebot freigeben?",
           "expected_doc_ids": [
-            "vertrieb/provisionsmodell"
+            "vertrieb/angebotsprozess"
           ],
           "result": {
-            "answer": "Die Auszahlung richtet sich nach der Zielerreichung:\n\n- **unter 80 Prozent:** 0 Prozent Auszahlung.\n- **80 bis 99 Prozent:** linear von 50 bis 99 Prozent der Provision.\n- **100 Prozent:** 100 Prozent der Provision.\n- **101 bis 150 Prozent:** je Prozentpunkt 2 Prozent mehr.\n- **über 150 Prozent:** gedeckelt bei 200 Prozent. [vertrieb/provisionsmodell#Auszahlung nach Zielerreichung]\n\nDie Provision wird quartalsweise abgerechnet und mit dem Gehalt des Folgemonats ausgezahlt. Maßgeblich sind bezahlte Rechnungen. Gutschriften und Stornierungen werden verrechnet. [vertrieb/provisionsmodell#Abrechnung]\n\nDie genaue Berechnung steht im Provisionsportal. [vertrieb/provisionsmodell#Rechenbeispiel]",
+            "answer": "Der Vertriebsleiter Tjark Rohwedder muss ein Angebot freigeben, wenn die Marge unter 12 Prozent liegt. Die Zielmarge liegt bei 14 Prozent. Unter 6 Prozent ist zusätzlich die Geschäftsführerin Henrike Wulff einzubeziehen [vertrieb/angebotsprozess#Marge und Freigabe].",
             "citations": [
               {
-                "doc_id": "vertrieb/provisionsmodell",
-                "title": "Provisionsmodell Vertrieb 2026",
-                "section": "Auszahlung nach Zielerreichung",
-                "chunk_id": "vertrieb/provisionsmodell#2"
-              },
-              {
-                "doc_id": "vertrieb/provisionsmodell",
-                "title": "Provisionsmodell Vertrieb 2026",
-                "section": "Abrechnung",
-                "chunk_id": "vertrieb/provisionsmodell#3"
-              },
-              {
-                "doc_id": "vertrieb/provisionsmodell",
-                "title": "Provisionsmodell Vertrieb 2026",
-                "section": "Rechenbeispiel",
-                "chunk_id": "vertrieb/provisionsmodell#6"
+                "doc_id": "vertrieb/angebotsprozess",
+                "title": "Angebotsprozess",
+                "section": "Marge und Freigabe",
+                "chunk_id": "vertrieb/angebotsprozess#1"
               }
             ],
             "mode": "agentic",
@@ -1755,27 +1744,33 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Provision Auszahlung Zielerreichung teilweise",
-                  "k": 5
+                  "query": "Marge Freigabe Angebot Vertriebsleiter"
                 },
                 "summary": "5 Zeilen"
               },
               {
                 "tool": "read_document",
                 "args": {
-                  "doc_id": "vertrieb/provisionsmodell"
+                  "doc_id": "vertrieb/angebotsprozess"
                 },
-                "summary": "7 Abschnitte gelesen"
+                "summary": "4 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6532,
-            "output_tokens": 815,
-            "cost": 0.0010607000000000001,
-            "latency_ms": 4934.168783998757,
+            "input_tokens": 5536,
+            "output_tokens": 335,
+            "cost": 0.0007211,
+            "latency_ms": 2941.4611859974684,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/provisionsmodell"
-            ]
+              "vertrieb/angebotsprozess",
+              "vertrieb/vertrieb-reisekosten",
+              "vertrieb/vertragsvorlagen",
+              "vertrieb/provisionsmodell",
+              "vertrieb/kunden-sla-uebersicht"
+            ],
+            "route": "",
+            "ttft_ms": 2562.9026160022477,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1784,18 +1779,30 @@
           "id": "s08",
           "type": "single",
           "user": "katja",
-          "question": "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+          "question": "Welche Vertragsstrafe droht bei Nordhafen Frische, wenn ich eine Kühlketten-Unterbrechung zu spät melde?",
           "expected_doc_ids": [
-            "vertrieb/crm-pflege"
+            "vertrieb/kundenakte-nordhafen-frische"
           ],
           "result": {
-            "answer": "Für jeden Kunden müssen im CRM (Kundenkompass) folgende Felder gepflegt sein: Firmenname, Rechtsform, Rechnungsadresse, Branche, Umsatzsteuer-ID, Hauptansprechpartner und Zahlungsziel [vertrieb/crm-pflege#Pflichtfelder]. Für Großkunden kommen Rahmenvertragsnummer, Vertragsende und Rabattstufe hinzu [vertrieb/crm-pflege#Pflichtfelder].",
+            "answer": "Bei Nordhafen Frische droht eine Vertragsstrafe von 750 Euro je Vorfall, wenn eine Kühlkettenunterbrechung (über 30 Minuten oder über 8 Grad) nicht binnen 60 Minuten an den Kunden gemeldet wird [vertrieb/kundenakte-nordhafen-frische#SLA und Vertragsstrafe].\n\nZusätzlich gilt laut Zusatzvereinbarung nach dem Vorfall vom 17.02.2026: Das Temperaturprotokoll als PDF ist binnen 24 Stunden nach jedem Vorfall zu liefern [vertrieb/kundenakte-nordhafen-frische#Historie]. Eskalationen bei Kühlketten-Vorfällen gehen immer an die Key Accountin Katja Sommer und die Hallenleitung Halle 2 [vertrieb/kundenakte-nordhafen-frische#Ansprechpersonen beim Kunden].",
             "citations": [
               {
-                "doc_id": "vertrieb/crm-pflege",
-                "title": "CRM-Pflege",
-                "section": "Pflichtfelder",
-                "chunk_id": "vertrieb/crm-pflege#1"
+                "doc_id": "vertrieb/kundenakte-nordhafen-frische",
+                "title": "Kundenakte Nordhafen Frische",
+                "section": "SLA und Vertragsstrafe",
+                "chunk_id": "vertrieb/kundenakte-nordhafen-frische#2"
+              },
+              {
+                "doc_id": "vertrieb/kundenakte-nordhafen-frische",
+                "title": "Kundenakte Nordhafen Frische",
+                "section": "Historie",
+                "chunk_id": "vertrieb/kundenakte-nordhafen-frische#5"
+              },
+              {
+                "doc_id": "vertrieb/kundenakte-nordhafen-frische",
+                "title": "Kundenakte Nordhafen Frische",
+                "section": "Ansprechpersonen beim Kunden",
+                "chunk_id": "vertrieb/kundenakte-nordhafen-frische#4"
               }
             ],
             "mode": "agentic",
@@ -1803,20 +1810,23 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "CRM Pflichtfelder"
+                  "query": "Nordhafen Frische Vertragsstrafe Kühlkette Meldung verspätet"
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 2957,
-            "output_tokens": 243,
-            "cost": 0.0004172,
-            "latency_ms": 2075.0836329971207,
+            "input_tokens": 3069,
+            "output_tokens": 423,
+            "cost": 0.0005184000000000001,
+            "latency_ms": 2837.3192569997627,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/crm-pflege",
-              "vertrieb/angebotsprozess"
-            ]
+              "vertrieb/kundenakte-nordhafen-frische",
+              "vertrieb/provisionsmodell"
+            ],
+            "route": "",
+            "ttft_ms": 1812.8379300032975,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1825,24 +1835,24 @@
           "id": "s09",
           "type": "single",
           "user": "katja",
-          "question": "Wie funktioniert das Jobrad und das Deutschlandticket?",
+          "question": "Bis wann ist Annahmeschluss für Seeger Pharma Großhandel und an welchem Tor wird angeliefert?",
           "expected_doc_ids": [
-            "alle/betriebsrestaurant"
+            "vertrieb/kunden-sla-uebersicht"
           ],
           "result": {
-            "answer": "**Jobrad (Dienstrad-Leasing):**\n- Nach der Probezeit kann ein Dienstrad über Gehaltsumwandlung geleast werden [alle/betriebsrestaurant#Jobrad].\n- Die Leasingdauer beträgt 36 Monate. Der Arbeitgeber übernimmt die Versicherung, und das Rad darf privat genutzt werden [alle/betriebsrestaurant#Jobrad].\n- Der maximale Bruttolistenpreis beträgt 4.500 Euro [alle/betriebsrestaurant#Jobrad].\n- Anträge laufen über die Personalabteilung [alle/betriebsrestaurant#Jobrad].\n\n**Deutschlandticket:**\n- Das Unternehmen bezuschusst das Ticket mit 25 Euro pro Monat [alle/betriebsrestaurant#Deutschlandticket].\n- Der Zuschuss wird automatisch mit dem Gehalt ausgezahlt, sobald ein Nachweis im Portal hochgeladen wurde [alle/betriebsrestaurant#Deutschlandticket].",
+            "answer": "Annahmeschluss für Seeger Pharma Großhandel (KD-10517) ist 12:00 Uhr. Angeliefert wird an Tor 5 in Halle 2 [vertrieb/kunden-sla-uebersicht#Tabelle] [alle/standortplan-durchwahlen#Hallen und Tore].",
             "citations": [
               {
-                "doc_id": "alle/betriebsrestaurant",
-                "title": "Betriebsrestaurant und Sozialleistungen",
-                "section": "Jobrad",
-                "chunk_id": "alle/betriebsrestaurant#2"
+                "doc_id": "vertrieb/kunden-sla-uebersicht",
+                "title": "SLA-Übersicht der Sonderkunden",
+                "section": "Tabelle",
+                "chunk_id": "vertrieb/kunden-sla-uebersicht#1"
               },
               {
-                "doc_id": "alle/betriebsrestaurant",
-                "title": "Betriebsrestaurant und Sozialleistungen",
-                "section": "Deutschlandticket",
-                "chunk_id": "alle/betriebsrestaurant#3"
+                "doc_id": "alle/standortplan-durchwahlen",
+                "title": "Standortplan Billbrook und Durchwahlen",
+                "section": "Hallen und Tore",
+                "chunk_id": "alle/standortplan-durchwahlen#0"
               }
             ],
             "mode": "agentic",
@@ -1850,37 +1860,32 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Jobrad Leasing Ablauf"
-                },
-                "summary": "5 Zeilen"
-              },
-              {
-                "tool": "search",
-                "args": {
-                  "query": "Deutschlandticket Zuschuss Ablauf"
+                  "query": "Annahmeschluss Seeger Pharma Großhandel Anlieferung Tor",
+                  "k": 5
                 },
                 "summary": "5 Zeilen"
               },
               {
                 "tool": "read_document",
                 "args": {
-                  "doc_id": "alle/betriebsrestaurant"
+                  "doc_id": "vertrieb/kunden-sla-uebersicht"
                 },
-                "summary": "8 Abschnitte gelesen"
+                "summary": "5 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 8223,
-            "output_tokens": 655,
-            "cost": 0.0011498,
-            "latency_ms": 3849.451975998818,
+            "input_tokens": 6205,
+            "output_tokens": 318,
+            "cost": 0.0007795,
+            "latency_ms": 2964.68438100419,
             "found": true,
             "retrieved_doc_ids": [
-              "alle/betriebsrestaurant",
-              "vertrieb/angebotsprozess",
-              "alle/onboarding",
-              "vertrieb/vertragsvorlagen",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/kunden-sla-uebersicht",
+              "alle/standortplan-durchwahlen",
+              "vertrieb/kundenakte-nordhafen-frische"
+            ],
+            "route": "",
+            "ttft_ms": 2633.852824001224,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1889,18 +1894,30 @@
           "id": "s10",
           "type": "single",
           "user": "bent",
-          "question": "Was muss bei der täglichen Abfahrtskontrolle des Fahrzeugs geprüft werden?",
+          "question": "Was bedeutet K3 in ELKO?",
           "expected_doc_ids": [
-            "logistik/fahrzeugpruefung"
+            "logistik/elko-statuscodes"
           ],
           "result": {
-            "answer": "Vor jeder Fahrt sind laut Dokument folgende Punkte zu prüfen:\n\n- Reifen und Reifendruck\n- Beleuchtung\n- Bremsen\n- Ölstand und Flüssigkeiten\n- Spiegel\n- Warnweste\n- Warndreieck\n- Verbandskasten\n- Ladungssicherung\n\n[logistik/fahrzeugpruefung#Tägliche Abfahrtskontrolle]",
+            "answer": "K3 in ELKO ist der Statuscode für „gesperrt, Klärfall“. Die Ware darf nicht ausgeliefert oder bewegt werden, außer in die Sperrzone [logistik/elko-statuscodes#Bedeutung der Statuscodes]. Bei K3 muss ein Sperrgrund angegeben werden: S1 Temperatur, S2 Beschädigung, S3 Etikett fehlt oder falsch, S4 Gefahrgut-Dokumente fehlen [logistik/elko-statuscodes#Sperrgründe (nur mit K3)]. Die Schichtleitung wird über ein K3 informiert, und ein K3 älter als 48 Stunden erscheint rot im Leitstand [logistik/elko-statuscodes#Praxis].",
             "citations": [
               {
-                "doc_id": "logistik/fahrzeugpruefung",
-                "title": "Fahrzeugprüfung und Fahrerpflichten",
-                "section": "Tägliche Abfahrtskontrolle",
-                "chunk_id": "logistik/fahrzeugpruefung#0"
+                "doc_id": "logistik/elko-statuscodes",
+                "title": "ELKO-Statuscodes und Sperrgründe",
+                "section": "Bedeutung der Statuscodes",
+                "chunk_id": "logistik/elko-statuscodes#0"
+              },
+              {
+                "doc_id": "logistik/elko-statuscodes",
+                "title": "ELKO-Statuscodes und Sperrgründe",
+                "section": "Sperrgründe (nur mit K3)",
+                "chunk_id": "logistik/elko-statuscodes#1"
+              },
+              {
+                "doc_id": "logistik/elko-statuscodes",
+                "title": "ELKO-Statuscodes und Sperrgründe",
+                "section": "Praxis",
+                "chunk_id": "logistik/elko-statuscodes#2"
               }
             ],
             "mode": "agentic",
@@ -1908,21 +1925,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "tägliche Abfahrtskontrolle Fahrzeug prüfen",
-                  "k": 5
+                  "query": "K3 ELKO Bedeutung"
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 3165,
-            "output_tokens": 247,
-            "cost": 0.00044,
-            "latency_ms": 2211.578948001261,
+            "input_tokens": 2991,
+            "output_tokens": 334,
+            "cost": 0.0004661,
+            "latency_ms": 2371.573365991935,
             "found": true,
             "retrieved_doc_ids": [
-              "logistik/fahrzeugpruefung",
+              "logistik/elko-statuscodes",
+              "logistik/zollabwicklung",
               "logistik/gefahrgut-handling"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 1495.5947499984177,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1931,36 +1951,18 @@
           "id": "s11",
           "type": "single",
           "user": "bent",
-          "question": "Welche Fristen gelten für die Meldung eines Transportschadens?",
+          "question": "Welche Mängelklasse bedeutet im Fahrer-Check ein Fahrverbot?",
           "expected_doc_ids": [
-            "logistik/reklamation-transportschaden"
+            "logistik/fahrzeugpruefung"
           ],
           "result": {
-            "answer": "Die Fristen für die Meldung und Bearbeitung eines Transportschadens sind:\n\n- **Offensichtliche Schäden:** Der Empfänger muss sie sofort bei Ablieferung auf dem Lieferschein vermerken [logistik/reklamation-transportschaden#Wenn ein Schaden auftritt].\n- **Nicht erkennbare Schäden:** Sie müssen innerhalb von sieben Tagen nach Ablieferung schriftlich angezeigt werden [logistik/reklamation-transportschaden#Wenn ein Schaden auftritt].\n- **Eingangsbestätigung an den Kunden:** innerhalb von einem Arbeitstag [logistik/reklamation-transportschaden#Meldung im Haus].\n- **Erste Rückmeldung an den Kunden:** spätestens nach fünf Arbeitstagen [logistik/reklamation-transportschaden#Fristen].\n- **Endgültige Entscheidung:** innerhalb von 30 Tagen [logistik/reklamation-transportschaden#Fristen].\n- **Meldung an die Transportversicherung** (bei Schäden über 5.000 Euro oder Diebstahl): binnen drei Tagen durch die Schadenabteilung [logistik/reklamation-transportschaden#Versicherung].\n- **Verjährung von Ansprüchen aus Frachtverträgen:** ein Jahr, bei Vorsatz drei Jahre [logistik/reklamation-transportschaden#Fristen].",
+            "answer": "Im Fahrer-Check bedeutet die Mängelklasse **M1** ein Fahrverbot. Beispiele sind Bremsen oder Reifen unter dem Mindestprofil; dann ist sofort die Fuhrparkwerkstatt (Durchwahl 5500) zu informieren. [logistik/fahrzeugpruefung#Mängelklassen]",
             "citations": [
               {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Wenn ein Schaden auftritt",
-                "chunk_id": "logistik/reklamation-transportschaden#0"
-              },
-              {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Meldung im Haus",
-                "chunk_id": "logistik/reklamation-transportschaden#1"
-              },
-              {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Fristen",
-                "chunk_id": "logistik/reklamation-transportschaden#3"
-              },
-              {
-                "doc_id": "logistik/reklamation-transportschaden",
-                "title": "Reklamation und Transportschäden",
-                "section": "Versicherung",
-                "chunk_id": "logistik/reklamation-transportschaden#4"
+                "doc_id": "logistik/fahrzeugpruefung",
+                "title": "Fahrzeugprüfung vor Abfahrt",
+                "section": "Mängelklassen",
+                "chunk_id": "logistik/fahrzeugpruefung#1"
               }
             ],
             "mode": "agentic",
@@ -1968,27 +1970,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Meldung Transportschaden Frist",
-                  "k": 5
+                  "query": "Fahrer-Check Mängelklasse Fahrverbot"
                 },
                 "summary": "5 Zeilen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "logistik/reklamation-transportschaden"
-                },
-                "summary": "8 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6552,
-            "output_tokens": 735,
-            "cost": 0.0010227,
-            "latency_ms": 4236.63935699733,
+            "input_tokens": 3031,
+            "output_tokens": 197,
+            "cost": 0.0004016,
+            "latency_ms": 1996.9919150025817,
             "found": true,
             "retrieved_doc_ids": [
-              "logistik/reklamation-transportschaden"
-            ]
+              "logistik/fahrzeugpruefung",
+              "logistik/ladungssicherung",
+              "logistik/lagerordnung"
+            ],
+            "route": "",
+            "ttft_ms": 1523.3076910080854,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -1997,18 +1996,24 @@
           "id": "s12",
           "type": "single",
           "user": "bent",
-          "question": "Welche Schutzausrüstung ist im Lager Pflicht?",
+          "question": "Warum wurde 2025 auf Schichtmodell B umgestellt?",
           "expected_doc_ids": [
-            "logistik/lagerordnung"
+            "logistik/schichtmodelle"
           ],
           "result": {
-            "answer": "In allen Hallenbereichen des Lagers sind Sicherheitsschuhe der Klasse S3 und eine Warnweste Pflicht. Im Hochregallager kommt ein Schutzhelm hinzu. [logistik/lagerordnung#Zutritt und Schutzausrüstung]",
+            "answer": "Die Umstellung auf Schichtmodell B erfolgte aus drei Gründen:\n\n- **Unfallrisiko:** Nachtschichten in Halle 1 und 3 leisteten nur 9 Prozent der Menge, verursachten aber 31 Prozent der Arbeitsunfälle. Ein Pilot in Halle 3 (Oktober bis Dezember 2024) zeigte 22 Prozent weniger Unfälle. [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt]\n- **Kundenanforderung:** Nordhafen Frische verlangte ein Anlieferfenster ab 04:00 Uhr. [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt]\n- **Kosten:** Der Wegfall der Nachtzuschläge sparte etwa 118.000 Euro pro Jahr. [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt]\n\nDie Geschäftsführung beschloss die Umstellung am 11.02.2025 im Rahmen des Projekts Leuchtturm, mit Zustimmung des Betriebsrats (Betriebsvereinbarung BV 2025/03). [logistik/schichtmodelle#Warum wurde auf Modell B umgestellt] Modell B gilt seit dem 01.04.2025. [logistik/schichtmodelle#Modell B (seit 01.04.2025)]",
             "citations": [
               {
-                "doc_id": "logistik/lagerordnung",
-                "title": "Lagerordnung",
-                "section": "Zutritt und Schutzausrüstung",
-                "chunk_id": "logistik/lagerordnung#1"
+                "doc_id": "logistik/schichtmodelle",
+                "title": "Schichtmodelle A und B",
+                "section": "Warum wurde auf Modell B umgestellt",
+                "chunk_id": "logistik/schichtmodelle#2"
+              },
+              {
+                "doc_id": "logistik/schichtmodelle",
+                "title": "Schichtmodelle A und B",
+                "section": "Modell B (seit 01.04.2025)",
+                "chunk_id": "logistik/schichtmodelle#1"
               }
             ],
             "mode": "agentic",
@@ -2016,30 +2021,29 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Schutzausrüstung Pflicht Lager",
-                  "k": 5
+                  "query": "Umstellung Schichtmodell B 2025"
                 },
                 "summary": "5 Zeilen"
               },
               {
                 "tool": "read_document",
                 "args": {
-                  "doc_id": "logistik/lagerordnung"
+                  "doc_id": "logistik/schichtmodelle"
                 },
-                "summary": "8 Abschnitte gelesen"
+                "summary": "5 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6546,
-            "output_tokens": 320,
-            "cost": 0.0008146000000000001,
-            "latency_ms": 2987.086567998631,
+            "input_tokens": 5535,
+            "output_tokens": 650,
+            "cost": 0.0008785,
+            "latency_ms": 4629.895003992715,
             "found": true,
             "retrieved_doc_ids": [
-              "logistik/lagerordnung",
-              "alle/onboarding",
-              "logistik/gefahrgut-handling",
-              "logistik/ladungssicherung"
-            ]
+              "logistik/schichtmodelle"
+            ],
+            "route": "",
+            "ttft_ms": 3179.135813988978,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2047,25 +2051,19 @@
         {
           "id": "s13",
           "type": "single",
-          "user": "ole",
-          "question": "Wie viele Urlaubstage habe ich und wann verfällt der Resturlaub?",
+          "user": "katja",
+          "question": "In welchem Zeitraum gilt die Urlaubssperre zur Weihnachtsspitze Wintersturm?",
           "expected_doc_ids": [
             "alle/urlaubsantrag"
           ],
           "result": {
-            "answer": "Der jährliche Urlaubsanspruch beträgt für Vollzeitkräfte 30 Arbeitstage bei einer Fünf-Tage-Woche. Teilzeitkräfte erhalten den Anspruch anteilig [alle/urlaubsantrag#Urlaubsanspruch]. Im Eintrittsjahr entsteht für jeden vollen Monat der Beschäftigung ein Zwölftel des Jahresanspruchs [alle/urlaubsantrag#Urlaubsanspruch].\n\nNicht genommener Urlaub kann bis zum 31. März des Folgejahres übertragen werden. Danach verfällt er, sofern die Firma die Mitarbeitenden rechtzeitig auf den Verfall hingewiesen hat. Die Personalabteilung versendet diesen Hinweis jedes Jahr [alle/urlaubsantrag#Übertragung und Verfall].",
+            "answer": "Die Urlaubssperre der Weihnachtsspitze (\"Wintersturm\") gilt vom 23.11. bis 23.12. Sie betrifft den Bereich Logistik und Disposition. [alle/urlaubsantrag#Urlaubssperren]",
             "citations": [
               {
                 "doc_id": "alle/urlaubsantrag",
                 "title": "Urlaubsantrag und Urlaubsregelung",
-                "section": "Urlaubsanspruch",
-                "chunk_id": "alle/urlaubsantrag#1"
-              },
-              {
-                "doc_id": "alle/urlaubsantrag",
-                "title": "Urlaubsantrag und Urlaubsregelung",
-                "section": "Übertragung und Verfall",
-                "chunk_id": "alle/urlaubsantrag#4"
+                "section": "Urlaubssperren",
+                "chunk_id": "alle/urlaubsantrag#3"
               }
             ],
             "mode": "agentic",
@@ -2073,28 +2071,22 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Urlaubstage Anspruch Resturlaub Verfall",
-                  "k": 5
-                },
-                "summary": "5 Zeilen"
-              },
-              {
-                "tool": "search",
-                "args": {
-                  "query": "Anzahl Urlaubstage pro Jahr Vollzeit Anspruch",
-                  "k": 5
+                  "query": "Urlaubssperre Weihnachtsspitze Wintersturm Zeitraum"
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 5855,
-            "output_tokens": 534,
-            "cost": 0.0008525,
-            "latency_ms": 3495.9663989939145,
+            "input_tokens": 3036,
+            "output_tokens": 167,
+            "cost": 0.00038710000000000003,
+            "latency_ms": 1906.3793789973715,
             "found": true,
             "retrieved_doc_ids": [
               "alle/urlaubsantrag"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 1632.376977999229,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2103,30 +2095,24 @@
           "id": "s14",
           "type": "single",
           "user": "fiete",
-          "question": "Wie läuft die Evakuierung von Besuchern im Brandfall ab?",
+          "question": "Wo ist bei Feueralarm der Sammelplatz und wie lange dauerte die letzte Räumungsübung?",
           "expected_doc_ids": [
             "alle/brandschutz-notfall"
           ],
           "result": {
-            "answer": "Bei einem Brand gilt laut Dokument folgender Ablauf für Besucher:\n\n- **Besucherliste:** Der Empfang führt eine tagesaktuelle Besucherliste, damit alle Personen im Gebäude erfasst werden können. Die Empfangskraft nimmt die Liste zum Sammelplatz mit. [alle/brandschutz-notfall#Evakuierung von Besuchern]\n- **Begleitung:** Gäste und Fremdfirmen werden vom jeweiligen Gastgeber betreut und zum Sammelplatz begleitet. [alle/brandschutz-notfall#Übungen]\n- **Sammelplatz:** Der Parkplatz hinter Halle 3 an der Elbseite. [alle/brandschutz-notfall#Im Brandfall]\n\nAllgemeines Verhalten im Brandfall: Brand über 112 und die interne Notrufnummer 999 melden, gefährdete Personen warnen und mitnehmen, Türen schließen (nicht abschließen), Aufzüge nicht benutzen. Löschversuche nur ohne Eigengefährdung. [alle/brandschutz-notfall#Im Brandfall]\n\nMitarbeitende mit eingeschränkter Mobilität erhalten einen individuellen Evakuierungsplan von der Fachkraft für Arbeitssicherheit. [alle/brandschutz-notfall#Evakuierung von Besuchern]",
+            "answer": "Bei Feueralarm ist der Sammelplatz Nord an Tor 12, für alle Hallen und das Bürogebäude [alle/brandschutz-notfall#Alarmsignal und Sammelplatz].\n\nDie letzte Räumungsübung am 17.09.2026 dauerte 6 Minuten 40 Sekunden bis zur Vollständigkeitsmeldung. Das Ziel liegt bei unter 8 Minuten [alle/brandschutz-notfall#Übungen].",
             "citations": [
               {
                 "doc_id": "alle/brandschutz-notfall",
-                "title": "Brandschutz und Notfallverhalten",
-                "section": "Evakuierung von Besuchern",
-                "chunk_id": "alle/brandschutz-notfall#8"
+                "title": "Brandschutz und Notfall",
+                "section": "Alarmsignal und Sammelplatz",
+                "chunk_id": "alle/brandschutz-notfall#1"
               },
               {
                 "doc_id": "alle/brandschutz-notfall",
-                "title": "Brandschutz und Notfallverhalten",
+                "title": "Brandschutz und Notfall",
                 "section": "Übungen",
                 "chunk_id": "alle/brandschutz-notfall#4"
-              },
-              {
-                "doc_id": "alle/brandschutz-notfall",
-                "title": "Brandschutz und Notfallverhalten",
-                "section": "Im Brandfall",
-                "chunk_id": "alle/brandschutz-notfall#1"
               }
             ],
             "mode": "agentic",
@@ -2134,28 +2120,36 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Evakuierung Besucher Brandfall",
+                  "query": "Feueralarm Sammelplatz",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               },
               {
-                "tool": "read_document",
+                "tool": "search",
                 "args": {
-                  "doc_id": "alle/brandschutz-notfall"
+                  "query": "Räumungsübung Dauer letzte",
+                  "k": 5
                 },
-                "summary": "9 Abschnitte gelesen"
+                "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 6365,
-            "output_tokens": 664,
-            "cost": 0.0009685,
-            "latency_ms": 4063.6023819970433,
+            "input_tokens": 3929,
+            "output_tokens": 329,
+            "cost": 0.0005574000000000001,
+            "latency_ms": 2248.5146849940065,
             "found": true,
             "retrieved_doc_ids": [
               "alle/brandschutz-notfall",
-              "logistik/lagerordnung"
-            ]
+              "alle/onboarding",
+              "alle/standortplan-durchwahlen",
+              "hr/kuendigungsfristen",
+              "logistik/protokoll-hallenleitung-2026-09",
+              "alle/urlaubsantrag"
+            ],
+            "route": "",
+            "ttft_ms": 1693.8508429884678,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2164,31 +2158,31 @@
           "id": "m01",
           "type": "multi",
           "user": "katja",
-          "question": "Wie viel darf ein Hotel im Vertrieb pro Nacht kosten, und wie schnell muss ich abrechnen?",
+          "question": "Wer gibt meine Vertriebsreise für 1.800 Euro frei und wie viel darf das Hotel pro Nacht kosten?",
           "expected_doc_ids": [
             "alle/reisekostenrichtlinie",
             "vertrieb/vertrieb-reisekosten"
           ],
           "result": {
-            "answer": "Im Vertrieb gilt eine Hotelobergrenze von 140 Euro pro Nacht inklusive Frühstück. Bei Messen mit ausgebuchten Hotels sind bis zu 180 Euro möglich, dafür ist eine Freigabe nötig [vertrieb/vertrieb-reisekosten#Höhere Hotelgrenze].\n\nDie Reisekostenabrechnung muss im Vertrieb innerhalb von 7 Tagen eingereicht werden [vertrieb/vertrieb-reisekosten#Abrechnung]. Die allgemeine Richtlinie sieht 14 Tage vor [alle/reisekostenrichtlinie#Abrechnung].",
+            "answer": "Für 1.800 Euro gibt die Bereichsleitung frei. Im Vertrieb ist das Vertriebsleiter Tjark Rohwedder [vertrieb/vertrieb-reisekosten#Freigabe][alle/reisekostenrichtlinie#Dienstreiseantrag und Freigabe].\n\nDas Hotel darf im Vertrieb bis zu 140 Euro pro Nacht kosten [vertrieb/vertrieb-reisekosten#Abweichende Obergrenzen].",
             "citations": [
               {
                 "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Höhere Hotelgrenze",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
-              },
-              {
-                "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Abrechnung",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#5"
+                "title": "Reisekosten im Vertrieb",
+                "section": "Freigabe",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#3"
               },
               {
                 "doc_id": "alle/reisekostenrichtlinie",
                 "title": "Reisekostenrichtlinie",
-                "section": "Abrechnung",
-                "chunk_id": "alle/reisekostenrichtlinie#6"
+                "section": "Dienstreiseantrag und Freigabe",
+                "chunk_id": "alle/reisekostenrichtlinie#2"
+              },
+              {
+                "doc_id": "vertrieb/vertrieb-reisekosten",
+                "title": "Reisekosten im Vertrieb",
+                "section": "Abweichende Obergrenzen",
+                "chunk_id": "vertrieb/vertrieb-reisekosten#1"
               }
             ],
             "mode": "agentic",
@@ -2196,7 +2190,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Hotel Übernachtung Vertrieb Kosten pro Nacht Obergrenze",
+                  "query": "Vertriebsreise Genehmigung Freigabe Betrag 1.800 Euro Hotel Nacht Obergrenze",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
@@ -2204,21 +2198,25 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Reisekosten Abrechnung Frist Spesen einreichen",
+                  "query": "Freigabe Reisekosten Stufung Betrag Bereichsleiter Geschäftsführung",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 4215,
-            "output_tokens": 428,
-            "cost": 0.0006355,
-            "latency_ms": 2831.4337089977926,
+            "input_tokens": 5928,
+            "output_tokens": 429,
+            "cost": 0.0008073,
+            "latency_ms": 4072.6015039981576,
             "found": true,
             "retrieved_doc_ids": [
+              "alle/reisekostenrichtlinie",
               "vertrieb/vertrieb-reisekosten",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/kundenbewirtung"
+            ],
+            "route": "",
+            "ttft_ms": 3556.438554995111,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2227,37 +2225,37 @@
           "id": "m02",
           "type": "multi",
           "user": "ole",
-          "question": "Wie arbeite ich im Homeoffice auf interne Systeme zu?",
+          "question": "Ich möchte von zu Hause aus arbeiten und auf Laufwerk K: zugreifen. Wie viele Tage sind erlaubt und was muss ich starten?",
           "expected_doc_ids": [
             "alle/arbeitszeit-homeoffice",
             "it/vpn-einrichtung"
           ],
           "result": {
-            "answer": "Für den Zugriff auf interne Systeme aus dem Homeoffice verwenden Sie das Firmen-VPN. Es ist für Teamlaufwerke, das Warenwirtschaftssystem und interne Webseiten erforderlich [it/vpn-einrichtung#VPN-Einrichtung]. Die Einrichtung beschreibt die IT-Anleitung [alle/arbeitszeit-homeoffice#Ausstattung und Datenschutz].\n\n- Im Homeoffice bleibt das VPN während der gesamten Arbeitszeit aktiv [it/vpn-einrichtung#Wann ist VPN Pflicht].\n- In öffentlichen Netzwerken (Hotel, Bahnhof, Café) verbinden Sie das VPN, bevor Sie E-Mails öffnen [it/vpn-einrichtung#Wann ist VPN Pflicht].\n- Diensthandys und Tablets können das VPN ebenfalls nutzen. Installieren Sie dazu den Client aus dem Unternehmensportal und melden Sie sich wie am Laptop an [it/vpn-einrichtung#Mobile Geräte].",
+            "answer": "Die Antwort hängt von Ihrer Tätigkeit ab:\n\n**Erlaubte Tage:** Beschäftigte in der Verwaltung dürfen bis zu 2 Tage pro Woche im Homeoffice arbeiten; in der Disposition ist es 1 Tag pro Woche. Lager, Fuhrpark und Werkstatt sind ausgenommen. Die Tage tragen Sie im Zeitanker ein, die Teamleitung genehmigt sie. [alle/arbeitszeit-homeoffice#Homeoffice-Tage]\n\n**Zugriff auf Laufwerk K:** Laufwerke und ELKO-Auswertungen sind von zu Hause nur über das VPN „Elbtunnel“ mit MFA-Code erreichbar. Drucken im Homeoffice ist nicht erlaubt. [alle/arbeitszeit-homeoffice#Zugriff auf interne Systeme]\n\n**Was Sie benötigen:**\n- Den VPN-Client „Elbtunnel Connect“. Sie fordern ihn im Lotse unter „Zugang / VPN“ an; er wird in der Regel am selben Arbeitstag installiert. [it/vpn-einrichtung#Client einrichten]\n- Server: vpn.elbkontor.example, dann Anmeldung mit Benutzername, Passwort und MFA-Code. [it/vpn-einrichtung#Client einrichten]\n- Private Geräte sind nicht erlaubt. [it/vpn-einrichtung#Regeln]\n\nBeachten Sie außerdem: Die Verbindung trennt sich nach 10 Stunden oder nach 20 Minuten Inaktivität, und pro Person ist nur eine Verbindung gleichzeitig möglich. [it/vpn-einrichtung#Regeln]",
             "citations": [
               {
-                "doc_id": "it/vpn-einrichtung",
-                "title": "VPN-Einrichtung",
-                "section": "VPN-Einrichtung",
-                "chunk_id": "it/vpn-einrichtung#0"
+                "doc_id": "alle/arbeitszeit-homeoffice",
+                "title": "Arbeitszeit und Homeoffice",
+                "section": "Homeoffice-Tage",
+                "chunk_id": "alle/arbeitszeit-homeoffice#1"
               },
               {
                 "doc_id": "alle/arbeitszeit-homeoffice",
                 "title": "Arbeitszeit und Homeoffice",
-                "section": "Ausstattung und Datenschutz",
-                "chunk_id": "alle/arbeitszeit-homeoffice#4"
+                "section": "Zugriff auf interne Systeme",
+                "chunk_id": "alle/arbeitszeit-homeoffice#3"
               },
               {
                 "doc_id": "it/vpn-einrichtung",
-                "title": "VPN-Einrichtung",
-                "section": "Wann ist VPN Pflicht",
-                "chunk_id": "it/vpn-einrichtung#3"
+                "title": "VPN-Einrichtung \"Elbtunnel\"",
+                "section": "Client einrichten",
+                "chunk_id": "it/vpn-einrichtung#1"
               },
               {
                 "doc_id": "it/vpn-einrichtung",
-                "title": "VPN-Einrichtung",
-                "section": "Mobile Geräte",
-                "chunk_id": "it/vpn-einrichtung#6"
+                "title": "VPN-Einrichtung \"Elbtunnel\"",
+                "section": "Regeln",
+                "chunk_id": "it/vpn-einrichtung#2"
               }
             ],
             "mode": "agentic",
@@ -2265,21 +2263,32 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Homeoffice Zugriff interne Systeme",
+                  "query": "Homeoffice Tage erlaubt Laufwerk K VPN Zugriff",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
+              },
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Homeoffice wie viele Tage pro Woche erlaubt",
+                  "k": 3
+                },
+                "summary": "3 Zeilen"
               }
             ],
-            "input_tokens": 3034,
-            "output_tokens": 543,
-            "cost": 0.0005749,
-            "latency_ms": 3117.6828960014973,
+            "input_tokens": 5614,
+            "output_tokens": 835,
+            "cost": 0.0009789,
+            "latency_ms": 4840.823452992481,
             "found": true,
             "retrieved_doc_ids": [
               "alle/arbeitszeit-homeoffice",
               "it/vpn-einrichtung"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 2666.2423509988002,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2287,32 +2296,56 @@
         {
           "id": "m03",
           "type": "multi",
-          "user": "fiete",
-          "question": "Was kostet ein Gefahrguttransport für einen Großkunden mit 10 Prozent Rabatt?",
+          "user": "bent",
+          "question": "Was tun, wenn bei Nordhafen Frische an Tor 7 die Kühlkette unterbrochen ist, und was wurde nach dem Vorfall im Februar geändert?",
           "expected_doc_ids": [
-            "vertrieb/rabattstaffel-grosskunden",
-            "logistik/gefahrgut-handling"
+            "logistik/eskalationsplan-kuehlkette",
+            "logistik/stoerungsbericht-tor7-kuehlkette-2026-02"
           ],
           "result": {
-            "answer": "Eine konkrete Gesamtsumme lässt sich nicht berechnen, weil der Grundfrachtpreis des Transports in den Dokumenten fehlt. So gilt die Kalkulation:\n\n- **Rabatt:** Der Rabatt von 10 Prozent wird nur auf die Grundfracht gewährt, nicht auf Nebenleistungen wie den Gefahrgutzuschlag [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz]. Ein Rabatt von 10 Prozent ist für Jahresumsätze von 600.000 bis 999.999 Euro vorgesehen [vertrieb/rabattstaffel-grosskunden#Staffel auf Frachtumsatz].\n- **Gefahrgutzuschlag:** Er beträgt 18 Prozent auf die Grundfracht und ist nicht rabattierbar [vertrieb/rabattstaffel-grosskunden#Sonderfall Gefahrgut].\n- **Freigabe:** Ein Rabatt bis 10 Prozent entscheidet der Vertriebsleiter, Herr Henrik Tiedemann [vertrieb/rabattstaffel-grosskunden#Freigabegrenzen].\n\nDie Formel lautet: Grundfracht × 0,90 + Grundfracht × 0,18 (Gefahrgutzuschlag, ohne Rabatt), plus gegebenenfalls weitere Nebenleistungen. Für eine Zahl benötige ich den Listenpreis der Grundfracht.",
+            "answer": "**Sofortmaßnahmen bei unterbrochener Kühlkette (Nordhafen Frische, Tor 7):**\n\n- Ab 10 Minuten über 6 °C (Soll 2 bis 6 °C) setzt die Schichtleitung Halle 2 die Ware sofort auf K3 mit Sperrgrund S1 und ruft den Kühlkette-Notfall unter Durchwahl 5299 [logistik/eskalationsplan-kuehlkette#Stufe 1: Schichtleitung].\n- Tor 7 schließen, Schleuse prüfen, Ware in Zone K umlagern und das Kühlaggregat des Lkw prüfen. Das Temperaturprotokoll geht binnen 24 Stunden als PDF an den Kunden [logistik/eskalationsplan-kuehlkette#Sofortmaßnahmen an Tor 7].\n- Dauert die Abweichung länger als 30 Minuten oder werden 8 °C überschritten, informiert die Hallenleiterin Wiebke Thiele die Key Accountin Katja Sommer. Der Kunde wird innerhalb von 60 Minuten benachrichtigt [logistik/eskalationsplan-kuehlkette#Stufe 2: Hallenleitung].\n- Bei mehr als zwei Stunden oder über 10 °C entscheidet Bereichsleiter Carsten Dohrmann mit dem Kunden über Freigabe oder Vernichtung. Ware wird nie ohne schriftliche Kundenfreigabe vernichtet [logistik/eskalationsplan-kuehlkette#Stufe 3: Bereichsleitung].\n- Bei Ausfall der Kühlwacht oder Kälteanlage: IT-Bereitschaft (3070 oder 3077) und Kältedienst rufen [logistik/eskalationsplan-kuehlkette#Technik].\n\n**Änderungen nach dem Vorfall vom 17.02.2026** (Beschluss vom 12.03.2026) [logistik/stoerungsbericht-tor7-kuehlkette-2026-02#Maßnahmen (Beschluss 12.03.2026)]:\n\n1. Wartung der Lichtschranken alle 6 Monate.\n2. Doppelte Temperaturfühler an Tor 5 und Tor 7 (Projekt Nebelhorn).\n3. Schulung der Schichtleitungen im Eskalationsplan Kühlkette bis 30.04.2026.\n4. Notfallnummer 5299 auf alle Handscanner-Startbildschirme.\n\nSeitdem meldet die Hallenleitung bereits bei Stufe 1 an den Vertrieb [logistik/stoerungsbericht-tor7-kuehlkette-2026-02#Gelernt].",
             "citations": [
               {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Staffel auf Frachtumsatz",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Stufe 1: Schichtleitung",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#1"
               },
               {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Sonderfall Gefahrgut",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#6"
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Sofortmaßnahmen an Tor 7",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#4"
               },
               {
-                "doc_id": "vertrieb/rabattstaffel-grosskunden",
-                "title": "Rabattstaffel für Großkunden",
-                "section": "Freigabegrenzen",
-                "chunk_id": "vertrieb/rabattstaffel-grosskunden#4"
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Stufe 2: Hallenleitung",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#2"
+              },
+              {
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Stufe 3: Bereichsleitung",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#3"
+              },
+              {
+                "doc_id": "logistik/eskalationsplan-kuehlkette",
+                "title": "Eskalationsplan Kühlkette",
+                "section": "Technik",
+                "chunk_id": "logistik/eskalationsplan-kuehlkette#5"
+              },
+              {
+                "doc_id": "logistik/stoerungsbericht-tor7-kuehlkette-2026-02",
+                "title": "Störungsbericht: Kühlkettenunterbrechung Tor 7 am 17.02.2026",
+                "section": "Maßnahmen (Beschluss 12.03.2026)",
+                "chunk_id": "logistik/stoerungsbericht-tor7-kuehlkette-2026-02#3"
+              },
+              {
+                "doc_id": "logistik/stoerungsbericht-tor7-kuehlkette-2026-02",
+                "title": "Störungsbericht: Kühlkettenunterbrechung Tor 7 am 17.02.2026",
+                "section": "Gelernt",
+                "chunk_id": "logistik/stoerungsbericht-tor7-kuehlkette-2026-02#4"
               }
             ],
             "mode": "agentic",
@@ -2320,28 +2353,48 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Gefahrguttransport Preis Großkunde Rabatt 10 Prozent",
+                  "query": "Kühlkette unterbrochen Tor 7 Nordhafen Frische",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               },
               {
+                "tool": "search",
+                "args": {
+                  "query": "Vorfall Februar Kühlkette Änderung nach Vorfall",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
+              },
+              {
                 "tool": "read_document",
                 "args": {
-                  "doc_id": "vertrieb/rabattstaffel-grosskunden"
+                  "doc_id": "logistik/stoerungsbericht-tor7-kuehlkette-2026-02"
                 },
-                "summary": "8 Abschnitte gelesen"
+                "summary": "5 Abschnitte gelesen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "logistik/eskalationsplan-kuehlkette"
+                },
+                "summary": "6 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6817,
-            "output_tokens": 861,
-            "cost": 0.0011122,
-            "latency_ms": 7112.498505994154,
+            "input_tokens": 7380,
+            "output_tokens": 1327,
+            "cost": 0.0014015,
+            "latency_ms": 5914.824084000429,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/rabattstaffel-grosskunden",
-              "logistik/gefahrgut-handling"
-            ]
+              "logistik/eskalationsplan-kuehlkette",
+              "logistik/stoerungsbericht-tor7-kuehlkette-2026-02",
+              "logistik/ladungssicherung",
+              "logistik/lagerordnung"
+            ],
+            "route": "",
+            "ttft_ms": 3106.0548600071343,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2349,26 +2402,26 @@
         {
           "id": "m04",
           "type": "multi",
-          "user": "katja",
-          "question": "Wie viel darf ich Kunden auf einer Dienstreise zum Essen einladen?",
+          "user": "fiete",
+          "question": "Wir verkaufen einem Großkunden mit 10 Prozent Rabatt einen Gefahrguttransport. Wie hoch ist der Gefahrgutzuschlag und wird darauf Rabatt gewährt?",
           "expected_doc_ids": [
-            "vertrieb/kundenbewirtung",
-            "vertrieb/vertrieb-reisekosten"
+            "vertrieb/rabattstaffel-grosskunden",
+            "logistik/gefahrgut-handling"
           ],
           "result": {
-            "answer": "Bis zu 60 Euro pro Person (inklusive Getränke und Trinkgeld) werden erstattet, sofern die Bewirtung geschäftlich begründet ist [vertrieb/kundenbewirtung#Bewirtung]. Die Bewirtungsrechnung muss Anlass, Teilnehmer und Namen der Gäste enthalten [vertrieb/vertrieb-reisekosten#Kundenbewirtung auf Reisen]. Ab mehr als 8 Teilnehmenden ist vorab die Genehmigung des Vertriebsleiters nötig [vertrieb/kundenbewirtung#Bewirtung].",
+            "answer": "Der Gefahrgutzuschlag beträgt 18 Prozent auf die Fracht [logistik/gefahrgut-handling#Preis]. Darauf wird kein Rabatt gewährt: Der Zuschlag ist nicht rabattierbar, auch nicht für Großkunden [logistik/gefahrgut-handling#Preis][vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar]. Der 10-Prozent-Rabatt gilt also nur auf die Fracht selbst, nicht auf den Gefahrgutzuschlag.",
             "citations": [
               {
-                "doc_id": "vertrieb/kundenbewirtung",
-                "title": "Kundenbewirtung und Geschenke an Kunden",
-                "section": "Bewirtung",
-                "chunk_id": "vertrieb/kundenbewirtung#1"
+                "doc_id": "logistik/gefahrgut-handling",
+                "title": "Gefahrgut-Handling",
+                "section": "Preis",
+                "chunk_id": "logistik/gefahrgut-handling#3"
               },
               {
-                "doc_id": "vertrieb/vertrieb-reisekosten",
-                "title": "Reisekosten im Vertrieb: Ergänzung zur Reisekostenrichtlinie",
-                "section": "Kundenbewirtung auf Reisen",
-                "chunk_id": "vertrieb/vertrieb-reisekosten#4"
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel Großkunden",
+                "section": "Nicht rabattierbar",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
               }
             ],
             "mode": "agentic",
@@ -2376,22 +2429,34 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Kundenbewirtung Essen Einladung Betrag Dienstreise",
+                  "query": "Gefahrgutzuschlag Rabatt",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Gefahrgut Zuschlag Höhe Prozent",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 3087,
-            "output_tokens": 320,
-            "cost": 0.00046870000000000006,
-            "latency_ms": 2241.332222998608,
+            "input_tokens": 3954,
+            "output_tokens": 370,
+            "cost": 0.0005804000000000001,
+            "latency_ms": 2365.167793002911,
             "found": true,
             "retrieved_doc_ids": [
-              "vertrieb/vertrieb-reisekosten",
-              "vertrieb/kundenbewirtung",
-              "alle/reisekostenrichtlinie"
-            ]
+              "vertrieb/rabattstaffel-grosskunden",
+              "logistik/gefahrgut-handling",
+              "vertrieb/kundenakte-nordhafen-frische",
+              "vertrieb/provisionsmodell"
+            ],
+            "route": "",
+            "ttft_ms": 1817.4101909971796,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2400,13 +2465,13 @@
           "id": "m05",
           "type": "multi",
           "user": "ole",
-          "question": "Darf ich ein neues Programm auf meinem bestellten Laptop installieren?",
+          "question": "Der neue Kollege bekommt einen HW-S1. Darf er selbst Programme installieren und wie lange dauert die Freigabe?",
           "expected_doc_ids": [
             "it/hardware-bestellung",
             "it/software-freigabe"
           ],
           "result": {
-            "answer": "Nicht ohne Weiteres. Auf Firmengeräten darf nur freigegebene Software installiert werden [it/software-freigabe#Grundsatz]. Standardprogramme wie Office, PDF-Reader, Browser, Videokonferenz und Passwortmanager können Sie selbst über das Selbstbedienungsportal ohne Administratorrechte installieren [it/software-freigabe#Softwarekatalog]. Für Programme, die nicht im Katalog stehen, stellen Sie im Ticketsystem einen Antrag \"Software-Freigabe\" mit Zweck, Hersteller, Kosten, Anzahl der Nutzer und Art der verarbeiteten Daten; die IT prüft diesen [it/software-freigabe#Neue Software beantragen].",
+            "answer": "Nein, der neue Kollege darf nicht selbst Programme installieren. Auf Firmengeräten läuft nur freigegebene Software, und eigenständige Installationen sind gesperrt [it/software-freigabe#Grundsatz]. Der HW-S1 wird mit den freigegebenen Standardprogrammen vorinstalliert ausgegeben [it/hardware-bestellung#Lieferzeit und Ausgabe]. Weitere Programme beantragt man über das Formular \"Software-Freigabe\" im Lotse [it/software-freigabe#Ablauf].\n\nDie Freigabe dauert in der Regel etwa 10 Arbeitstage. Das Software-Board unter Vorsitz von Imke Ohlsen tagt alle zwei Wochen dienstags um 14:00 Uhr [it/software-freigabe#Ablauf].",
             "citations": [
               {
                 "doc_id": "it/software-freigabe",
@@ -2415,16 +2480,16 @@
                 "chunk_id": "it/software-freigabe#0"
               },
               {
-                "doc_id": "it/software-freigabe",
-                "title": "Software-Freigabe",
-                "section": "Softwarekatalog",
-                "chunk_id": "it/software-freigabe#1"
+                "doc_id": "it/hardware-bestellung",
+                "title": "Hardware-Bestellung",
+                "section": "Lieferzeit und Ausgabe",
+                "chunk_id": "it/hardware-bestellung#2"
               },
               {
                 "doc_id": "it/software-freigabe",
                 "title": "Software-Freigabe",
-                "section": "Neue Software beantragen",
-                "chunk_id": "it/software-freigabe#2"
+                "section": "Ablauf",
+                "chunk_id": "it/software-freigabe#1"
               }
             ],
             "mode": "agentic",
@@ -2432,21 +2497,34 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Software installieren Laptop Genehmigung",
+                  "query": "HW-S1 Software-Installation Freigabe",
+                  "k": 5
+                },
+                "summary": "5 Zeilen"
+              },
+              {
+                "tool": "search",
+                "args": {
+                  "query": "HW-S1 Laptop Ausgabe neue Mitarbeiter",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 2958,
-            "output_tokens": 353,
-            "cost": 0.0004723,
-            "latency_ms": 2404.9055089999456,
+            "input_tokens": 3775,
+            "output_tokens": 469,
+            "cost": 0.000612,
+            "latency_ms": 2772.57510900381,
             "found": true,
             "retrieved_doc_ids": [
               "it/software-freigabe",
-              "it/hardware-bestellung"
-            ]
+              "it/hardware-bestellung",
+              "alle/onboarding",
+              "it/mfa"
+            ],
+            "route": "",
+            "ttft_ms": 1911.9060400116723,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2455,25 +2533,19 @@
           "id": "m06",
           "type": "multi",
           "user": "mira",
-          "question": "Wie viel Urlaub bekomme ich, wenn ich neun Monate in Elternzeit bin?",
+          "question": "Ich gehe für neun Monate in Elternzeit. Wie viel von meinen 30 Urlaubstagen wird gekürzt?",
           "expected_doc_ids": [
             "alle/urlaubsantrag",
             "hr/elternzeit"
           ],
           "result": {
-            "answer": "Bei neun Monaten Elternzeit wird Ihr Urlaubsanspruch um 9/12 gekürzt. Das Unternehmen macht von dieser Kürzung Gebrauch, außer bei Teilzeitarbeit während der Elternzeit [hr/elternzeit#Urlaub während der Elternzeit].\n\nAls Vollzeitkraft mit Fünf-Tage-Woche haben Sie jährlich 30 Arbeitstage Urlaub [alle/urlaubsantrag#Urlaubsanspruch]. Die Kürzung von 9/12 entspricht 22,5 Tagen, sodass rechnerisch 7,5 Urlaubstage verbleiben. Bereits entstandener Urlaub wird auf das Jahr nach der Rückkehr übertragen [hr/elternzeit#Urlaub während der Elternzeit].",
+            "answer": "Bei neun Monaten Elternzeit kann Ihr Urlaub um 9/12 gekürzt werden. Von 30 Urlaubstagen sind das 22,5 Tage, also werden 7,5 Tage gekürzt, und Sie hätten 22,5 Tage Anspruch. Bereits entstandener Urlaub wird nach der Rückkehr gewährt [hr/elternzeit#Urlaub in der Elternzeit].\n\nQuelle: [hr/elternzeit#Urlaub in der Elternzeit]",
             "citations": [
               {
                 "doc_id": "hr/elternzeit",
-                "title": "Elternzeit und Familienleistungen",
-                "section": "Urlaub während der Elternzeit",
-                "chunk_id": "hr/elternzeit#4"
-              },
-              {
-                "doc_id": "alle/urlaubsantrag",
-                "title": "Urlaubsantrag und Urlaubsregelung",
-                "section": "Urlaubsanspruch",
-                "chunk_id": "alle/urlaubsantrag#1"
+                "title": "Elternzeit",
+                "section": "Urlaub in der Elternzeit",
+                "chunk_id": "hr/elternzeit#1"
               }
             ],
             "mode": "agentic",
@@ -2481,28 +2553,24 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Urlaub Elternzeit Kürzung Urlaubsanspruch",
+                  "query": "Elternzeit Urlaubskürzung Urlaubsanspruch",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "hr/elternzeit"
-                },
-                "summary": "7 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 6567,
-            "output_tokens": 758,
-            "cost": 0.0010357,
-            "latency_ms": 5233.955547999358,
+            "input_tokens": 3077,
+            "output_tokens": 277,
+            "cost": 0.00044620000000000006,
+            "latency_ms": 2133.749777000048,
             "found": true,
             "retrieved_doc_ids": [
               "hr/elternzeit",
               "alle/urlaubsantrag"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 1453.6299019964645,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2511,31 +2579,31 @@
           "id": "m07",
           "type": "multi",
           "user": "ole",
-          "question": "Ich habe mein Passwort und mein Handy verloren - wie komme ich wieder rein?",
+          "question": "Mein Passwort ist weg und das Handy mit der Authenticator-App auch. Wie komme ich wieder rein?",
           "expected_doc_ids": [
             "it/passwortrichtlinie",
             "it/mfa"
           ],
           "result": {
-            "answer": "Da Sie Passwort und Smartphone verloren haben, gehen Sie so vor:\n\n1. **Handy verloren:** Melden Sie sich beim IT-Support unter Durchwahl 300. Nach einer Identitätsprüfung per Rückruf wird der zweite Faktor zurückgesetzt, was bis zu einer Stunde dauern kann. Alternativ können Sie Ihre gespeicherten Wiederherstellungscodes nutzen. [it/mfa#Handy verloren oder gewechselt]\n2. **Passwort:** Setzen Sie es über das Portal \"Passwort zurücksetzen\" selbst zurück. Dort bestätigen Sie sich mit der Authenticator-App. Da Ihr Handy verloren ist, ist das voraussichtlich nicht möglich. In diesem Fall ruft Sie der IT-Support unter einer im System hinterlegten Nummer zurück. [it/passwortrichtlinie#Sperrung und Zurücksetzen]\n\nWichtig: Der IT-Support fragt Sie nie nach Passwörtern oder Codes am Telefon. Melden Sie unerwartete Anfragen sofort. [it/mfa#Sicherheitshinweise] [it/passwortrichtlinie#Sperrung und Zurücksetzen]",
+            "answer": "Du kannst dein Passwort nicht selbst zurücksetzen, weil dafür der zweite Faktor aus der App nötig ist. Ohne ihn hilft der IT-Support unter Durchwahl 300, nach einem Rückruf an die hinterlegte Nummer [it/passwortrichtlinie#Zurücksetzen].\n\nSo gehst du vor:\n\n1. **Wiederherstellungscodes prüfen:** Sie wurden bei der Einrichtung im Tresor gespeichert und können alternativ genutzt werden [it/mfa#Handy verloren oder gewechselt].\n2. **IT-Support anrufen (Durchwahl 300):** Nach der Identitätsprüfung wird der zweite Faktor zurückgesetzt. Das dauert bis zu einer Stunde [it/mfa#Handy verloren oder gewechselt].\n3. **Servicezeiten:** Mo bis Fr, 06:00 bis 18:00. Außerhalb davon hilft die IT-Bereitschaft nur bei P1-Fällen, sonst erst am nächsten Werktag [it/mfa#Handy verloren oder gewechselt].\n\nFalls du ein Ersatzgerät brauchst, kannst du im Lotse einen Schlüssel-Token beantragen. Die Lieferung dauert etwa drei Arbeitstage [it/mfa#Sicherheitsschlüssel].",
             "citations": [
+              {
+                "doc_id": "it/passwortrichtlinie",
+                "title": "Passwortrichtlinie",
+                "section": "Zurücksetzen",
+                "chunk_id": "it/passwortrichtlinie#2"
+              },
               {
                 "doc_id": "it/mfa",
                 "title": "Mehrfaktor-Anmeldung (MFA)",
                 "section": "Handy verloren oder gewechselt",
-                "chunk_id": "it/mfa#4"
-              },
-              {
-                "doc_id": "it/passwortrichtlinie",
-                "title": "Passwortrichtlinie",
-                "section": "Sperrung und Zurücksetzen",
-                "chunk_id": "it/passwortrichtlinie#4"
+                "chunk_id": "it/mfa#3"
               },
               {
                 "doc_id": "it/mfa",
                 "title": "Mehrfaktor-Anmeldung (MFA)",
-                "section": "Sicherheitshinweise",
-                "chunk_id": "it/mfa#6"
+                "section": "Sicherheitsschlüssel",
+                "chunk_id": "it/mfa#4"
               }
             ],
             "mode": "agentic",
@@ -2543,7 +2611,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Passwort verloren Handy verloren Zugang wiederherstellen",
+                  "query": "Passwort vergessen Handy verloren Authenticator MFA Zurücksetzen",
                   "k": 5
                 },
                 "summary": "5 Zeilen"
@@ -2553,25 +2621,21 @@
                 "args": {
                   "doc_id": "it/mfa"
                 },
-                "summary": "7 Abschnitte gelesen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "it/passwortrichtlinie"
-                },
-                "summary": "7 Abschnitte gelesen"
+                "summary": "5 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 7892,
-            "output_tokens": 773,
-            "cost": 0.0011757,
-            "latency_ms": 4542.524188997049,
+            "input_tokens": 5926,
+            "output_tokens": 794,
+            "cost": 0.0009896,
+            "latency_ms": 4779.228415995021,
             "found": true,
             "retrieved_doc_ids": [
-              "it/mfa",
-              "it/passwortrichtlinie"
-            ]
+              "it/passwortrichtlinie",
+              "it/mfa"
+            ],
+            "route": "",
+            "ttft_ms": 3158.297902002232,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2580,19 +2644,19 @@
           "id": "m08",
           "type": "multi",
           "user": "fiete",
-          "question": "Gilt der Großkundenrabatt auch für die Zollabfertigung?",
+          "question": "Gilt der Großkundenrabatt auch für die Zollpauschale und wie hoch ist sie?",
           "expected_doc_ids": [
             "logistik/zollabwicklung",
             "vertrieb/rabattstaffel-grosskunden"
           ],
           "result": {
-            "answer": "Nein. Die Zollabfertigung unterliegt nicht der Rabattstaffel für Großkunden. Dort gilt eine Pauschale von 45 Euro pro Zollanmeldung zuzüglich der verauslagten Abgaben mit einer Auslagenpauschale von 2 Prozent [logistik/zollabwicklung#Gebühren].",
+            "answer": "Nein, der Großkundenrabatt gilt nicht für die Zollpauschale. Sie ist ausdrücklich nicht rabattfähig [vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar]. Die Zollpauschale beträgt 45 Euro je Anmeldung [vertrieb/rabattstaffel-grosskunden#Nicht rabattierbar].",
             "citations": [
               {
-                "doc_id": "logistik/zollabwicklung",
-                "title": "Zollabwicklung",
-                "section": "Gebühren",
-                "chunk_id": "logistik/zollabwicklung#5"
+                "doc_id": "vertrieb/rabattstaffel-grosskunden",
+                "title": "Rabattstaffel Großkunden",
+                "section": "Nicht rabattierbar",
+                "chunk_id": "vertrieb/rabattstaffel-grosskunden#2"
               }
             ],
             "mode": "agentic",
@@ -2600,27 +2664,33 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Großkundenrabatt Zollabfertigung"
+                  "query": "Großkundenrabatt Zollpauschale",
+                  "k": 5
                 },
                 "summary": "5 Zeilen"
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Rabatt Zollabfertigung Großkunden"
+                  "query": "Zollpauschale Höhe",
+                  "k": 5
                 },
-                "summary": "5 Zeilen"
+                "summary": "Keine Treffer."
               }
             ],
-            "input_tokens": 4060,
-            "output_tokens": 247,
-            "cost": 0.0005295,
-            "latency_ms": 2516.1351490023662,
+            "input_tokens": 3131,
+            "output_tokens": 298,
+            "cost": 0.0004621,
+            "latency_ms": 2289.0802080073627,
             "found": true,
             "retrieved_doc_ids": [
               "vertrieb/rabattstaffel-grosskunden",
-              "logistik/zollabwicklung"
-            ]
+              "vertrieb/kundenakte-nordhafen-frische",
+              "logistik/kundenvorgaben-annahmeschluss"
+            ],
+            "route": "",
+            "ttft_ms": 1830.503012999543,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2629,7 +2699,7 @@
           "id": "n01",
           "type": "not_found",
           "user": "fiete",
-          "question": "Wer hat die Fußball-Betriebsmeisterschaft im Sommer gewonnen?",
+          "question": "Wie hoch ist der Zuschuss zum Fitnessstudio?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2639,17 +2709,20 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Fußball-Betriebsmeisterschaft Sommer Gewinner"
+                  "query": "Zuschuss Fitnessstudio"
                 },
                 "summary": "Keine Treffer."
               }
             ],
-            "input_tokens": 2257,
-            "output_tokens": 96,
-            "cost": 0.00027370000000000004,
-            "latency_ms": 1656.080064996786,
+            "input_tokens": 2229,
+            "output_tokens": 84,
+            "cost": 0.0002649,
+            "latency_ms": 1588.041636001435,
             "found": false,
-            "retrieved_doc_ids": []
+            "retrieved_doc_ids": [],
+            "route": "",
+            "ttft_ms": 1505.482975000632,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2658,7 +2731,7 @@
           "id": "n02",
           "type": "not_found",
           "user": "mira",
-          "question": "Dürfen Haustiere ins Büro mitgebracht werden?",
+          "question": "Wie hoch ist der Zuschuss für die Bildschirmarbeitsplatz-Brille?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2668,46 +2741,36 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Haustiere im Büro mitbringen"
+                  "query": "Zuschuss Bildschirmarbeitsplatz Brille"
                 },
                 "summary": "Keine Treffer."
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Haustiere"
+                  "query": "Bildschirmbrille Zuschuss",
+                  "k": 5
                 },
                 "summary": "Keine Treffer."
               },
               {
-                "tool": "list_documents",
-                "args": {},
-                "summary": "15 Zeilen"
-              },
-              {
-                "tool": "read_document",
+                "tool": "search",
                 "args": {
-                  "doc_id": "alle/verhaltenskodex"
+                  "query": "Sehhilfe Bildschirmarbeit Kostenübernahme",
+                  "k": 5
                 },
-                "summary": "9 Abschnitte gelesen"
-              },
-              {
-                "tool": "read_document",
-                "args": {
-                  "doc_id": "alle/onboarding"
-                },
-                "summary": "10 Abschnitte gelesen"
+                "summary": "Keine Treffer."
               }
             ],
-            "input_tokens": 8973,
-            "output_tokens": 394,
-            "cost": 0.0010943,
-            "latency_ms": 3991.9961870036786,
+            "input_tokens": 3662,
+            "output_tokens": 260,
+            "cost": 0.0004962,
+            "latency_ms": 2947.8513639915036,
             "found": false,
-            "retrieved_doc_ids": [
-              "alle/verhaltenskodex",
-              "alle/onboarding"
-            ]
+            "retrieved_doc_ids": [],
+            "route": "",
+            "ttft_ms": 2839.046381996013,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2716,7 +2779,7 @@
           "id": "n03",
           "type": "not_found",
           "user": "bent",
-          "question": "Wie funktioniert die Parkplatzvergabe in der Tiefgarage?",
+          "question": "Wer ist Ansprechperson für die Photovoltaikanlage auf dem Dach von Halle 1?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2726,14 +2789,14 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Parkplatzvergabe Tiefgarage"
+                  "query": "Ansprechperson Photovoltaikanlage Dach Halle 1"
                 },
                 "summary": "Keine Treffer."
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Parkplatz Tiefgarage Vergabe Stellplatz",
+                  "query": "Photovoltaik Halle 1",
                   "k": 5
                 },
                 "summary": "Keine Treffer."
@@ -2741,23 +2804,30 @@
               {
                 "tool": "list_documents",
                 "args": {},
-                "summary": "14 Zeilen"
+                "summary": "24 Zeilen"
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Parken Firmenparkplatz Garage Mitarbeitende",
-                  "k": 5
+                  "query": "Solaranlage Dach Ansprechpartner Verantwortlich"
                 },
-                "summary": "Keine Treffer."
+                "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 7083,
-            "output_tokens": 374,
-            "cost": 0.0008953,
-            "latency_ms": 5257.1215410062,
+            "input_tokens": 7408,
+            "output_tokens": 324,
+            "cost": 0.0009028,
+            "latency_ms": 3784.15313300502,
             "found": false,
-            "retrieved_doc_ids": []
+            "retrieved_doc_ids": [
+              "logistik/protokoll-hallenleitung-2026-09",
+              "logistik/eskalationsplan-kuehlkette",
+              "logistik/stoerungsbericht-tor7-kuehlkette-2026-02",
+              "logistik/schichtmodelle"
+            ],
+            "route": "",
+            "ttft_ms": 3692.92188899999,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2766,7 +2836,7 @@
           "id": "n04",
           "type": "not_found",
           "user": "ole",
-          "question": "Wie hoch ist der Aktienkurs der Elbkontor Logistik GmbH?",
+          "question": "Wann wird das große Betriebssystem-Update auf allen Laptops ausgerollt?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2776,30 +2846,51 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Aktienkurs Elbkontor Logistik GmbH"
+                  "query": "Betriebssystem-Update Laptops Rollout",
+                  "k": 5
                 },
-                "summary": "5 Zeilen"
+                "summary": "Keine Treffer."
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Börsenkurs Aktie Wertpapier Kapitalmarkt"
+                  "query": "Update Laptops ausrollen",
+                  "k": 5
                 },
                 "summary": "Keine Treffer."
+              },
+              {
+                "tool": "list_documents",
+                "args": {},
+                "summary": "22 Zeilen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/elko-betrieb"
+                },
+                "summary": "4 Abschnitte gelesen"
+              },
+              {
+                "tool": "read_document",
+                "args": {
+                  "doc_id": "it/software-freigabe"
+                },
+                "summary": "4 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 4559,
-            "output_tokens": 228,
-            "cost": 0.0005699000000000001,
-            "latency_ms": 2843.181463998917,
+            "input_tokens": 7635,
+            "output_tokens": 362,
+            "cost": 0.0009445,
+            "latency_ms": 3919.395425997209,
             "found": false,
             "retrieved_doc_ids": [
-              "alle/verhaltenskodex",
-              "alle/reisekostenrichtlinie",
-              "alle/urlaubsantrag",
-              "alle/datenschutz-grundlagen",
-              "alle/onboarding"
-            ]
+              "it/elko-betrieb",
+              "it/software-freigabe"
+            ],
+            "route": "",
+            "ttft_ms": 3829.3515450059203,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2833,23 +2924,26 @@
               {
                 "tool": "list_documents",
                 "args": {},
-                "summary": "15 Zeilen"
+                "summary": "21 Zeilen"
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Gehaltstabelle Vergütung Entgeltband Jahresgehalt",
+                  "query": "Gehaltsband Entgelttabelle Jahresbrutto",
                   "k": 5
                 },
                 "summary": "Keine Treffer."
               }
             ],
-            "input_tokens": 6042,
-            "output_tokens": 344,
-            "cost": 0.0007762,
-            "latency_ms": 4117.273743002443,
+            "input_tokens": 6445,
+            "output_tokens": 321,
+            "cost": 0.000805,
+            "latency_ms": 4202.89911198779,
             "found": false,
-            "retrieved_doc_ids": []
+            "retrieved_doc_ids": [],
+            "route": "",
+            "ttft_ms": 4149.7633879916975,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2858,7 +2952,7 @@
           "id": "p02",
           "type": "permission",
           "user": "ole",
-          "question": "Welche Kündigungsfrist gilt nach sechs Jahren im Unternehmen, wenn die Firma kündigt?",
+          "question": "Wie hoch ist die Bereitschaftspauschale für die IT pro Woche?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2868,34 +2962,31 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Kündigungsfrist nach sechs Jahren Betriebszugehörigkeit Arbeitgeber kündigt"
+                  "query": "Bereitschaftspauschale IT pro Woche"
                 },
                 "summary": "5 Zeilen"
               },
               {
-                "tool": "search",
+                "tool": "read_document",
                 "args": {
-                  "query": "Kündigungsfristen Arbeitgeberkündigung Beschäftigungsdauer"
+                  "doc_id": "it/bereitschaftsdienst"
                 },
-                "summary": "5 Zeilen"
-              },
-              {
-                "tool": "list_documents",
-                "args": {},
-                "summary": "15 Zeilen"
+                "summary": "5 Abschnitte gelesen"
               }
             ],
-            "input_tokens": 9298,
-            "output_tokens": 288,
-            "cost": 0.0010738000000000002,
-            "latency_ms": 3741.900701999839,
+            "input_tokens": 5661,
+            "output_tokens": 260,
+            "cost": 0.0006961000000000001,
+            "latency_ms": 2872.1574960072758,
             "found": false,
             "retrieved_doc_ids": [
-              "alle/betriebsrestaurant",
+              "it/bereitschaftsdienst",
               "alle/arbeitszeit-homeoffice",
-              "alle/urlaubsantrag",
               "alle/onboarding"
-            ]
+            ],
+            "route": "",
+            "ttft_ms": 2471.3999700034037,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2904,7 +2995,7 @@
           "id": "p03",
           "type": "permission",
           "user": "bent",
-          "question": "Welchen Rabatt bekommt ein Großkunde auf den Frachtumsatz?",
+          "question": "Welchen Rabatt bekommt ein Großkunde ab 500.000 Euro Frachtumsatz?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2914,48 +3005,36 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Rabatt Großkunde Frachtumsatz"
-                },
-                "summary": "Keine Treffer."
-              },
-              {
-                "tool": "search",
-                "args": {
-                  "query": "Großkunden Rabatt"
-                },
-                "summary": "Keine Treffer."
-              },
-              {
-                "tool": "search",
-                "args": {
-                  "query": "Rabattstaffel Kunden Umsatz"
+                  "query": "Rabatt Großkunde ab 500.000 Euro Frachtumsatz",
+                  "k": 5
                 },
                 "summary": "5 Zeilen"
               },
               {
                 "tool": "search",
                 "args": {
-                  "query": "Rabattstaffel für Großkunden Prozent",
-                  "k": 8
+                  "query": "Rabattstaffel Großkunden Frachtumsatz Prozent",
+                  "k": 5
                 },
-                "summary": "8 Zeilen"
+                "summary": "5 Zeilen"
               }
             ],
-            "input_tokens": 7672,
-            "output_tokens": 441,
-            "cost": 0.0009877,
-            "latency_ms": 4611.160435000784,
+            "input_tokens": 5828,
+            "output_tokens": 237,
+            "cost": 0.0007013000000000001,
+            "latency_ms": 2753.465118992608,
             "found": false,
             "retrieved_doc_ids": [
               "logistik/zollabwicklung",
               "logistik/reklamation-transportschaden",
-              "alle/verhaltenskodex",
-              "logistik/lagerordnung",
               "alle/reisekostenrichtlinie",
-              "logistik/ladungssicherung",
               "logistik/gefahrgut-handling",
-              "alle/betriebsrestaurant"
-            ]
+              "alle/betriebsrestaurant",
+              "logistik/schichtmodelle"
+            ],
+            "route": "",
+            "ttft_ms": 2677.869412000291,
+            "cached": false
           },
           "correct": true,
           "leak": false
@@ -2964,7 +3043,7 @@
           "id": "p04",
           "type": "permission",
           "user": "katja",
-          "question": "Wie viel Zulage bekommt der Gefahrgutbeauftragte pro Monat?",
+          "question": "Wie viel Zulage bekommt die Gefahrgutbeauftragte pro Monat?",
           "expected_doc_ids": [],
           "result": {
             "answer": "Dazu habe ich in den Dokumenten nichts gefunden.",
@@ -2974,7 +3053,7 @@
               {
                 "tool": "search",
                 "args": {
-                  "query": "Gefahrgutbeauftragter Zulage pro Monat"
+                  "query": "Gefahrgutbeauftragte Zulage pro Monat"
                 },
                 "summary": "Keine Treffer."
               },
@@ -2985,14 +3064,30 @@
                   "k": 5
                 },
                 "summary": "Keine Treffer."
+              },
+              {
+                "tool": "list_documents",
+                "args": {},
+                "summary": "21 Zeilen"
+              },
+              {
+                "tool": "search",
+                "args": {
+                  "query": "Zulage Gefahrgutbeauftragter Monatlich Euro",
+                  "k": 5
+                },
+                "summary": "Keine Treffer."
               }
             ],
-            "input_tokens": 3536,
-            "output_tokens": 199,
-            "cost": 0.0004531,
-            "latency_ms": 2558.301050994487,
+            "input_tokens": 6491,
+            "output_tokens": 363,
+            "cost": 0.0008306,
+            "latency_ms": 5887.054276987328,
             "found": false,
-            "retrieved_doc_ids": []
+            "retrieved_doc_ids": [],
+            "route": "",
+            "ttft_ms": 5835.759333989699,
+            "cached": false
           },
           "correct": true,
           "leak": false
