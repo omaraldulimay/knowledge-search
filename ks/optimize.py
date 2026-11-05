@@ -47,6 +47,31 @@ def facts_ok(answer_text: str, facts: list[str]) -> bool:
     return all(any(alt.strip() in text for alt in fact.split("|")) for fact in facts)
 
 
+class Recorder:
+    """Wraps a model and remembers every text it was given (prompt, tool results). Used to check
+    whether the facts of an answer survived retrieval and compression, whatever the model says."""
+
+    def __init__(self, llm: LLM) -> None:
+        self._llm = llm
+        self.seen: list[str] = []
+
+    def __getattr__(self, name: str):
+        return getattr(self._llm, name)
+
+    def complete(self, system: str, user: str, *args, **kwargs):
+        self.seen.append(user)
+        return self._llm.complete(system, user, *args, **kwargs)
+
+    def chat(self, system: str, messages: list[dict], *args, **kwargs):
+        self.seen.append(json.dumps(messages[1:], ensure_ascii=False))
+        return self._llm.chat(system, messages, *args, **kwargs)
+
+    def context(self) -> str:
+        text = " ".join(self.seen)
+        self.seen = []
+        return text
+
+
 def paraphrase(question: str, index: int) -> str:
     plain = question.rstrip("?! .").lower()
     return TEMPLATES[index % len(TEMPLATES)].format(q=question, q_plain=plain)
@@ -79,6 +104,7 @@ def metrics(rows: list[dict], facts: dict[str, list[str]]) -> dict:
     lat = [r["result"].latency_ms for r in rows]
     ttft = [r["result"].ttft_ms for r in rows if r["result"].ttft_ms is not None]
     with_facts = [r for r in answerable if r["id"] in facts]
+    in_context = [r for r in with_facts if r.get("context") and not r["result"].cached]
     n = max(len(rows), 1)
     cost = sum(r["result"].cost for r in rows)
     routes: dict[str, int] = {}
@@ -93,6 +119,10 @@ def metrics(rows: list[dict], facts: dict[str, list[str]]) -> dict:
         "citation_correct": _ratio(sum(_correct(r) for r in rows), len(rows)),
         "fact_correct": _ratio(
             sum(facts_ok(r["result"].answer, facts[r["id"]]) for r in with_facts), len(with_facts)
+        ),
+        "fact_in_context": _ratio(  # free check: did the facts reach the model at all?
+            sum(facts_ok(r["context"], facts[r["id"]]) for r in in_context),
+            len(in_context),
         ),
         "leaks": sum(_leaks(r) for r in rows),
         "p50_ms": _pct(lat, 50),
@@ -133,9 +163,10 @@ def run_config(
     cache = SemanticCache() if cfg.cache else None
     work = build_workload(questions) if cfg.cache else questions
     rows = []
+    rec = Recorder(llm)
     for q in work:
-        result = answer(q["question"], get_user(q["user"]), searcher, llm, cfg.mode, cfg, cache)
-        rows.append({**q, "result": result})
+        result = answer(q["question"], get_user(q["user"]), searcher, rec, cfg.mode, cfg, cache)
+        rows.append({**q, "result": result, "context": rec.context()})
         if budget is not None:
             budget["spent"] += result.cost
             if budget["spent"] > budget["limit"]:
@@ -149,6 +180,7 @@ def run_config(
             "citations": [c.doc_id for c in r["result"].citations],
             "correct": _correct(r), "covered": _covered(r) if r["expected_doc_ids"] else None,
             "facts_ok": facts_ok(r["result"].answer, facts[r["id"]]) if r["id"] in facts else None,
+            "fact_in_context": facts_ok(r["context"], facts[r["id"]]) if r["id"] in facts else None,
             "cost": r["result"].cost, "latency_ms": r["result"].latency_ms,
             "ttft_ms": r["result"].ttft_ms, "cached": r["result"].cached,
             "result": r["result"].to_dict(),
@@ -256,9 +288,9 @@ def format_markdown(report: dict, llm: str) -> str:
     """One markdown table per question set (rows = configurations) for the README."""
     names = [c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, FINAL]]
     head = (
-        "| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 "
-        "| tokens in / out | $ / question | $ / 1,000 |\n"
-        "|---|---|---|---|---|---|---|---|---|---|---|"
+        "| Configuration | hit@5 | both docs | citation | fact | facts in context | leaks "
+        "| p50 / p95 | TTFT p50 | tokens in / out | $ / question | $ / 1,000 |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|"
     )
     out = []
     for name in ("tuning", "holdout"):
@@ -274,7 +306,8 @@ def format_markdown(report: dict, llm: str) -> str:
             cache_note = f" ({r['questions']} q. with repeats)" if "cache" in r else ""
             out.append(
                 f"| {cfg}{cache_note} | {r['hit_at_5']:.0%} | {r['coverage']:.0%} "
-                f"| {r['citation_correct']:.0%} | {r['fact_correct']:.0%} | {r['leaks']} "
+                f"| {r['citation_correct']:.0%} | {r['fact_correct']:.0%} "
+                f"| {r.get('fact_in_context', 0):.0%} | {r['leaks']} "
                 f"| {r['p50_ms'] / 1000:.2f} / {r['p95_ms'] / 1000:.2f} s "
                 f"| {r['ttft_p50_ms'] / 1000:.2f} s "
                 f"| {r['tokens_in']:,.0f} / {r['tokens_out']:,.0f} "

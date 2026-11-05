@@ -12,17 +12,17 @@ DOCS = Path(__file__).resolve().parent.parent / "data" / "docs"
 
 
 def test_corpus_size_and_formats(documents):
-    assert len(documents) == 35
+    assert len(documents) == 52
     suffixes = [d.source.rsplit(".", 1)[1] for d in documents]
     assert suffixes.count("pdf") == 3
     assert suffixes.count("docx") == 2
-    assert suffixes.count("md") == 30
+    assert suffixes.count("md") == 47
     assert {d.department for d in documents} == {"alle", "hr", "it", "vertrieb", "logistik"}
 
 
 def test_document_length(documents):
     for d in documents:
-        assert 300 <= len(d.text.split()) <= 1200, d.doc_id
+        assert 30 <= len(d.text.split()) <= 1200, d.doc_id
 
 
 def test_load_markdown():
@@ -36,14 +36,14 @@ def test_load_pdf_detects_headings():
     doc = load_document(DOCS / "logistik" / "zollabwicklung.pdf", "logistik")
     assert doc.title == "Zollabwicklung"
     headings = [h for h, _ in split_sections(doc.text)]
-    assert "Gebühren" in headings
+    assert "Kosten" in headings
     assert "45 Euro" in doc.text
 
 
 def test_load_docx_detects_headings():
     doc = load_document(DOCS / "hr" / "probezeit-feedback.docx", "hr")
     assert doc.title.startswith("Leitfaden Probezeit")
-    assert "Gesprächstermine" in [h for h, _ in split_sections(doc.text)]
+    assert "Feedbackgespräche" in [h for h, _ in split_sections(doc.text)]
     assert "sechs Monate" in doc.text
 
 

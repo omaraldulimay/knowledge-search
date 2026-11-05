@@ -26,9 +26,11 @@ MULTI_PART = re.compile(
 # two different documents both match strongly (vector score) and the two rankers disagree
 STRONG_DOC = {"fastembed": 0.65, "hash": 0.3}
 SECOND_DOC = {
-    "fastembed": 0.5,
-    "hash": 0.2,
-}  # a two-part question needs a 2nd doc at least this good
+    "fastembed": 0.65,
+    "hash": 0.3,
+}  # a two-part question needs a 2nd doc at least this good (same bar as STRONG_DOC: with ~50
+#    documents many unrelated ones score 0.5, and the graph already puts linked documents into
+#    the classic prompt, so the agent is kept for questions where two documents clearly compete)
 
 
 @dataclass(frozen=True)

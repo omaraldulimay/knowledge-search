@@ -82,7 +82,7 @@ def test_incremental_indexing(tmp_path):
     shutil.copytree(ROOT / "data" / "docs", tmp_path / "docs")
     embedder, store, manifest = HashEmbedder(), MemoryStore(), {}
     first = sync_index(load_documents(tmp_path / "docs"), store, embedder, manifest)
-    assert first.added == 35 and first.chunks_embedded == store.count()
+    assert first.added == 52 and first.chunks_embedded == store.count()
     total = store.count()
 
     again = sync_index(load_documents(tmp_path / "docs"), store, embedder, manifest)

@@ -130,7 +130,7 @@ def test_documents_list_is_filtered(client):
     assert not any(d["doc_id"].startswith("hr/") for d in katja)
     fiete = client.get("/documents", headers=auth(client, "fiete")).json()
     assert any(d["doc_id"] == "hr/gehaltsbaender" for d in fiete)
-    assert len(fiete) == 35
+    assert len(fiete) == 52
 
 
 def test_get_document_forbidden_equals_missing(client):
@@ -162,7 +162,7 @@ def test_admin_delete_removes_document_everywhere(client):
     assert client.get("/documents/hr/gehaltsbaender", headers=admin).status_code == 404
     assert client.delete("/documents/hr/gehaltsbaender", headers=admin).status_code == 404
     ids = [d["doc_id"] for d in client.get("/documents", headers=admin).json()]
-    assert "hr/gehaltsbaender" not in ids and len(ids) == 34
+    assert "hr/gehaltsbaender" not in ids and len(ids) == 51
 
 
 def test_upload_then_ask_finds_new_document(client):

@@ -49,7 +49,7 @@ class ForbiddenLLM(FakeLLM):
 
 
 def test_links_have_explicit_and_shared_term_sources(link_index):
-    targets = {link["to"]: link["why"] for link in link_index.links["alle/onboarding"]}
+    targets = {link["to"]: link["why"] for link in link_index.links["alle/arbeitszeit-homeoffice"]}
     assert "it/mfa" in targets and "nennt" in targets["it/mfa"]  # (a) names the MFA document
     assert link_index.key_terms["it/vpn-einrichtung"]  # (b) key terms exist
     assert any(
@@ -203,7 +203,7 @@ def test_router_multi_part_question_needs_a_second_document(chunks):
     two_part = "Wie viel darf ein Hotel kosten und wie schnell muss ich abrechnen?"
     one_doc = [_hit(a, 0.8, 12.0), _hit(b, 0.4, 5.0)]
     assert decide(one_doc, "fastembed", two_part).route == "classic"  # one document covers both
-    two_docs = [_hit(a, 0.8, 12.0), _hit(b, 0.6, 5.0)]
+    two_docs = [_hit(a, 0.8, 12.0), _hit(b, 0.7, 5.0)]
     assert decide(two_docs, "fastembed", two_part).route == "agentic"
     assert decide(two_docs, "fastembed", "Wie hoch ist das Budget?").route == "classic"
 
