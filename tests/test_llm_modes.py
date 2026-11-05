@@ -62,10 +62,10 @@ class AsksForHrDocument:
     model = "scripted"
     price_in = price_out = 0.0
 
-    def complete(self, system, user):
+    def complete(self, system, user, **kwargs):
         raise NotImplementedError
 
-    def chat(self, system, messages, tools, allow_tools=True):
+    def chat(self, system, messages, tools, allow_tools=True, **kwargs):
         if len(messages) == 1:
             call = ToolCall("t1", "read_document", {"doc_id": "hr/gehaltsbaender"})
             return LLMResponse("", [call], Usage(1, 1), [])
@@ -87,10 +87,10 @@ class NeverStops:
         self.calls = 0
         self.last_allow_tools = None
 
-    def complete(self, system, user):
+    def complete(self, system, user, **kwargs):
         raise NotImplementedError
 
-    def chat(self, system, messages, tools, allow_tools=True):
+    def chat(self, system, messages, tools, allow_tools=True, **kwargs):
         self.calls += 1
         self.last_allow_tools = allow_tools
         if not allow_tools:

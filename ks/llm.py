@@ -8,12 +8,17 @@ The real API is only used when LLM_PROVIDER=anthropic AND ANTHROPIC_API_KEY is s
 import json
 import os
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 NOT_FOUND = "Dazu habe ich in den Dokumenten nichts gefunden."
 # A citation looks like [hr/kuendigungsfristen#Probezeit] = [doc_id#section heading]
 LABEL_RE = re.compile(r"\[([a-z0-9_-]+/[a-z0-9_-]+#[^\]\n]+)\]")
+# Short citation keys of the compressed prompts: [1], [2] or [1, 3]; mapped back to chunks in code.
+KEY_RE = re.compile(r"\[(\d+(?:\s*[,;]\s*\d+)*)\]")
+DOC_ID_RE = re.compile(r"\b([a-z0-9_-]+/[a-z0-9_-]+)\b")
+TextCallback = Callable[[str], None]  # called with every piece of streamed answer text
 
 DEFAULT_MODEL = "claude-haiku-5-5"
 # USD per million tokens, from the claude-api skill price table (Haiku 5.5, prompts <= 100K tokens)
@@ -47,13 +52,17 @@ class LLM(Protocol):
     price_in: float  # USD per million input tokens
     price_out: float
 
-    def complete(self, system: str, user: str) -> LLMResponse:
-        """Plain completion: one user prompt, no tools."""
+    def complete(
+        self, system: str, user: str, max_tokens: int | None = None,
+        on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
+        """Plain completion: one user prompt, no tools. `on_text` receives streamed text."""
         ...
 
     def chat(
-        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True
-    ) -> LLMResponse:
+        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
+        max_tokens: int | None = None, on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
         """One step of a tool-use conversation. allow_tools=False forces a text answer."""
         ...
 
@@ -84,7 +93,7 @@ def _labelled_blocks(text: str) -> list[tuple[str, str]]:
     Search result lines ("[label] snippet") are handled as one-line blocks."""
     blocks: list[tuple[str, str]] = []
     for line in text.splitlines():
-        m = re.match(r"^\[([a-z0-9_-]+/[a-z0-9_-]+#[^\]\n]+)\]\s*(.*)$", line)
+        m = re.match(r"^\[([a-z0-9_-]+/[a-z0-9_-]+#[^\]\n]+|\d+)\]\s*(.*)$", line)
         if m:
             blocks.append((m.group(1), m.group(2)))
         elif blocks and line.strip() and not line.startswith("Frage:"):
@@ -114,7 +123,12 @@ class FakeLLM:
                 break
         return "Laut den Dokumenten:\n" + "\n".join(lines) if lines else NOT_FOUND
 
-    def _response(self, text: str, calls: list[ToolCall], prompt: str) -> LLMResponse:
+    def _response(
+        self, text: str, calls: list[ToolCall], prompt: str, on_text: TextCallback | None = None
+    ) -> LLMResponse:
+        if on_text:
+            for word in text.split(" "):
+                on_text(word + " ")
         content: list[dict] = [{"type": "text", "text": text}] if text else []
         content += [
             {"type": "tool_use", "id": c.id, "name": c.name, "input": c.args} for c in calls
@@ -123,12 +137,17 @@ class FakeLLM:
         usage = Usage(_estimate_tokens(prompt), _estimate_tokens(out))
         return LLMResponse(text, calls, usage, content)
 
-    def complete(self, system: str, user: str) -> LLMResponse:
-        return self._response(self._compose(_labelled_blocks(user)), [], system + user)
+    def complete(
+        self, system: str, user: str, max_tokens: int | None = None,
+        on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
+        text = self._compose(_labelled_blocks(user))
+        return self._response(text, [], system + user, on_text)
 
     def chat(
-        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True
-    ) -> LLMResponse:
+        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
+        max_tokens: int | None = None, on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
         prompt = system + json.dumps(messages, ensure_ascii=False)
         question = messages[0]["content"]
         results = [
@@ -145,10 +164,11 @@ class FakeLLM:
         search_result = results[0] if results else ""
         blocks = _labelled_blocks(search_result)
         if len(results) == 1 and allow_tools and blocks:
-            doc_id = blocks[0][0].split("#")[0]
+            found = DOC_ID_RE.search(blocks[0][0] + " " + blocks[0][1])
+            doc_id = found.group(1) if found else blocks[0][0].split("#")[0]
             call = ToolCall("fake_2", "read_document", {"doc_id": doc_id})
             return self._response("", [call], prompt)
-        return self._response(self._compose(blocks), [], prompt)
+        return self._response(self._compose(blocks), [], prompt, on_text)
 
 
 class AnthropicLLM:
@@ -163,25 +183,37 @@ class AnthropicLLM:
         self.price_in, self.price_out = _prices()
         self._client = anthropic.Anthropic(api_key=api_key)  # key from ANTHROPIC_API_KEY
 
-    def complete(self, system: str, user: str) -> LLMResponse:
-        return self.chat(system, [{"role": "user", "content": user}], [], allow_tools=False)
+    def complete(
+        self, system: str, user: str, max_tokens: int | None = None,
+        on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
+        messages = [{"role": "user", "content": user}]
+        return self.chat(system, messages, [], False, max_tokens, on_text)
 
     def chat(
-        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True
-    ) -> LLMResponse:
+        self, system: str, messages: list[dict], tools: list[dict], allow_tools: bool = True,
+        max_tokens: int | None = None, on_text: TextCallback | None = None,
+    ) -> LLMResponse:  # fmt: skip
         kwargs: dict[str, Any] = {}
         if tools:
             kwargs["tools"] = tools
             if not allow_tools:
                 kwargs["tool_choice"] = {"type": "none"}  # tools stay declared for the history
-        response = self._client.messages.create(
+        params: dict[str, Any] = dict(
             model=self.model,
-            max_tokens=2048,
+            max_tokens=max_tokens or 2048,
             system=system,
             messages=messages,
             output_config={"effort": "low"},  # short factual answers; no sampling params on 5.5
             **kwargs,
         )
+        if on_text:  # streaming: text arrives piece by piece, the final message has the usage
+            with self._client.messages.stream(**params) as stream:
+                for piece in stream.text_stream:
+                    on_text(piece)
+                response = stream.get_final_message()
+        else:
+            response = self._client.messages.create(**params)
         # keep the raw blocks (incl. thinking blocks) so they can be sent back unchanged
         content = [b.model_dump(exclude_none=True) for b in response.content]
         text = "".join(b.text for b in response.content if b.type == "text")
