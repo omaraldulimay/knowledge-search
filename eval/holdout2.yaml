@@ -1,0 +1,28 @@
+# Second held-out set: 15 NEW questions in everyday employee language (slang, abbreviations, no
+# document wording). Committed BEFORE the "colloquial retrieval" work (embedding model, reranker,
+# doc2query, ...). Rule: per-question results of this file are never looked at while tuning; it is
+# evaluated once at the very end. The facts of the right answers are in eval/facts.yaml (ids i01-i15).
+# type: single | multi | not_found | permission
+questions:
+  # --- 6 single-document questions
+  - {id: i01, type: single, user: bent, question: "Was zahl ich eigentlich für das Tagesessen in der Kantine?", expected_doc_ids: [alle/betriebsrestaurant]}
+  - {id: i02, type: single, user: ole, question: "Wie lange kann ich im VPN hängen, bevor der mich rauswirft, wenn ich nix mache?", expected_doc_ids: [it/vpn-einrichtung]}
+  - {id: i03, type: single, user: bent, question: "Palette ist beim Transport kaputtgegangen, wen muss ich sofort anpingen und bis wann muss das schriftlich rein?", expected_doc_ids: [logistik/reklamation-transportschaden]}
+  - {id: i04, type: single, user: katja, question: "Wie viel darf ich nen Kunden beim Essen einladen, pro Nase?", expected_doc_ids: [vertrieb/kundenbewirtung]}
+  - {id: i05, type: single, user: bent, question: "Wann muss ich auf ner langen Tour die Zurrgurte nachziehen?", expected_doc_ids: [logistik/ladungssicherung]}
+  - {id: i06, type: single, user: mira, question: "Wie lange heben wir eigentlich Bewerbungsunterlagen auf, bis die weg sind?", expected_doc_ids: [hr/bewerbungsprozess]}
+
+  # --- 5 questions that need two documents
+  - {id: i07, type: multi, user: bent, question: "Ich will kurz vor Weihnachten noch Urlaub nehmen, geht das und wie lange vorher muss ich den eintragen?", expected_doc_ids: [alle/urlaubsantrag, logistik/protokoll-hallenleitung-2026-09]}
+  - {id: i08, type: multi, user: mira, question: "Ich hör bei uns auf, krieg ich meinen Resturlaub noch und wann ist mein Chip dicht?", expected_doc_ids: [hr/kuendigungsfristen, alle/urlaubsantrag]}
+  - {id: i09, type: multi, user: katja, question: "Mein Kunde kriegt ein Geschenk für 40 Euro, ist das ok, und was darf ich selber von Lieferanten annehmen?", expected_doc_ids: [vertrieb/kundenbewirtung, alle/verhaltenskodex]}
+  - {id: i10, type: multi, user: bent, question: "Wo kriege ich Ersatzgurte her und wen rufe ich an, wenn die Ladung trotzdem verrutscht und was kaputt ist?", expected_doc_ids: [logistik/ladungssicherung, logistik/reklamation-transportschaden]}
+  - {id: i11, type: multi, user: ole, question: "Unsere Neue kriegt Montag ihren Rechner, wo holt sie den ab und wann kickt sie der Tunnel aus dem Netz, wenn sie von zuhause arbeitet?", expected_doc_ids: [alle/onboarding, it/vpn-einrichtung]}
+
+  # --- 2 questions whose answer is in no document
+  - {id: i12, type: not_found, user: mira, question: "Zahlt die Firma was dazu, wenn ich ins Fitnessstudio gehe?", expected_doc_ids: []}
+  - {id: i13, type: not_found, user: katja, question: "Kann ich mein Auto auf dem Hof parken und kostet das was?", expected_doc_ids: []}
+
+  # --- 2 permission questions: the answer lives only in documents the user may not read
+  - {id: i14, type: permission, user: ole, question: "Wie lang ist meine Kündigungsfrist, wenn die Firma mich nach sechs Jahren loswerden will?", expected_doc_ids: []}
+  - {id: i15, type: permission, user: bent, question: "Was kriege ich, wenn ich nen Kumpel fürs Lager anwerbe?", expected_doc_ids: []}

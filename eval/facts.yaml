@@ -1,6 +1,6 @@
 # Facts a correct answer must contain (checked after lower-casing; "|" separates alternatives,
 # every entry must match). Used for the answer-quality column, next to citation correctness.
-# Written from the documents; tuning and held-out questions share this file.
+# Written from the documents; tuning and both held-out sets share this file.
 s01: ["20 prozent", "250 euro"]
 s02: ["pz-2", "6 wochen|sechs wochen"]
 s03: ["bereichsleitung"]
@@ -34,3 +34,14 @@ h08: ["3077", "60 minuten"]
 h09: ["marquardt", "5299"]
 h10: ["1.04", "elbkontor auth|authenticator|mfa|zweite"]
 h11: ["dohrmann", "6 paletten|sechs paletten"]
+i01: ["4,20"]
+i02: ["10 stunden", "20 minuten"]
+i03: ["420", "7 tage|sieben tage"]
+i04: ["60 euro"]
+i05: ["50 kilometer|50 km", "150 kilometer|150 km"]
+i06: ["6 monate|sechs monate"]
+i07: ["23.11|23. november", "4 wochen|vier wochen"]
+i08: ["kündigungsfrist|vorrangig", "letzten arbeitstag"]
+i09: ["35 euro"]
+i10: ["5500", "420"]
+i11: ["1.04", "20 minuten|10 stunden"]
