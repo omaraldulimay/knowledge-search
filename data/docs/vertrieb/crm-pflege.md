@@ -1,33 +1,17 @@
-# CRM-Pflege
-
-## Zweck
-
-Das CRM-System "Kundenkompass" ist die zentrale Datenbasis für alle Kundenbeziehungen der Elbkontor Logistik GmbH. Es wird von Vertrieb, Kundenservice und Geschäftsführung genutzt. Daten im CRM sind nur dann nützlich, wenn sie vollständig und aktuell sind.
+# Kontorbuch (CRM) pflegen
 
 ## Pflichtfelder
 
-Für jeden Kunden müssen folgende Felder gepflegt sein: Firmenname, Rechtsform, Rechnungsadresse, Branche, Umsatzsteuer-ID, Hauptansprechpartner und Zahlungsziel. Für Großkunden kommen Rahmenvertragsnummer, Vertragsende und Rabattstufe hinzu. Fehlende Pflichtfelder werden in der Wochenübersicht rot markiert.
+Jeder Kunde im Kontorbuch braucht: Kundennummer (Muster KD-10482), Ansprechperson, Branche, Temperaturklasse (T0 trocken, T1 gekühlt 2 bis 6 Grad, T2 Pharma 2 bis 8 Grad), SLA-Kennzeichen (S-Standard, S-Plus oder S-Individuell) und die zuständige Kundenbetreuung. Ohne diese Felder lässt sich kein Angebot anlegen.
 
-## Kontakte dokumentieren
+## Aktivitäten
 
-Jedes Kundengespräch, jeder Besuch und jedes Angebot wird innerhalb von 24 Stunden als Aktivität erfasst. Die Notiz soll Datum, Gesprächspartner, Inhalt und nächsten Schritt enthalten. Persönliche Details wie Familie oder Gesundheit gehören nicht ins CRM. Es sind nur sachliche und geschäftsrelevante Informationen erlaubt.
+Gespräche, Anrufe und Besuche werden innerhalb von 24 Stunden als Aktivität erfasst. Kundenreklamationen werden zusätzlich mit der Schadensnummer SCH-JJJJ-nnn verknüpft.
 
 ## Datenqualität
 
-Einmal im Quartal führt der Vertriebsinnendienst eine Bereinigung durch: Dubletten werden zusammengeführt, veraltete Kontakte archiviert. Kunden ohne Aktivität in 24 Monaten werden auf inaktiv gesetzt. Nach 36 Monaten Inaktivität werden Personenkontakte gelöscht, soweit keine gesetzlichen Aufbewahrungsfristen entgegenstehen.
+Zum Monatsende prüft die Vertriebsassistenz Lena Marquardt doppelte Kunden. Inaktive Kunden (kein Auftrag seit 24 Monaten) werden auf "ruhend" gesetzt, nicht gelöscht. Personenbezogene Daten werden nach den Vorgaben des Datenschutzes gelöscht.
 
-## Pipeline
+## Sonderkunden
 
-Opportunities durchlaufen die Phasen Anfrage, Machbarkeit, Angebot, Verhandlung, gewonnen und verloren. Die Pipeline wird jeden Montag im Vertriebsmeeting besprochen. Opportunities in der gleichen Phase seit mehr als 60 Tagen werden von der Vertriebsleitung überprüft.
-
-## Berechtigungen
-
-Alle Vertriebsmitarbeitenden sehen alle Kunden. Der Export der Kundenliste ist nur dem Vertriebsinnendienst und der Vertriebsleitung erlaubt, da diese Listen personenbezogene Daten enthalten. Der Zugriff aus dem Ausland ist gesperrt.
-
-## Schulung
-
-Neue Mitarbeitende erhalten innerhalb der ersten zwei Wochen eine zweistündige CRM-Schulung. Ansprechpartnerin für Fragen ist die CRM-Administratorin Frau Lena Wittkamp.
-
-## Datenschutz im CRM
-
-Kontaktdaten von Ansprechpersonen sind personenbezogene Daten. Sie dürfen nur für geschäftliche Zwecke verwendet werden. Auf Wunsch einer Person müssen Daten umgehend berichtigt oder gelöscht werden, Anfragen gehen an den Datenschutzbeauftragten. Newsletter dürfen nur an Kontakte gesendet werden, die eingewilligt haben, das Einverständnis wird im CRM mit Datum gespeichert. Importe aus gekauften Adresslisten sind nicht erlaubt.
+Die Kunden mit Individual-SLA stehen in der SLA-Übersicht. Neue Sonderkonditionen gehen nur über die Vertragsvorlagen.

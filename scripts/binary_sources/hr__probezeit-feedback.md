@@ -1,31 +1,19 @@
 # Leitfaden Probezeit und Feedbackgespräche
 
-Dieser Leitfaden richtet sich an Führungskräfte der Elbkontor Logistik GmbH und beschreibt, wie die Probezeit begleitet wird.
+Dieser Leitfaden richtet sich an Führungskräfte der Elbkontor Logistik GmbH.
 
 ## Dauer der Probezeit
 
-Die Probezeit beträgt sechs Monate. In dieser Zeit gilt eine Kündigungsfrist von zwei Wochen. Bei befristeten Verträgen unter einem Jahr kann die Probezeit auf drei Monate verkürzt werden. Eine Verlängerung der Probezeit ist nur in gegenseitigem Einvernehmen und höchstens um drei Monate möglich.
+Die Probezeit beträgt sechs Monate. In dieser Zeit gilt eine Kündigungsfrist von zwei Wochen. Bei befristeten Verträgen unter einem Jahr kann die Probezeit auf drei Monate verkürzt werden.
 
-## Gesprächstermine
+## Feedbackgespräche
 
-Es finden drei Gespräche statt: nach vier Wochen (Ankommensgespräch), nach drei Monaten (Zwischenbilanz) und spätestens vier Wochen vor Ende der Probezeit (Abschlussgespräch). Die Termine trägt die Führungskraft im Personalportal ein. Die Personalabteilung erinnert eine Woche vorher automatisch.
+Es gibt drei Pflichtgespräche: nach 6 Wochen, nach 3 Monaten und nach 5 Monaten. Dokumentiert wird mit dem Formular "PZ-2" in der Personalakte. Beim 5-Monats-Gespräch fällt die Vorentscheidung über die Übernahme.
 
-## Inhalt der Gespräche
+## Entscheidung
 
-Besprochen werden die Ziele der Probezeit, fachliche Leistung, Zusammenarbeit im Team und Fragen der neuen Person. Die Führungskraft dokumentiert die Ergebnisse auf dem Bogen "Probezeitgespräch". Eine Kopie erhält die Mitarbeiterin oder der Mitarbeiter. Das Feedback soll konkret und mit Beispielen unterlegt sein.
+Die Entscheidung über die Übernahme teilt die Führungskraft der Personalleitung spätestens 4 Wochen vor Ende der Probezeit mit. Ohne Rückmeldung läuft das Verfahren weiter, die Personalleiterin Greta Hartwig fragt dann bei der Teamleitung nach. Bei einer Nichtübernahme beteiligt die Personalabteilung den Betriebsrat.
 
-## Entscheidung über die Übernahme
+## Besonderheiten im Lager
 
-Spätestens vier Wochen vor Ende der Probezeit entscheidet die Führungskraft gemeinsam mit der Personalabteilung, ob das Arbeitsverhältnis fortgesetzt wird. Wird nicht fortgesetzt, muss die Kündigung wegen der Frist von zwei Wochen schriftlich vor dem Ende der Probezeit zugehen. Der Betriebsrat ist vor einer Kündigung in der Probezeit anzuhören.
-
-## Nach der Probezeit
-
-Nach bestandener Probezeit werden zusätzliche Leistungen freigeschaltet: betriebliche Altersvorsorge, Jobrad und das volle Bildungsbudget. Die Einordnung im Gehaltsband wird überprüft, eine Anpassung ist möglich, wenn die Leistung überzeugt hat.
-
-## Besondere Situationen
-
-Bei längerer Krankheit in der Probezeit kann die Probezeit um die Krankheitstage verlängert werden. Schwangere genießen auch in der Probezeit Kündigungsschutz. Bei Unsicherheit wenden Sie sich bitte frühzeitig an die Personalabteilung, Durchwahl 200.
-
-## Dokumentation
-
-Alle Unterlagen zur Probezeit werden in der Personalakte aufbewahrt. Führungskräfte haben nur Zugriff auf die Unterlagen ihrer eigenen Teammitglieder. Der Bogen enthält Felder für Stärken, Entwicklungsfelder und vereinbarte Maßnahmen. Er wird von beiden Seiten unterschrieben.
+Lagermitarbeitende absolvieren innerhalb der Probezeit die Staplerunterweisung Stufe 1 und die ELKO-Schulung Basis; ohne beides erfolgt keine Übernahme.

@@ -1,35 +1,21 @@
-# Verhaltenskodex der Elbkontor Logistik GmbH
+# Verhaltenskodex
 
-Der Verhaltenskodex beschreibt, wie wir miteinander, mit Kunden und mit Geschäftspartnern umgehen.
+## Grundsätze
 
-## Respekt und Fairness
-
-Wir behandeln einander mit Respekt. Diskriminierung, Mobbing und sexuelle Belästigung werden nicht geduldet. Wer sich betroffen fühlt, kann sich an die Führungskraft, die Personalabteilung, den Betriebsrat oder an die externe Beschwerdestelle wenden. Meldungen werden vertraulich behandelt und Hinweisgebende vor Nachteilen geschützt.
+Der Verhaltenskodex der Elbkontor Logistik GmbH gilt für alle Beschäftigten, Leiharbeitskräfte und Subunternehmer auf dem Gelände in Billbrook. Er wurde zuletzt am 15.01.2026 durch die Geschäftsführerin Henrike Wulff in Kraft gesetzt.
 
 ## Geschenke und Einladungen
 
-Geschenke von Geschäftspartnern dürfen einen Wert von 40 Euro pro Anlass und Jahr nicht übersteigen. Bargeld und Gutscheine dürfen nie angenommen werden. Einladungen zu Essen oder Veranstaltungen sind in angemessenem Rahmen erlaubt, wenn sie einen geschäftlichen Bezug haben. Jedes Geschenk über 40 Euro muss der Compliance-Beauftragten gemeldet werden.
+Geschenke von Geschäftspartnern dürfen bis zu einem Wert von 35 Euro angenommen werden, darüber ist die Personalleitung zu informieren. Bargeld wird nie angenommen. In laufenden Ausschreibungen werden gar keine Geschenke angenommen.
 
-## Interessenkonflikte
+## Vertrauensstelle
 
-Private Interessen dürfen Geschäftsentscheidungen nicht beeinflussen. Beteiligungen an Wettbewerbern, Lieferanten oder Kunden sind der Personalabteilung anzuzeigen. Nebentätigkeiten bedürfen der schriftlichen Genehmigung, wenn sie mehr als fünf Stunden pro Woche beanspruchen oder im gleichen Geschäftsfeld liegen.
+Verstöße können vertraulich an die Vertrauensstelle gemeldet werden: Silke Brodersen, Durchwahl 245, oder das Meldeformular im Intranet "Kai". Hinweisgebende sind vor Nachteilen geschützt. Die Vertrauensstelle bestätigt jede Meldung innerhalb von 7 Tagen und schließt die Prüfung in der Regel binnen drei Monaten ab.
 
-## Umgang mit Informationen
+## Umgang mit Kundenwaren
 
-Betriebs- und Geschäftsgeheimnisse sind vertraulich zu behandeln, auch nach dem Ausscheiden. Interne Dokumente dürfen nicht auf private Speicher oder in private Cloud-Dienste kopiert werden. Äußerungen in sozialen Medien dürfen nicht im Namen des Unternehmens erfolgen, solange keine Freigabe der Kommunikationsabteilung vorliegt.
+Kundenwaren dürfen nicht für private Zwecke genutzt werden. Beschädigte oder gesperrte Ware (ELKO-Status K3) darf nicht mitgenommen werden, auch nicht zur Entsorgung.
 
-## Hinweise auf Verstöße
+## Konflikte im Team
 
-Verdachtsfälle können anonym über das Hinweisgebersystem unter der Adresse hinweise.elbkontor.example gemeldet werden. Die Compliance-Beauftragte, Frau Tessa Brandvold, bestätigt den Eingang innerhalb von sieben Tagen und informiert nach drei Monaten über die Maßnahmen.
-
-## Konsequenzen
-
-Verstöße können arbeitsrechtliche Folgen haben, bis hin zur Kündigung. Bei strafbaren Handlungen behält sich das Unternehmen die Anzeige vor.
-
-## Umgang mit Geschäftspartnern
-
-Unsere Lieferanten und Subunternehmer, insbesondere Frachtführer, werden nach transparenten Kriterien ausgewählt. Aufträge ab 10.000 Euro erfordern mindestens drei Vergleichsangebote. Wir arbeiten nicht mit Partnern zusammen, die Mindestlohn- oder Sicherheitsstandards verletzen. Zahlungen erfolgen ausschließlich auf Geschäftskonten gegen Rechnung. Bestechung und Vorteilsgewährung sind verboten.
-
-## Ansprechpersonen
-
-Bei Fragen zum Verhaltenskodex wenden Sie sich an die Compliance-Beauftragte Frau Tessa Brandvold oder an Ihre Führungskraft. Schulungen zum Kodex finden jährlich als Online-Training statt und dauern etwa 45 Minuten.
+Zuerst Teamleitung, dann Personalabteilung (Durchwahl 210). Der Betriebsrat, Vorsitzender Kai Tiedemann, steht unabhängig davon jederzeit zur Verfügung.

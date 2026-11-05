@@ -1,37 +1,17 @@
-# Angebotsprozess im Vertrieb
+# Angebotsprozess
 
-## Überblick
+## Ablauf
 
-Vom Kundenkontakt bis zum unterschriebenen Vertrag durchläuft jedes Angebot der Elbkontor Logistik GmbH sechs Schritte. Alle Schritte werden im CRM dokumentiert.
+Jedes Angebot entsteht im Kontorbuch aus einer Anfrage. Die Fracht wird mit dem "Frachtrechner" kalkuliert, der Kostenstellen und Zuschläge kennt. Angebote sind 30 Tage gültig. Nachgefasst wird nach 5 Arbeitstagen, danach noch einmal nach weiteren 10.
 
-## 1. Anfrage erfassen
+## Marge und Freigabe
 
-Eingehende Anfragen per E-Mail, Telefon oder Ausschreibungsportal werden innerhalb von zwei Stunden im CRM als Opportunity angelegt. Pflichtangaben sind Kunde, Ansprechperson, Start- und Zielort, Warenart, Menge, gewünschter Zeitraum und besondere Anforderungen wie Gefahrgut oder Kühlung.
+Die Zielmarge liegt bei 14 Prozent. Unter 12 Prozent Marge braucht das Angebot die Freigabe von Vertriebsleiter Tjark Rohwedder, unter 6 Prozent zusätzlich der Geschäftsführerin Henrike Wulff. Angebote über 50.000 Euro Jahresvolumen folgen dem Vier-Augen-Prinzip: eine zweite Person aus dem Vertrieb prüft die Kalkulation vor dem Versand.
 
-## 2. Machbarkeit klären
+## Kühl- und Gefahrgutanfragen
 
-Die Disposition prüft Kapazitäten, Routen und Fahrzeuge. Bei Gefahrgut oder Zoll wird die Logistik hinzugezogen. Die Rückmeldung der Disposition kommt innerhalb von einem Arbeitstag.
+Anfragen mit Temperaturführung (T1 gekühlt, T2 Pharma) prüft die Hallenleitung Halle 2 auf Kapazität, Anfragen mit Gefahrgut die Gefahrgutbeauftragte. Ohne Rückmeldung innerhalb von 2 Arbeitstagen darf kein Angebot für diese Temperaturklassen rausgehen.
 
-## 3. Kalkulation
+## Vertrag
 
-Der Vertriebsinnendienst kalkuliert mit dem Tarifrechner. Maßgeblich sind Listenpreise, Zuschläge und die Rabattstaffel. Die Marge darf bei Einzelaufträgen nicht unter 8 Prozent fallen, bei Rahmenverträgen nicht unter 6 Prozent. Abweichungen müssen vom Vertriebsleiter freigegeben werden.
-
-## 4. Angebot erstellen
-
-Das Angebot wird aus der Vorlage im CRM erzeugt. Es enthält Leistungsbeschreibung, Preis, Gültigkeit, Haftungsgrenzen nach den Allgemeinen Deutschen Spediteurbedingungen und Zahlungsziel. Standardgültigkeit ist 30 Tage. Das Vier-Augen-Prinzip gilt für alle Angebote ab 25.000 Euro: eine zweite Person prüft vor Versand.
-
-## 5. Nachfassen
-
-Spätestens fünf Arbeitstage nach Versand wird telefonisch nachgefasst. Das Gespräch wird im CRM notiert. Wenn nach drei Kontaktversuchen keine Antwort kommt, wird die Opportunity auf "ruhend" gesetzt. Gewonnene und verlorene Angebote werden mit Grund erfasst.
-
-## 6. Vertrag und Übergabe
-
-Bei Zusage wird der Vertrag nach den Vorlagen der Rechtsabteilung erstellt. Verträge über 100.000 Euro Jahresvolumen werden von der Geschäftsführung unterzeichnet. Nach Unterschrift übergibt der Vertrieb den Kunden mit einem Übergabeprotokoll an den Kundenservice.
-
-## Reaktionszeiten
-
-Ziel ist ein Angebot innerhalb von zwei Arbeitstagen für Standardtransporte und innerhalb von fünf Arbeitstagen für Projektgeschäft oder Ausschreibungen. Die Kennzahl wird monatlich im Vertriebsmeeting besprochen.
-
-## Ausschreibungen
-
-Öffentliche Ausschreibungen werden von einem Mitglied der Vertriebsleitung koordiniert. Es gelten die Fristen der Vergabestelle, die Unterlagen werden mindestens drei Arbeitstage vor Abgabe vom Vier-Augen-Team geprüft. Bietergemeinschaften müssen von der Geschäftsführung genehmigt werden. Nach jeder Ausschreibung erfolgt eine Auswertung, bei Absagen wird das Debriefing der Vergabestelle angefragt.
+Bei Zusage wird die passende Vorlage aus den Vertragsvorlagen genommen. Abweichende Haftung ist nur mit der Geschäftsführerin zulässig.

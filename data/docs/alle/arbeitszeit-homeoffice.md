@@ -1,34 +1,24 @@
 ---
 policy: arbeitszeit-homeoffice
-valid_from: 2026-01-01
+valid_from: 2026-03-01
 superseded: false
 ---
 # Arbeitszeit und Homeoffice
 
-## Regelarbeitszeit
+Gültig ab 01.03.2026. Sie ersetzt die Fassung vom 01.01.2024 (dort waren drei Homeoffice-Tage erlaubt).
 
-Die vertragliche Wochenarbeitszeit für Vollzeit beträgt 39 Stunden. Die Kernarbeitszeit in der Verwaltung liegt zwischen 10:00 und 15:00 Uhr. Außerhalb davon gilt Gleitzeit zwischen 06:30 und 19:30 Uhr. Im Lager und in der Disposition gelten feste Schichtpläne mit Früh-, Spät- und Nachtschicht.
+## Homeoffice-Tage
 
-## Zeiterfassung
+Beschäftigte in der Verwaltung dürfen bis zu 2 Tage pro Woche im Homeoffice arbeiten. Die Disposition darf einen Tag pro Woche. Lager, Fuhrpark und Werkstatt sind ausgenommen. Die Tage werden im Zeitanker eingetragen und von der Teamleitung bestätigt. Grund für die Reduzierung von drei auf zwei Tage war der Beschluss der Betriebsversammlung vom 12.02.2026: mehr Präsenz bei der Einarbeitung neuer Teams.
 
-Arbeitszeiten werden elektronisch über das Zeiterfassungsterminal oder die Webanwendung erfasst. Korrekturen müssen innerhalb von drei Arbeitstagen bei der Führungskraft beantragt werden. Das Gleitzeitkonto darf maximal 60 Plusstunden und 20 Minusstunden aufweisen. Überstunden werden bevorzugt durch Freizeit ausgeglichen. Ab einem Saldo von 40 Stunden spricht die Führungskraft mit dem Mitarbeitenden über einen Abbau.
+## Kernzeit und Erreichbarkeit
 
-## Pausen
+Kernzeit in der Verwaltung ist 09:30 bis 14:30 Uhr. Rahmenarbeitszeit 06:30 bis 19:30 Uhr. Im Homeoffice gilt dieselbe Erreichbarkeit wie im Büro, Teams-Status bitte pflegen.
 
-Bei mehr als sechs Stunden Arbeit besteht Anspruch auf 30 Minuten Pause, bei mehr als neun Stunden auf 45 Minuten. Die Pausen werden nicht als Arbeitszeit gerechnet und automatisch abgezogen, wenn sie nicht gebucht wurden.
+## Zugriff auf interne Systeme
 
-## Homeoffice
+Zugriff auf Laufwerke und ELKO-Auswertungen nur über das VPN "Elbtunnel" mit MFA-Code, siehe VPN-Einrichtung. Ausgedruckt wird zu Hause nichts.
 
-Mitarbeitende in der Verwaltung können bis zu drei Tage pro Woche von zu Hause arbeiten, sofern die Tätigkeit es erlaubt und die Führungskraft zustimmt. Die Vereinbarung wird schriftlich im Portal festgehalten. Im Team müssen mindestens an zwei Tagen pro Woche alle vor Ort sein, in der Regel dienstags und donnerstags.
+## Überstunden und Gleitzeit
 
-## Ausstattung und Datenschutz
-
-Das Unternehmen stellt Laptop und Headset. Ein Monitor kann auf Antrag geliehen werden. Für den Zugriff auf interne Systeme ist das Firmen-VPN zu verwenden, die Einrichtung beschreibt die IT-Anleitung. Papierunterlagen mit vertraulichen Inhalten dürfen nicht zu Hause aufbewahrt werden. Es wird eine monatliche Pauschale von 20 Euro für Internet und Strom gezahlt.
-
-## Mobiles Arbeiten im Ausland
-
-Arbeiten aus dem Ausland ist nur bis zu 10 Arbeitstage pro Jahr und nur innerhalb der EU nach vorheriger Genehmigung erlaubt. Steuerliche und sozialversicherungsrechtliche Fragen klärt die Personalabteilung vorab.
-
-## Rufbereitschaft und Zuschläge
-
-Rufbereitschaft wird in der Disposition und im IT-Betrieb eingesetzt und pauschal mit 55 Euro pro Tag vergütet. Rückt jemand tatsächlich aus, zählt die Einsatzzeit als Arbeitszeit. Nachtarbeit zwischen 22:00 und 06:00 Uhr wird mit 25 Prozent Zuschlag vergütet, Sonntagsarbeit mit 50 Prozent und Feiertagsarbeit mit 100 Prozent. Nach einem Nachteinsatz muss eine Ruhezeit von mindestens elf Stunden eingehalten werden, bevor die nächste Schicht beginnt.
+Das Gleitzeitkonto darf zwischen minus 20 und plus 60 Stunden liegen. Überstunden über 60 Stunden zeigt der Zeitanker der Teamleitung rot an; sie müssen innerhalb von drei Monaten abgebaut werden. Auszahlung gibt es nur im Lager (Schichtmodell B) mit Freigabe der Hallenleitung.

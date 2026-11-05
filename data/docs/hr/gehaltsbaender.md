@@ -1,37 +1,24 @@
-# Gehaltsbänder 2026 (vertraulich)
+# Gehaltsbänder und Zulagen (vertraulich)
 
-**Vertraulich: nur für die Personalabteilung und die Geschäftsführung.** Diese Übersicht darf nicht an Führungskräfte außerhalb der Personalabteilung weitergegeben werden.
-
-## Systematik
-
-Alle Stellen der Elbkontor Logistik GmbH sind in die Entgeltgruppen E1 bis E9 eingeordnet. Jede Gruppe hat ein Jahresbrutto-Band für eine Vollzeitstelle mit 39 Wochenstunden. Die Einordnung erfolgt anhand von Verantwortung, Qualifikation und Erfahrung. Das 13. Monatsgehalt ist in den Bändern nicht enthalten und wird zu 100 Prozent im November gezahlt.
+Nur für die Personalabteilung. Stand 01.01.2026, abgestimmt mit der Geschäftsführung und dem Betriebsrat.
 
 ## Bänder
 
-| Entgeltgruppe | Beispielstellen | Jahresbrutto von | Jahresbrutto bis |
-|---|---|---|---|
-| E1 | Lagerhelfer, Empfang | 32.000 | 36.000 |
-| E2 | Fachlagerist, Sachbearbeitung | 35.000 | 40.000 |
-| E3 | Disponent, Kundenservice | 38.000 | 45.000 |
-| E4 | Speditionskaufmann, IT-Support | 42.000 | 50.000 |
-| E5 | Teamleitung Lager, Vertriebsinnendienst | 48.000 | 58.000 |
-| E6 | Entwickler, Key Account Manager | 55.000 | 68.000 |
-| E7 | Abteilungsleitung | 65.000 | 80.000 |
-| E8 | Bereichsleitung | 78.000 | 98.000 |
-| E9 | Geschäftsleitung | nach Vereinbarung | nach Vereinbarung |
+Jahresbrutto-Gehaltsband je Entgeltgruppe in Vollzeit: E1 29.000 bis 33.000 Euro, E2 32.000 bis 37.000 Euro, E3 36.000 bis 42.000 Euro, E4 41.000 bis 48.000 Euro, E5 47.000 bis 56.000 Euro, E6 55.000 bis 66.000 Euro, E7 64.000 bis 78.000 Euro, E8 76.000 bis 92.000 Euro. Teamleitungen im Lager starten in E5, Hallenleitungen in E7, Bereichsleitungen in E8. Einstellungen oberhalb der Bandmitte brauchen die Freigabe der Personalleiterin Greta Hartwig.
 
-## Einstieg und Entwicklung
+## Zulagen und Pauschalen
 
-Neue Mitarbeitende starten in der Regel im unteren Drittel des Bandes. Nach der Probezeit kann ein Aufstieg im Band erfolgen, wenn die Leistungsbeurteilung mindestens "erfüllt voll" lautet. Ein Gruppenwechsel ist nur bei Übernahme einer höherwertigen Tätigkeit möglich. Berufseinsteiger ohne Berufserfahrung beginnen in E4 mit höchstens 42.000 Euro.
+- Gefahrgutbeauftragte: 150 Euro pro Monat
+- Schichtleitung: 220 Euro pro Monat
+- Nachtzuschlag (nur Halle 2 Kühlkette): 25 Prozent
+- Frühzuschlag Schichtmodell B für Beginn vor 05:00 Uhr: 15 Prozent
+- IT-Bereitschaft: 95 Euro pro Bereitschaftswoche, Einsatz außerhalb der Reichweite wird als Arbeitszeit mit 1,5-fachem Satz vergütet
+- Hallenbereitschaft Logistik: 70 Euro pro Wochenende
+
+## Elbstern-Prämie
+
+Die jährliche Erfolgsprämie "Elbstern" beträgt zwischen 0,5 und 1,5 Monatsgehältern und wird im März ausgezahlt. Sie hängt zu 50 Prozent vom Unternehmensergebnis und zu 50 Prozent von der Zielerreichung der Abteilung ab. Der Vertrieb ist ausgenommen, weil dort das Provisionsmodell gilt.
 
 ## Gehaltsrunde
 
-Gehaltsanpassungen erfolgen einmal jährlich zum 1. April. Das Budget für die Runde beträgt für 2026 drei Prozent der Lohnsumme. Zusätzlich gibt es einen Inflationsausgleichsfonds, über den die Geschäftsführung gesondert entscheidet. Außerhalb der Runde sind Erhöhungen nur bei Beförderung oder Marktanpassung möglich und brauchen die Zustimmung der Geschäftsführung.
-
-## Zulagen
-
-Schichtzulagen, Schmutz- und Gefahrenzulagen sowie die Funktionszulage für Gefahrgutbeauftragte in Höhe von 150 Euro pro Monat werden zusätzlich zum Bandgehalt gezahlt. Die Zulagen sind nicht Bestandteil der Bänder.
-
-## Umgang mit Anfragen
-
-Anfragen zu einzelnen Gehältern werden nur durch die Personalabteilung beantwortet. Die Bänder dürfen nicht in Stellenanzeigen veröffentlicht werden, solange die Geschäftsführung dies nicht ausdrücklich beschließt.
+Die Gehaltsrunde ist jährlich zum 01. April. Anträge auf Höhergruppierung stellt die Teamleitung bis 15. Februar bei der Personalabteilung.

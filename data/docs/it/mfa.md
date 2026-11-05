@@ -2,34 +2,20 @@
 
 ## Was ist MFA
 
-Neben dem Passwort wird bei der Anmeldung ein zweiter Faktor verlangt. Bei der Elbkontor Logistik GmbH ist das ein Code aus der Authenticator-App "Elbkontor Auth" auf dem Smartphone oder ein physischer Sicherheitsschlüssel. SMS-Codes werden nicht mehr unterstützt, da sie leichter abgefangen werden können.
+Neben dem Passwort wird bei der Anmeldung ein zweiter Faktor verlangt: ein Code aus der Authenticator-App "Elbkontor Auth" oder der Sicherheitsschlüssel "Schlüssel-Token". SMS-Codes werden seit 2025 nicht mehr unterstützt. Im Büro wird der zweite Faktor nur einmal pro Tag abgefragt.
 
 ## Wo ist MFA Pflicht
 
-MFA ist Pflicht für E-Mail, VPN, das Mitarbeiterportal, die Cloud-Dienste und alle administrativen Zugänge. Im internen Netz am Arbeitsplatz wird der zweite Faktor nur einmal pro Tag abgefragt.
+E-Mail, VPN Elbtunnel, Mitarbeiterportal, Zeitanker, Kontorbuch und alle Admin-Zugänge. Handscanner im Lager sind ausgenommen (Chip und PIN).
 
 ## Einrichtung
 
-1. Installieren Sie die App aus dem App-Store Ihres Smartphones.
-2. Öffnen Sie im Browser die Seite mfa.elbkontor.example und melden Sie sich an.
-3. Scannen Sie den angezeigten QR-Code mit der App.
-4. Geben Sie den sechsstelligen Code zur Bestätigung ein.
-5. Speichern Sie die angezeigten Wiederherstellungscodes im Passwortmanager.
-
-Die Einrichtung dauert etwa fünf Minuten. Neue Beschäftigte machen sie am ersten Tag gemeinsam mit dem IT-Support.
-
-## Kein Diensthandy
-
-Wer kein Smartphone privat nutzen möchte, bekommt auf Antrag einen Sicherheitsschlüssel. Die Beantragung erfolgt über das Ticketsystem, die Lieferzeit beträgt etwa drei Arbeitstage. Der Schlüssel wird gegen Unterschrift ausgegeben. Bei Verlust ist sofort der IT-Support zu informieren, der Schlüssel wird dann gesperrt.
+Mfa.elbkontor.example öffnen, QR-Code scannen, sechsstelligen Code bestätigen und die Wiederherstellungscodes im Tresor speichern. Dauer etwa fünf Minuten; neue Beschäftigte machen das am ersten Tag im IT-Raum 1.04.
 
 ## Handy verloren oder gewechselt
 
-Beim Wechsel des Smartphones übertragen Sie die Konten vor dem Zurücksetzen des alten Geräts. Ist das alte Gerät verloren, melden Sie sich beim IT-Support unter Durchwahl 300. Nach einer Identitätsprüfung per Rückruf wird der zweite Faktor zurückgesetzt. Dies kann bis zu einer Stunde dauern. Alternativ können die gespeicherten Wiederherstellungscodes genutzt werden.
+Beim Wechsel zuerst die Konten übertragen. Ist das Gerät weg: IT-Support unter Durchwahl 300 anrufen. Nach der Identitätsprüfung per Rückruf an die in der Personalakte hinterlegte Nummer wird der zweite Faktor zurückgesetzt, das dauert bis zu einer Stunde. Außerhalb der Servicezeiten (Mo bis Fr 06:00 bis 18:00) hilft die IT-Bereitschaft nur bei P1-Fällen; sonst am nächsten Werktag. Alternativ gelten die Wiederherstellungscodes.
 
-## Ausnahmen
+## Sicherheitsschlüssel
 
-Ausnahmen von der MFA-Pflicht gibt es nicht. Dienstkonten für automatisierte Prozesse sind davon ausgenommen und werden stattdessen über Zertifikate abgesichert.
-
-## Sicherheitshinweise
-
-Bestätigen Sie niemals eine Anmeldeanfrage in der App, die Sie nicht selbst ausgelöst haben. Solche unerwarteten Push-Anfragen deuten auf einen Angriff hin und müssen dem IT-Support sofort gemeldet werden. Teilen Sie Codes nicht am Telefon, auch nicht mit Personen, die sich als IT-Mitarbeitende ausgeben. Die App ist durch Gesichtserkennung oder PIN geschützt, bitte aktivieren Sie die Bildschirmsperre auf Ihrem Smartphone.
+Wer kein privates Smartphone nutzen möchte, beantragt im Lotse einen Schlüssel-Token; Lieferzeit etwa drei Arbeitstage, Ausgabe gegen Unterschrift. Bei Verlust sofort melden, der Token wird gesperrt.

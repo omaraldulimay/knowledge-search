@@ -2,28 +2,16 @@
 
 ## Grundsatz
 
-Auf Firmengeräten darf nur freigegebene Software installiert werden. Damit schützt die IT das Unternehmen vor Schadsoftware, Lizenzverstößen und Datenschutzproblemen. Die Liste freigegebener Programme finden Sie im Softwarekatalog des Intranets.
+Auf Firmengeräten darf nur freigegebene Software laufen. Die Liste der freigegebenen Programme führt die IT im Lotse als "Whitelist". Eigenständige Installationen sind gesperrt.
 
-## Softwarekatalog
+## Ablauf
 
-Standardprogramme wie Office, PDF-Reader, Browser, Videokonferenz und Passwortmanager können Sie selbst über das Selbstbedienungsportal installieren. Die Installation erfolgt ohne Administratorrechte. Weitere Programme aus dem Katalog erfordern die Zustimmung der Führungskraft.
+Antrag im Lotse über das Formular "Software-Freigabe". Das Software-Board unter Vorsitz von Imke Ohlsen tagt alle zwei Wochen dienstags um 14:00 Uhr. Die Bearbeitung dauert in der Regel etwa 10 Arbeitstage. Geprüft werden Datenschutz (Rücksprache mit der Datenschutzbeauftragten Anneke Sandmann, Durchwahl 240), Lizenzkosten und Sicherheit.
 
-## Neue Software beantragen
+## Kosten
 
-Wird ein Programm benötigt, das nicht im Katalog steht, stellen Sie im Ticketsystem einen Antrag "Software-Freigabe". Geben Sie Zweck, Hersteller, Kosten, Anzahl der Nutzer und die Art der verarbeiteten Daten an. Die IT prüft Sicherheit und Lizenzfragen, der Datenschutzbeauftragte prüft, ob personenbezogene Daten verarbeitet werden. Die Bearbeitung dauert in der Regel zehn Arbeitstage. Bei Cloud-Diensten, die Kundendaten verarbeiten, ist zusätzlich ein Auftragsverarbeitungsvertrag erforderlich.
+Lizenzen werden der Kostenstelle des Antragstellers belastet. Kostenlose Programme brauchen trotzdem eine Freigabe. Ausnahmen für Testzwecke: maximal 14 Tage auf einer virtuellen Maschine der IT.
 
-## Kostenfreie Software und Open Source
+## Sonderfall Lager
 
-Auch kostenlose Programme müssen freigegeben werden. Für Open-Source-Bibliotheken in eigenen Entwicklungen gilt, dass die Lizenz geprüft werden muss. Lizenzen mit Copyleft-Wirkung wie die GPL sind für Software, die an Kunden ausgeliefert wird, nur nach Prüfung zulässig.
-
-## Verbotene Software
-
-Nicht erlaubt sind Filesharing-Programme, nicht freigegebene Fernwartungstools, private Cloud-Speicher-Clients und Software zum Umgehen von Sicherheitseinstellungen. Auch KI-Dienste dürfen nur genutzt werden, wenn sie freigegeben sind. Vertrauliche Daten, Kundendaten und Personendaten dürfen nie in nicht freigegebene KI-Dienste eingegeben werden.
-
-## Lizenzverwaltung
-
-Die IT führt ein Lizenzverzeichnis und prüft jährlich, ob alle installierten Programme lizenziert sind. Nicht genutzte Lizenzen werden nach sechs Monaten ohne Nutzung entzogen und anderen zugewiesen. Bei Verstößen informiert die IT die Führungskraft.
-
-## Entwicklungswerkzeuge
-
-Für die Softwareentwicklung gelten gesonderte Regeln. Entwicklerinnen und Entwickler dürfen Werkzeuge aus der Liste der geprüften Entwicklungsumgebungen mit lokalen Administratorrechten in einer virtuellen Maschine nutzen. Pakete aus öffentlichen Registern werden über den internen Proxy bezogen, der bekannte Schwachstellen blockiert. Quellcode darf nur in den Repositories des Unternehmens gespeichert werden, nicht in privaten Konten bei öffentlichen Plattformen.
+Apps auf Handscannern ändert nur die ELKO-Betreuung, Release-Termine siehe ELKO-Betrieb.

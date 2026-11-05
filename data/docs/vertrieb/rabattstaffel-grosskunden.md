@@ -3,41 +3,18 @@ policy: rabattstaffel-grosskunden
 valid_from: 2026-01-01
 superseded: false
 ---
-# Rabattstaffel für Großkunden
+# Rabattstaffel Großkunden
 
-Diese Staffel gilt für Rahmenverträge mit Großkunden der Elbkontor Logistik GmbH im Geschäftsjahr 2026. Sie ist ausschließlich für den Vertrieb bestimmt und darf Kunden nicht als Liste ausgehändigt werden.
+Gültig ab 01.01.2026, ersetzt die Fassung vom 01.07.2024 (siehe Rabattstaffel Großkunden 2024).
 
-## Definition Großkunde
+## Staffel auf den Frachtumsatz
 
-Als Großkunde gilt, wer im Vorjahr einen Frachtumsatz von mindestens 150.000 Euro netto erzielt hat oder dessen Rahmenvertrag ein Jahresvolumen von mindestens 150.000 Euro vorsieht. Neukunden können mit einer schriftlichen Volumenzusage eingestuft werden.
+Rabatt auf den Frachtumsatz pro Kalenderjahr: ab 250.000 Euro 4 Prozent, ab 500.000 Euro 7 Prozent, ab 1.000.000 Euro 10 Prozent. Die Staffel gilt rückwirkend für das ganze Jahr und wird im Kontorbuch zum Quartalsende nachberechnet. Rabatte über 10 Prozent darf nur der Vertriebsleiter Tjark Rohwedder zusagen, über 12 Prozent zusätzlich die Geschäftsführerin.
 
-## Staffel auf Frachtumsatz
+## Nicht rabattierbar
 
-| Jahresumsatz (netto) | Rabatt auf Listenpreis |
-|---|---|
-| 150.000 bis 299.999 Euro | 4 Prozent |
-| 300.000 bis 599.999 Euro | 7 Prozent |
-| 600.000 bis 999.999 Euro | 10 Prozent |
-| ab 1.000.000 Euro | 12 Prozent |
+Nicht rabattfähig sind der Gefahrgutzuschlag (18 Prozent auf die Fracht, siehe Gefahrgut-Handling), die Zollpauschale von 45 Euro je Anmeldung, der Kühlzuschlag (12 Prozent bei T1, 20 Prozent bei Pharma T2) und Maut und Treibstoffzuschlag. Ein Beispiel: 10 Prozent Rabatt auf 10.000 Euro Fracht, aber Gefahrgutzuschlag voll auf den ursprünglichen Betrag.
 
-Der Rabatt wird auf die Grundfracht gewährt. Nebenleistungen wie Maut, Treibstoffzuschlag, Gefahrgutzuschlag und Zollabfertigung sind nicht rabattfähig. Der Rabatt wird quartalsweise rückwirkend gutgeschrieben, wenn der anteilige Umsatz erreicht wurde.
+## Sonderkonditionen
 
-## Zusatzrabatte
-
-Bei einer Vertragslaufzeit von mindestens drei Jahren gibt es einen Treuebonus von einem weiteren Prozentpunkt. Bei Zahlung innerhalb von 10 Tagen werden 2 Prozent Skonto gewährt. Der Gesamtrabatt darf 14 Prozent nicht überschreiten.
-
-## Freigabegrenzen
-
-Vertriebsmitarbeitende dürfen bis zu 7 Prozent Rabatt selbst zusagen. Bis 10 Prozent entscheidet der Vertriebsleiter, Herr Henrik Tiedemann. Rabatte über 10 Prozent benötigen die Zustimmung der Geschäftsführung. Jede Abweichung von der Staffel ist im CRM mit Begründung zu dokumentieren.
-
-## Preisanpassung
-
-Die Preise werden jährlich zum 1. Januar an die Kostenentwicklung angepasst. Kunden werden bis zum 1. Oktober des Vorjahres schriftlich informiert. Der Dieselzuschlag wird monatlich auf Basis des Dieselpreisindex berechnet.
-
-## Sonderfall Gefahrgut
-
-Für Gefahrguttransporte gilt ein eigener Zuschlag von 18 Prozent auf die Grundfracht, der nicht rabattierbar ist. Details zu Gefahrgut finden Sie in der Anweisung der Logistik.
-
-## Beispielrechnung
-
-Ein Kunde mit einem Jahresumsatz von 420.000 Euro erhält 7 Prozent Rabatt auf die Grundfracht. Hat er außerdem einen Dreijahresvertrag, erhöht sich der Rabatt auf 8 Prozent. Zahlt er innerhalb von zehn Tagen, werden zusätzlich 2 Prozent Skonto abgezogen. Der Gesamtrabatt von 10 Prozent liegt damit im Bereich, den der Vertriebsleiter freigeben muss, denn Vertriebsmitarbeitende dürfen bis 7 Prozent selbst zusagen.
+Einzelne Kunden haben eigene Staffeln; sie stehen in der jeweiligen Kundenakte (zum Beispiel Nordhafen Frische) und gehen dieser Staffel vor.

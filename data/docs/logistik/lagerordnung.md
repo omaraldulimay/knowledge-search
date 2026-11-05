@@ -1,33 +1,21 @@
 # Lagerordnung
 
-## Zweck
+## Schutzausrüstung
 
-Die Lagerordnung sorgt für sichere und effiziente Abläufe im Zentrallager Hamburg-Billbrook und den Außenlagern. Sie gilt für alle, die sich in den Hallen aufhalten, auch für Besuchende und Fahrer von Fremdfirmen.
+Im Lager sind Sicherheitsschuhe der Klasse S3 und die Warnweste Pflicht, in Halle 2 zusätzlich die Kälteweste (Zone K) und in Halle 4 antistatische Schuhe. Gehörschutz ist ab Tor 9 (Crossdock) Pflicht. Die Ausgabe erfolgt gegen Chip an der Kleiderkammer in Halle 1.
 
-## Zutritt und Schutzausrüstung
+## Fahrregeln
 
-Der Zutritt zu den Hallen ist nur mit Mitarbeiterausweis oder nach Anmeldung am Pförtnerhaus möglich. In allen Hallenbereichen sind Sicherheitsschuhe der Klasse S3 und Warnweste Pflicht. Im Hochregallager ist zusätzlich ein Schutzhelm zu tragen. Besucher werden begleitet.
+In den Hallen gilt Höchstgeschwindigkeit 6 km/h für Stapler, auf dem Hof 10 km/h. Zwischen Tor 5 und Tor 8 gilt bei laufendem Rampenbetrieb Fahrverbot für Flurförderzeuge in der Zeit von 04:00 bis 06:00 Uhr, weil dort Nordhafen Frische und Seeger Pharma beliefert werden. Staplerfahren darf nur mit Staplerschein (Stufe 1 bis 3), der Nachweis hängt am Chip.
 
-## Verkehrswege
+## Lagerplätze
 
-In den Hallen gilt eine Höchstgeschwindigkeit von 6 km/h für Flurförderzeuge. Fußgängerwege sind grün markiert und dürfen nicht zugestellt werden. An Kreuzungen gilt Vorfahrt für beladene Fahrzeuge. Gabelstapler dürfen nur von Personen mit gültigem Staplerschein und schriftlicher Beauftragung gefahren werden. Der Schein muss alle zwölf Monate durch eine Unterweisung bestätigt werden.
+Lagerplätze haben die Form H2-K-14-03 (Halle, Zone, Gang, Fach). Palettenhöhe maximal 1,80 Meter in Halle 1, 1,60 Meter in Halle 2. Fluchtwege und Brandschutztüren müssen frei bleiben.
 
-## Wareneingang
+## Regalprüfung
 
-Lieferungen werden an den Rampen 1 bis 8 angenommen, Anmeldung bis 24 Stunden vorher über das Zeitfenstersystem. Bei der Annahme wird die Sendung auf Vollständigkeit, Beschädigung und Anzahl der Packstücke geprüft und im Lagerverwaltungssystem gebucht. Sichtbare Schäden werden auf dem Lieferschein vermerkt und fotografiert.
+Die Regale werden einmal jährlich im Mai von einem externen Prüfer geprüft. Beschädigte Regale meldet man im ELKO mit dem Sperrgrund S2 und sperrt das Fach mit gelbem Band. Schäden über 10 Prozent Verformung führen zu sofortiger Sperrung.
 
-## Lagerung und Ordnung
+## Sauberkeit
 
-Paletten werden nur bis zu einer Stapelhöhe von 4 Metern im Blocklager gestapelt. Die Tragfähigkeit der Regale ist am Regal angeschrieben und darf nicht überschritten werden. Die Regalprüfung führt eine befähigte Person jährlich durch, zusätzlich sieht der Regalschaden-Meldeprozess eine sofortige Sperrung bei Anfahrschäden vor. Am Ende jeder Schicht müssen Gänge aufgeräumt und Leergut sortiert sein.
-
-## Inventur
-
-Eine Stichtagsinventur findet jährlich im Dezember statt. Zusätzlich wird unterjährig eine permanente Inventur nach Zählplan durchgeführt. Abweichungen über 0,5 Prozent des Wertes werden untersucht und an die Lagerleitung gemeldet.
-
-## Rauchen und offenes Feuer
-
-In allen Hallen herrscht absolutes Rauchverbot. Raucherplätze befinden sich im Freien an gekennzeichneten Stellen. Heißarbeiten wie Schweißen benötigen eine schriftliche Erlaubnis der Fachkraft für Arbeitssicherheit.
-
-## Meldepflichten
-
-Beinaheunfälle, Regalschäden, auslaufende Flüssigkeiten und defekte Flurförderzeuge werden unverzüglich der Schichtleitung gemeldet. Die Schichtleitung dokumentiert den Vorfall im Sicherheitsbuch und sperrt betroffene Bereiche. Gefahrstoffe, die nicht eindeutig gekennzeichnet sind, dürfen nicht bewegt werden. Verstöße gegen die Lagerordnung werden von der Lagerleitung mit einem Gespräch und im Wiederholungsfall mit einer Abmahnung geahndet.
+Am Schichtende wird die Rampe gefegt; der Schichtleiter quittiert dies im Schichtprotokoll.
