@@ -15,7 +15,7 @@ import yaml
 
 from ks.auth import get_user
 from ks.cache import SemanticCache
-from ks.config import ABLATION, BASELINE_AGENTIC, Config
+from ks.config import ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC, Config
 from ks.eval import QUESTION_SETS, ROOT, _correct, _leaks, load_questions
 from ks.llm import LLM
 from ks.pipeline import answer
@@ -142,6 +142,19 @@ def run_config(
                 raise RuntimeError(f"budget exceeded: ${budget['spent']:.4f} > ${budget['limit']}")
     out = metrics(rows, facts)
     out["config"], out["mode"] = cfg.name, cfg.mode
+    out["answers"] = [  # kept in a side file (see run_ablation), not in the summary rows
+        {
+            "id": r["id"], "question": r["question"], "user": r["user"], "type": r["type"],
+            "route": r["result"].route or r["result"].mode, "answer": r["result"].answer,
+            "citations": [c.doc_id for c in r["result"].citations],
+            "correct": _correct(r), "covered": _covered(r) if r["expected_doc_ids"] else None,
+            "facts_ok": facts_ok(r["result"].answer, facts[r["id"]]) if r["id"] in facts else None,
+            "cost": r["result"].cost, "latency_ms": r["result"].latency_ms,
+            "ttft_ms": r["result"].ttft_ms, "cached": r["result"].cached,
+            "repeat_of": r.get("repeat_of"),
+        }
+        for r in rows
+    ]  # fmt: skip
     if cache:
         repeats = [r for r in rows if r["repeat_of"]]
         originals = [r for r in rows if not r["repeat_of"]]
@@ -167,16 +180,23 @@ def run_ablation(
     sets: list[str] | None = None, out: Path = OPTIMIZATION_JSON, budget: dict | None = None,
 ) -> dict:  # fmt: skip
     """Run configs x sets and merge the rows into eval/optimization.json (keyed by llm)."""
-    configs = configs or [*ABLATION, BASELINE_AGENTIC]
+    configs = configs or [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC]
     facts = load_facts()
     report = (
         json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"rows": [], "ledger": []}
+    )
+    answers_file = out.with_name("optimization_answers.json")
+    answer_store = (
+        json.loads(answers_file.read_text(encoding="utf-8")) if answers_file.exists() else {}
     )
     for name in sets or list(QUESTION_SETS):
         questions = load_questions(QUESTION_SETS[name])
         for cfg in configs:
             started = time.perf_counter()
             row = run_config(cfg, questions, searcher, llm, facts, budget)
+            answers = row.pop("answers")
+            if llm.model != "fake":  # real answers are kept for inspection and for the demo
+                answer_store.setdefault(llm.model, {}).setdefault(name, {})[cfg.name] = answers
             row |= {
                 "set": name,
                 "llm": llm.model,
@@ -193,12 +213,15 @@ def run_ablation(
     report["generated"] = date.today().isoformat()
     report["embedder"] = searcher.embedder.name
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    answers_file.write_text(
+        json.dumps(answer_store, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
     return report
 
 
 def format_markdown(report: dict, llm: str) -> str:
     """One markdown table per question set (rows = configurations) for the README."""
-    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC]]
+    names = [c.name for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC]]
     head = (
         "| Configuration | hit@5 | both docs | citation | fact | leaks | p50 / p95 | TTFT p50 "
         "| tokens in / out | $ / question | $ / 1,000 |\n"

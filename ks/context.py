@@ -11,13 +11,12 @@ from collections.abc import Iterable
 from ks.ingest import Chunk
 from ks.llm import KEY_RE
 from ks.search import Hit, HybridSearcher
-from ks.text import tokenize
+from ks.text import split_sentences, tokenize
 
 MAX_SENTENCES = 2  # sentences kept per section
 MAX_CHARS = 350  # characters kept per section
 MAX_SECTIONS = 5  # sections in one prompt
 SURE_RANKS = 3  # the best hits are kept even if no word matches (paraphrased questions)
-SENTENCE_SPLIT = re.compile(r"(?<=[^\W\d][.!?])\s+(?=[A-ZÄÖÜ\"])|\n+")
 SENTENCE_FLOOR = {"fastembed": 0.45, "hash": 0.1}  # weak sections below this are dropped
 WORD_BONUS = 0.1  # score added per question word found in a sentence
 
@@ -25,11 +24,6 @@ WORD_BONUS = 0.1  # score added per question word found in a sentence
 def label(chunk: Chunk) -> str:
     """Long citation label [doc_id#Abschnitt] as used in the answers and the UI."""
     return f"{chunk.doc_id}#{chunk.heading}"
-
-
-def split_sentences(text: str) -> list[str]:
-    """Sentences and list/table lines. "31. März" does not end a sentence (digit before the dot)."""
-    return [s.strip() for s in SENTENCE_SPLIT.split(text) if len(s.strip()) > 2]
 
 
 class Scorer:

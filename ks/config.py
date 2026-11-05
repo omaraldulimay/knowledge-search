@@ -26,3 +26,4 @@ CACHED = replace(AUTO, name="+cache", cache=True)
 
 ABLATION = [BASELINE, COMPRESSION, GLOSSARY, GRAPH, AUTO, CACHED]
 BASELINE_AGENTIC = replace(BASELINE, name="baseline (agentic)", mode="agentic")
+LEAN_AGENTIC = replace(AUTO, name="agentic, all levers", mode="agentic")  # lean agent on its own

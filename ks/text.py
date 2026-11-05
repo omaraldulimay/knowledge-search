@@ -29,3 +29,11 @@ def tokenize(text: str) -> list[str]:
         if len(stem) >= 10:
             tokens.append(stem[:7])
     return tokens
+
+
+SENTENCE_SPLIT = re.compile(r"(?<=[^\W\d][.!?])\s+(?=[A-ZÄÖÜ\"])|\n+")
+
+
+def split_sentences(text: str) -> list[str]:
+    """Sentences and list/table lines. "31. März" does not end a sentence (digit before the dot)."""
+    return [s.strip() for s in SENTENCE_SPLIT.split(text) if len(s.strip()) > 2]

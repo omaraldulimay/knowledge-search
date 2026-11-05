@@ -34,14 +34,14 @@ def open_searcher(index_dir: Path, docs_dir: Path) -> tuple[HybridSearcher, str]
         try:
             name = MemoryStore.saved_embedder_name(index_dir)
             store = MemoryStore.load(index_dir)
-            return build_searcher(store, get_embedder(name), index_dir), name
+            return build_searcher(store, get_embedder(name), index_dir, warm=True), name
         except Exception:  # model not downloadable offline etc.: fall through to hash
             pass
     embedder = HashEmbedder()
     chunks = chunk_documents(load_documents(docs_dir))
     store = MemoryStore()
     store.add(chunks, embedder.embed([embedding_text(c) for c in chunks]))
-    return build_searcher(store, embedder), embedder.name
+    return build_searcher(store, embedder, warm=True), embedder.name
 
 
 def _leaks(row: dict) -> bool:

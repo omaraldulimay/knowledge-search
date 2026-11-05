@@ -15,13 +15,15 @@ from ks.glossary import Glossary
 from ks.ingest import Chunk, embedding_text
 from ks.links import LinkIndex, build_links
 from ks.store import VectorStore
-from ks.text import STOPWORDS, UMLAUTS, tokenize  # noqa: F401  (re-exported)
+from ks.text import STOPWORDS, UMLAUTS, split_sentences, tokenize  # noqa: F401  (re-exported)
 
 SUPERSEDED_PENALTY = 0.5  # score factor for outdated chunks whose newer version was not found
 RRF_K = 60  # standard constant from the RRF paper; dampens the influence of top ranks
 # graph expansion: look at the documents of the top GRAPH_SEEDS hits, follow links of at least
 # GRAPH_MIN_WEIGHT, add at most GRAPH_MAX linked documents, and only if their best chunk is
 # similar enough to the question (cosine, per embedder).
+WARM_MAX_CHUNKS = 3000  # up to this size all sentence vectors are prepared up front
+SENTENCES_FILE = "sentences.npz"  # sentence vectors, written next to the index at ingest time
 GRAPH_SEEDS = 3
 GRAPH_MIN_WEIGHT = 0.5
 GRAPH_MAX = 2
@@ -79,6 +81,22 @@ class HybridSearcher:
         self._bm25_cache: dict[tuple[frozenset[str], int], tuple[BM25Okapi, list[Chunk]]] = {}
         self._query_vectors: dict[str, np.ndarray] = {}  # embedding memo for repeated questions
 
+    def warm(self, chunks: list[Chunk], directory: Path | None = None, save: bool = False) -> None:
+        """Embed every sentence once, up front (context compression scores sentences by meaning,
+        which is slow when done cold). Vectors saved at index time are loaded from `directory`."""
+        sentences = list(
+            dict.fromkeys(s for c in chunks for s in [c.heading, *split_sentences(c.text)])
+        )
+        if directory and (directory / SENTENCES_FILE).exists():
+            saved = np.load(directory / SENTENCES_FILE, allow_pickle=False)
+            self._query_vectors.update(zip(saved["texts"].tolist(), saved["vectors"], strict=True))
+        missing = [s for s in sentences if s not in self._query_vectors]
+        for i in range(0, len(missing), 128):
+            self.embed_texts(missing[i : i + 128])
+        if save and directory and (missing or not (directory / SENTENCES_FILE).exists()):
+            vectors = np.stack([self._query_vectors[s] for s in sentences])
+            np.savez(directory / SENTENCES_FILE, texts=np.array(sentences), vectors=vectors)
+
     def embed_query(self, query: str) -> np.ndarray:
         return self.embed_texts([query])[0]
 
@@ -86,7 +104,7 @@ class HybridSearcher:
         """Embeddings with a memo: repeated questions and sentences are not embedded twice."""
         todo = [t for t in dict.fromkeys(texts) if t not in self._query_vectors]
         if todo:
-            if len(self._query_vectors) > 4096:
+            if len(self._query_vectors) > 20000:
                 self._query_vectors.clear()
             for text, vec in zip(todo, self.embedder.embed(todo), strict=True):
                 self._query_vectors[text] = vec
@@ -174,8 +192,9 @@ class HybridSearcher:
 
 
 def build_searcher(
-    store: VectorStore, embedder: Embedder, index_dir: Path | None = None, save: bool = False
-) -> HybridSearcher:
+    store: VectorStore, embedder: Embedder, index_dir: Path | None = None, save: bool = False,
+    warm: bool = False,
+) -> HybridSearcher:  # fmt: skip
     """Searcher with glossary and link index. The saved links.json is reused if it describes
     exactly the documents in the store, otherwise the links are rebuilt (and saved if asked)."""
     chunks = store.get_chunks(DEPARTMENTS)  # the link index covers all departments
@@ -185,4 +204,7 @@ def build_searcher(
         links = build_links(chunks)
         if save and index_dir:
             links.save(index_dir)
-    return HybridSearcher(store, embedder, Glossary.load(), links)
+    searcher = HybridSearcher(store, embedder, Glossary.load(), links)
+    if warm and len(chunks) <= WARM_MAX_CHUNKS:  # small corpus: sentence vectors for all of it
+        searcher.warm(chunks, index_dir, save)
+    return searcher

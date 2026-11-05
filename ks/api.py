@@ -167,7 +167,7 @@ def build_state(
     if not secret:
         log.warning("APP_SECRET is not set - using an insecure development secret")
     return AppState(
-        store=store, embedder=embedder, searcher=build_searcher(store, embedder),
+        store=store, embedder=embedder, searcher=build_searcher(store, embedder, warm=True),
         llm=llm or get_llm(), docs_dir=docs_dir, index_dir=index_dir, manifest=manifest,
         log=RequestLog(os.environ.get("KS_METRICS_DB", ":memory:")),
         secret=secret or DEV_SECRET, lock=threading.Lock(), cfg=cfg, cache=SemanticCache(),

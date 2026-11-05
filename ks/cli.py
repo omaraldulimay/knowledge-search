@@ -44,7 +44,9 @@ def cmd_index(args: argparse.Namespace) -> None:
     if args.store == "memory":
         store.save(index_dir, embedder.name)
         save_manifest(index_dir, manifest)
-        build_searcher(store, embedder, index_dir, save=True)  # also writes links.json
+        build_searcher(
+            store, embedder, index_dir, save=True, warm=True
+        )  # links.json, sentences.npz
     print(
         f"Index '{embedder.name}' ({args.store}): {stats.added} new, {stats.changed} changed, "
         f"{stats.removed} removed, {stats.unchanged} unchanged documents; "
@@ -139,7 +141,7 @@ def cmd_seed_glossary(args: argparse.Namespace) -> None:
 
 
 def cmd_optimize(args: argparse.Namespace) -> None:
-    from ks.config import ABLATION, BASELINE_AGENTIC
+    from ks.config import ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC
     from ks.eval import open_searcher
     from ks.llm import get_llm
     from ks.optimize import run_ablation
@@ -147,7 +149,9 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     searcher, _ = open_searcher(Path(args.index_dir), Path(args.docs))
     llm = get_llm("anthropic" if args.real else "fake")
     wanted = args.configs.split(",") if args.configs else None
-    configs = [c for c in [*ABLATION, BASELINE_AGENTIC] if wanted is None or c.name in wanted]
+    configs = [
+        c for c in [*ABLATION, BASELINE_AGENTIC, LEAN_AGENTIC] if wanted is None or c.name in wanted
+    ]
     sets = args.sets.split(",")
     budget = {"spent": 0.0, "limit": args.budget} if args.real else None
     report = run_ablation(searcher, llm, configs, sets, Path(args.out), budget)
