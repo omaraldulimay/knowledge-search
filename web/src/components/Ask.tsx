@@ -24,6 +24,7 @@ const ROUTE_LABEL: Record<string, string> = {
 
 function stepLabel(s: Step): string {
   if (s.tool === "router") return "Router entscheidet";
+  if (s.tool === "rewrite") return `Suche neu formuliert: „${String(s.args.query ?? "")}“`;
   if (s.tool === "cache") return "Antwort aus dem Cache";
   if (s.tool === "search") return `Suche „${String(s.args.query ?? "")}“`;
   if (s.tool === "read_document") return `Dokument gelesen: ${String(s.args.doc_id ?? "")}`;
@@ -175,7 +176,7 @@ export default function Ask({ session, devParams }: { session: Session; devParam
               id="q"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="z. B. Wie viel Urlaub habe ich?"
+              placeholder="z. B. Was bedeutet K3 in ELKO?"
               maxLength={1000}
               autoComplete="off"
             />

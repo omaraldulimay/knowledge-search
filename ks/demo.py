@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 
 from ks.auth import USERS, User, allowed_departments
-from ks.config import AUTO, Config
+from ks.config import SERVING, Config
 from ks.eval import RESULTS, load_questions
 from ks.llm import LLM
 from ks.optimize import OPTIMIZATION_JSON
@@ -28,11 +28,13 @@ MIN_QUESTIONS = 6
 
 # Extra questions per department, used when a user has too few eval questions.
 EXAMPLES = {
-    "hr": ["Wie beantrage ich Elternzeit?"],
-    "it": ["Wie richte ich den VPN-Zugang ein?"],
-    "vertrieb": ["Wie wird die Provision ausgezahlt?"],
-    "logistik": ["Welche Schutzausrüstung ist im Lager Pflicht?"],
-    "alle": ["Wie läuft die Evakuierung im Brandfall ab?"],
+    "hr": ["Wann muss ich die Elternzeit anmelden und welches Formular brauche ich?"],
+    "it": ["Was passiert, wenn die IT-Bereitschaft nach 10 Minuten nicht abnimmt?"],
+    "vertrieb": [
+        "Bis wann ist Annahmeschluss für Nordhafen Frische und was kostet ein Eilauftrag?"
+    ],
+    "logistik": ["Wer gibt meinen Urlaub frei, wenn mein Teamleiter in Halle 2 krank ist?"],
+    "alle": ["Wo bekomme ich am ersten Tag meinen Chip und meinen Laptop?"],
 }
 
 
@@ -57,7 +59,7 @@ def candidates(login: str, kind: str, eval_questions: list[dict]) -> list[dict]:
 
 
 # Which row of the ablation (eval/optimization.json) holds the answers of each demo mode.
-MODE_CONFIG = {"auto": "+router (auto)", "classic": "+graph", "agentic": "agentic (all levers)"}
+MODE_CONFIG = {"auto": "final + rewrite", "classic": "baseline", "agentic": "baseline (agentic)"}
 ANSWERS_JSON = OPTIMIZATION_JSON.with_name("optimization_answers.json")
 
 
@@ -77,7 +79,7 @@ def eval_cache(llm: LLM) -> dict:
 
 def ask_all(
     q: dict, user: User, searcher: HybridSearcher, llm: LLM, cache: dict | None = None,
-    cfg: Config = AUTO,
+    cfg: Config = SERVING,
 ) -> dict:  # fmt: skip
     cached = (cache or {}).get((user.login, q["question"]), {})
     results = {
@@ -118,7 +120,7 @@ def _live_metrics(rows: list[tuple[str, dict]]) -> dict:
 
 
 def build_demo(
-    searcher: HybridSearcher, llm: LLM, eval_questions: list[dict], cfg: Config = AUTO
+    searcher: HybridSearcher, llm: LLM, eval_questions: list[dict], cfg: Config = SERVING
 ) -> dict:
     users, questions, documents, contents = [], {}, {}, {}
     rows: list[tuple[str, dict]] = []

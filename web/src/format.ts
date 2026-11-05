@@ -19,25 +19,28 @@ export const fmtCost = (usd: number) => `$${de(usd, usd < 0.01 ? 4 : 3)}`;
 
 /** Questions to try, per department of the logged-in user. */
 export const EXAMPLES: Record<string, string[]> = {
-  alle: ["Wie beantrage ich Urlaub?", "Wie läuft die Evakuierung im Brandfall ab?"],
+  alle: [
+    "Wer gibt meinen Urlaub frei, wenn mein Teamleiter in Halle 2 krank ist?",
+    "Wo ist bei Feueralarm der Sammelplatz?",
+  ],
   hr: [
-    "Wie hoch ist der Arbeitgeberzuschuss zur Altersvorsorge?",
-    "Welche Kündigungsfrist gilt in der Probezeit?",
-    "Wie hoch ist das jährliche Bildungsbudget?",
+    "Wie viel Prozent legt die Firma bei der bAV obendrauf?",
+    "Wer gibt eine Weiterbildung für 800 Euro aus dem Lerntopf frei?",
+    "Wie viele Feedbackgespräche gibt es in der Probezeit?",
   ],
   it: [
-    "Wie lang muss ein Passwort mindestens sein?",
-    "Wie schnell reagiert der IT-Support auf eine kritische Störung?",
-    "Wie oft werden Backups gemacht?",
+    "Welche Durchwahl hat die IT-Bereitschaft am Wochenende?",
+    "Wie viele Stunden darf die Wiederherstellung von ELKO höchstens dauern?",
+    "Wie viele Zeichen muss mein Passwort haben?",
   ],
   vertrieb: [
-    "Wie wird die Provision ausgezahlt?",
-    "Welche Pflichtfelder muss ich im CRM ausfüllen?",
+    "Welche Vertragsstrafe droht bei Nordhafen Frische bei zu später Meldung?",
+    "Ab welcher Marge muss der Vertriebsleiter ein Angebot freigeben?",
   ],
   logistik: [
-    "Was wird bei der täglichen Abfahrtskontrolle geprüft?",
-    "Welche Fristen gelten für die Meldung eines Transportschadens?",
-    "Welche Schutzausrüstung ist im Lager Pflicht?",
+    "Was bedeutet K3 in ELKO?",
+    "Warum wurde 2025 auf Schichtmodell B umgestellt?",
+    "Was tun, wenn bei Nordhafen Frische an Tor 7 die Kühlkette unterbrochen ist?",
   ],
 };
 
